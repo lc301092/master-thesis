@@ -12,33 +12,36 @@ router.get('/led', function (req, res, next) {
 
 		// you might want to check the found address with the address of your
 		// bluetooth enabled Arduino device here.
-		console.log('>>> found device with address +' + address + ' and name: ' + name + ' <<<');
-		btSerial.findSerialPortChannel(address, function (channel) {
-			btSerial.connect(address, channel, function () {
-				console.log('connected');
-				process.stdin.resume();
-				process.stdin.setEncoding('utf8');
-				console.log('Press "1" or "0" and "ENTER" to turn on or off the light.')
+		if (name.toLowerCase().includes('hc')){
+			console.log('>>> found device with address +' + address + ' and name: ' + name + ' <<<');
 
-				process.stdin.on('data', function (data) {
-					btSerial.write(Buffer.from('data', 'utf-8'), function (err, bytesWritten) {
-						console.log('bytes: ' + bytesWritten);
-						if (err) console.log(err);
+			btSerial.findSerialPortChannel(address, function (channel) {
+				btSerial.connect(address, channel, function () {
+					console.log('connected');
+					process.stdin.resume();
+					process.stdin.setEncoding('utf8');
+					console.log('Press "1" or "0" and "ENTER" to turn on or off the light.')
+					
+					process.stdin.on('data', function (data) {
+						btSerial.write(Buffer.from('data', 'utf-8'), function (err, bytesWritten) {
+							console.log('bytes: ' + bytesWritten);
+							if (err) console.log(err);
+						});
 					});
+					
+					btSerial.on('data', function (buffer) {
+						console.log(buffer.toString('utf-8'));
+					});
+					
+					btSerial.on('finish', function () {
+						console.log('finished triggered');
+					});
+					
+				}, function () {
+					console.log('cannot connect');
 				});
-
-				btSerial.on('data', function (buffer) {
-					console.log(buffer.toString('utf-8'));
-				});
-
-				btSerial.on('finish', function () {
-					console.log('finished triggered');
-				});
-
-			}, function () {
-				console.log('cannot connect');
 			});
-		});
+		} 
 	});
 
 	btSerial.inquire();
