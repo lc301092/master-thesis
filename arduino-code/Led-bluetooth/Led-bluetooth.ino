@@ -1,3 +1,7 @@
+#include <SoftwareSerial.h>
+
+SoftwareSerial BTserial(10, 11); // Setup of Bluetooth module on pins 10 (TXD) and 11 (RXD);
+
 unsigned int timeout=0;
 unsigned char state=0;
  
@@ -26,8 +30,8 @@ void init_timer2(void) {
 
 // sets up the program
 void setup() {
-  // open the serial port
-  Serial.begin(9600);
+  BTserial.begin(9600); // Bluetooth at baud 9600 for talking to the node server
+  Serial.begin(4800); // Default Serial on Baud 4800 for printing out some messages in the Serial Monitor
   
   
 
@@ -45,16 +49,14 @@ void setup() {
 // function for controlling the led
 void control(void) {
   //Serial.println("control check");
-  if (Serial.available()) {               // if data is available to read
-    val = Serial.read();                  // read it and store it in 'val'
+  if (BTserial.available()) {               // if data is available to read
+    val = BTserial.read();                  // read it and store it in 'val'
     Serial.println(val);
   }
 
   if (val == '1') {                       // if '1' was received
-    Serial.println('1');                  // display the new value
     digitalWrite(ledpin, HIGH);           // turn ON the LED
   } else if (val == '0') { 
-    Serial.println('0');                  // display the new value
     digitalWrite(ledpin, LOW);            // otherwise turn it OFF
   } else if (val == 's') {                // if 's' is received display the current status of the led
     if (digitalRead(ledpin) == HIGH) {
