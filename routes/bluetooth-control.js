@@ -23,7 +23,7 @@ router.get('/led', function (req, res, next) {
 					console.log('Press "1" or "0" and "ENTER" to turn on or off the light.')
 					
 					process.stdin.on('data', function (data) {
-						btSerial.write(Buffer.from('data', 'utf-8'), function (err, bytesWritten) {
+						btSerial.write(Buffer.from(data, 'utf-8'), function (err, bytesWritten) {
 							console.log('bytes: ' + bytesWritten);
 							if (err) console.log(err);
 						});
