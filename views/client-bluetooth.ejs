@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title><%= title %></title>
+	<link rel='stylesheet' href='/stylesheets/style.css' />
+	<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+	<script>
+		async function postData(url = '', data = {}) {
+			// Default options are marked with *
+			const response = await fetch(url, {
+				method: 'POST', // *GET, POST, PUT, DELETE, etc.
+				mode: 'cors', // no-cors, *cors, same-origin
+				cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+				credentials: 'same-origin', // include, *same-origin, omit
+				headers: {
+					'Content-Type': 'application/json'
+					// 'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				redirect: 'follow', // manual, *follow, error
+				referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+				body: JSON.stringify(data) // body data type must match "Content-Type" header
+			});
+			return response.json(); // parses JSON response into native JavaScript objects
+		}
+
+	</script>
+
+	<script>
+		$(function() {
+			$('#bt_start').on('click', function() {
+				let startBtn = $(this).prop('disabled', true);
+				console.log('attempting to connect to bluetooth');
+				postData('led', {
+						command: 'start connection'
+					})
+					.then(data => {
+						console.log(data); // JSON data parsed by `data.json()` call
+						if (!data.connected) {
+							alert('try again');
+							startBtn.prop('disabled', false);
+							return;
+						};
+						$('#bt_actions').css('display', 'block');
+					});
+			});
+		});
+
+	</script>
+
+</head>
+
+<body>
+	<h1><%= title %></h1>
+	<p>Welcome to <%= title %></p>
+
+	<button id="bt_start" type="button">start</button>
+
+	<div id="bt_actions" hidden="hidden">
+		Put in 1 to turn on the led or 0 to turn off the led
+		<br>
+		<input id="action_value" type="number" min="0" max="1">
+		<input id="action_submit" type="submit" onclick="postData('led',{ledValue: $('#action_value').val()} )">
+	</div>
+
+</body>
+
+</html>
