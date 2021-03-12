@@ -7,6 +7,7 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
 	<script>
 		async function postData(url = '', data = {}) {
+			console.log('benjamin');
 			// Default options are marked with *
 			const response = await fetch(url, {
 				method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -28,21 +29,21 @@
 
 	<script>
 		$(function() {
-			$('#bt_start').on('click', function() {
+			$('#bt_start').on('click', async function() {
+
 				let startBtn = $(this).prop('disabled', true);
+
 				console.log('attempting to connect to bluetooth');
-				postData('led', {
-						command: 'start connection'
-					})
-					.then(data => {
-						console.log(data); // JSON data parsed by `data.json()` call
-						if (!data.connected) {
-							alert('try again');
-							startBtn.prop('disabled', false);
-							return;
-						};
-						$('#bt_actions').css('display', 'block');
-					});
+
+				const data = await postData('led', {
+					command: 'start connection'
+				});
+				console.log(data); // JSON data parsed by `data.json()` call
+				if (data.connected) $('#bt_actions').css('display', 'block');
+				else {
+					alert('try again');
+					startBtn.prop('disabled', false);
+				}
 			});
 		});
 
