@@ -28,10 +28,12 @@ router.get('/led', function (req, res, next) {
 							if (err) console.log(err);
 						});
 					});
-					
+
+					// det her er eventet, der fanger data og printer den i node konsollen
 					btSerial.on('data', function (buffer) {
 						console.log(buffer.toString('utf-8'));
 					});
+					
 					
 					btSerial.on('finish', function () {
 						console.log('finished triggered');

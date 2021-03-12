@@ -7,6 +7,7 @@ unsigned char state=0;
  
 char val;         // variable to receive data from the serial port
 int ledpin = 13;  // LED connected to pin 13
+int potentiometer_measurement = A0;   //potentiometer connected to A0
 
 // Timer2 service
 ISR(TIMER2_OVF_vect) { 
@@ -58,18 +59,28 @@ void control(void) {
     digitalWrite(ledpin, HIGH);           // turn ON the LED
   } else if (val == '0') { 
     digitalWrite(ledpin, LOW);            // otherwise turn it OFF
-  } else if (val == 's') {                // if 's' is received display the current status of the led
-    if (digitalRead(ledpin) == HIGH) {
-      Serial.println('1');
-    } else {
-      Serial.println('0');
-    } 
   }
   
   val = ' ';
     
   delay(100);                             // wait 100ms for next reading
 }
+
+
+// function for controlling the potentiometer value
+void potentiometer_control(void) {
+  int sensorvalue = analogRead(potentiometer_measurement);
+  //Serial.println("control check");
+  if (BTserial.available()) {               // if data is available to read
+    BTserial.print(sensorvalue);     // read it and store it in 'val'
+    Serial.println(sensorvalue);
+  }  
+  sensorvalue = ' ';
+  delay(100);                             // wait 100ms for next reading
+}
+
+
+
 
 // control loop for the program
 void loop() {
@@ -81,8 +92,11 @@ void loop() {
     case 1:
       // when there is a bt connection enter the control function
       control(); 
+      potentiometer_control();
       break;
   }
+ 
+  //Serial.println(sensorvalue);
 }
  
 void cleantime() {
