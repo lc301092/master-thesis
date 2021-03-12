@@ -16,27 +16,7 @@
 <body>
 
 	<script type="text/javascript">
-		const config = {
-			type: Phaser.AUTO,
-			width: 1600,
-			height: 1200,
-			physics: {
-				default: 'arcade',
-				arcade: {
-					gravity: {
-						y: 0
-					},
-					debug: false
-				}
-			},
-			scene: {
-				preload: preload,
-				create: create,
-				update: update
-			}
-		};
-
-		const game = new Phaser.Game(config);
+		
 		let cursors;
 		let scene;
 		let player;
@@ -57,14 +37,15 @@
 
 		function preload() {
 			this.load.image('map', 'assets/map2.png');
-			this.load.spritesheet('dude', 'assets/dude.png', {
-				frameWidth: 32,
-				frameHeight: 48
+			this.load.spritesheet('player', 'assets/playable_charaters.png', {
+				frameWidth: 48,
+				frameHeight: 64
 			});
 			this.load.spritesheet('portal', 'assets/portal.png', {
 				frameWidth: 250,
 				frameHeight: 592
 			});
+			
 		}
 
 		// ### create ### 
@@ -76,7 +57,7 @@
 			scene.physics.world.setBounds(0, 0, 1920 * 2, 1080 * 2);
 
 			let map = scene.add.image(0, 0, 'map').setOrigin(0);
-			scene.player = scene.physics.add.sprite(400, 300, 'dude');
+			scene.player = scene.physics.add.sprite(400, 300, 'player');
 			player = scene.player;
 			playerAnimation = scene.player.anims;
 
@@ -87,12 +68,15 @@
 			animationSetup(scene);
 
 
-			let portals = scene.physics.add.staticGroup();
+			//let portals = scene.physics.add.staticGroup()
 			//let portal = scene.add.sprite(780, 820, 'portal').play('idle').setScale(0.25);
-			let portal = portals.create(780, 820, 'portal').play('idle').setScale(0.25);
-			portal.setCollideWorldBounds(true);
+			//let portal = portals.create(780, 820, 'portal').play('idle').setScale(0.25);
+			let portal2 = this.physics.add.staticSprite(200,200,'portal').play('idle').setScale(0.25).refreshBody();
 
-			this.physics.add.collider(player, portals, null, null, this);
+	
+
+			portal2.setCollideWorldBounds(true);
+			this.physics.add.collider(player, portal2, null, null, this);
 
 			keys = scene.input.keyboard.addKeys({
 				up: 'W',
@@ -104,45 +88,58 @@
 			});
 			//keys.interact.emitOnRepeat = true;
 
-
+	
 		}
 
 		function update() {
 
 			playerControl();
 
+		
 		}
 
 		function playerControl() {
 
 			// this will be the velocity when no keys are pressed
 			player.setVelocity(0, 0);
-
-
+			
+			
+			
 			if (keys.up.isDown) {
 				player.setVelocityY(-150);
+				playerAnimation.play('up', true);
 			} else if (keys.down.isDown) {
 				player.setVelocityY(150);
+				playerAnimation.play('down', true);
 			}
-
-			if (keys.left.isDown) {
+			
+			else if (keys.left.isDown) {
 				player.setVelocityX(-150);
 				playerAnimation.play('left', true);
-
-			} else if (keys.right.isDown) {
+				
+			} 
+			else if (keys.right.isDown) {
+				
 				player.setVelocityX(150);
+				console.log(player);
 				playerAnimation.play('right', true);
-			} else {
-				playerAnimation.play('turn', true);
-
 			}
-
-			if (singlePress(keys.interact)) console.log(keys.interact);;
-
-
-
+			else {
+				playerAnimation.play('turn', true);
+			} 
+			
+			if (singlePress(keys.interact)){
+				console.log(player);
+				//console.log(keys.interact);
+				//checkColliders()
+			} 
+			//if(player.velocity == 0) 
+			
 		}
+		
 
+
+//#region animation
 		function animationSetup(scene) {
 			scene.anims.create({
 				key: 'idle',
@@ -156,34 +153,71 @@
 
 			scene.anims.create({
 				key: 'left',
-				frames: scene.anims.generateFrameNumbers('dude', {
-					start: 0,
-					end: 3
+				frames: scene.anims.generateFrameNumbers('player', {
+					start: 15,
+					end: 17
 				}),
 				frameRate: 10,
 				repeat: -1
-			});
-
-			scene.anims.create({
-				key: 'turn',
-				frames: [{
-					key: 'dude',
-					frame: 4
-				}],
-				frameRate: 20
 			});
 
 			scene.anims.create({
 				key: 'right',
-				frames: scene.anims.generateFrameNumbers('dude', {
-					start: 5,
-					end: 8
+				frames: scene.anims.generateFrameNumbers('player', {
+					start: 27,
+					end: 29
 				}),
 				frameRate: 10,
 				repeat: -1
 			});
+			scene.anims.create({
+				key: 'down',
+				frames: scene.anims.generateFrameNumbers('player', {
+					start: 3,
+					end: 5
+				}),
+				frameRate: 10,
+				repeat: -1
+			});
+			scene.anims.create({
+				key: 'up',
+				frames: scene.anims.generateFrameNumbers('player', {
+					start: 39,
+					end: 41
+				}),
+				frameRate: 10,
+				repeat: -1
+			});
+			scene.anims.create({
+				key: 'turn',
+				frames: [{
+					key: 'player',
+					frame: 4
+				}],
+				frameRate: 10,
+				repeat: -1
+			});
 		}
+//#endregion animation
+	
+const config = {
+			type: Phaser.AUTO,
+			width: 1600,
+			height: 1200,
+    		physics: {
+        		default: 'arcade',
+        		arcade: {
+            		debug: true
+        		}
+    		},
+			scene: {
+				preload: preload,
+				create: create,
+				update: update
+			}
+		};
 
+		const game = new Phaser.Game(config);
 	</script>
 
 </body>
