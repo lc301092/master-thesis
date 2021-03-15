@@ -2,104 +2,104 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <title>Game 1 </title>
-<!-- <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script> -->
-    <script src="js/phaser-3.53.1"></script>
-    <style type="text/css">
-        body {
-            margin: 0;
-        }
-    </style>
+	<meta charset="UTF-8" />
+	<title>Game 1 </title>
+	<!-- <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script> -->
+	<script src="/js/phaser-3.53.1/dist/phaser.min.js"></script>
+	<style type="text/css">
+		body {
+			margin: 0;
+		}
+
+	</style>
+	<style href="stylesheets/style"></style>
 </head>
 
 <body>
 
-    <script type="text/javascript">
-		
-            let cursors;
-            let scene;
-            let player;
-            let playerBody;
-            let speed = 1;
+	<script type="text/javascript">
+		let cursors;
+		let scene;
+		let player;
+		let playerBody;
+		let speed = 1;
 
-            let keys;
-            let singlePress = Phaser.Input.Keyboard.JustDown;
-            let zeroVector = Phaser.Math.Vector2.ZERO;
-            let up = new Phaser.Math.Vector2(0, -1);
-            let down = new Phaser.Math.Vector2(0, 1);
-            let right = new Phaser.Math.Vector2(1, 0);
-            let left = new Phaser.Math.Vector2(-1, 0);
-            let interact;
-
-
-            let playerAnimation;
-
-            function preload() {
-                this.load.image('!$CC_doors_1', 'assets/!$CC_doors_1.png');
-                this.load.image('CC_City_Exterior_A2', 'assets/CC_City_Exterior_A2.png');
-                this.load.image('CC_Autoshop_Interior_B', 'assets/CC_Autoshop_Interior_B.png');
-                this.load.image('CC_City_Exterior_B', 'assets/CC_City_Exterior_B.png');
-                this.load.image('CC_City_Exterior_C', 'assets/CC_City_Exterior_C.png');
-                this.load.image('scifi_space_rpg_tiles_lpcized', 'assets/scifi_space_rpg_tiles_lpcized.png');
+		let keys;
+		let singlePress = Phaser.Input.Keyboard.JustDown;
+		let zeroVector = Phaser.Math.Vector2.ZERO;
+		let up = new Phaser.Math.Vector2(0, -1);
+		let down = new Phaser.Math.Vector2(0, 1);
+		let right = new Phaser.Math.Vector2(1, 0);
+		let left = new Phaser.Math.Vector2(-1, 0);
+		let interact;
 
 
-                this.load.tilemapTiledJSON('baseSceneTest','assets/baseSceneTest.json');
+		let playerAnimation;
 
-                this.load.spritesheet('player', 'assets/playable_charaters.png', {
-                    frameWidth: 48,
-                    frameHeight: 64
-                });
-
-                this.load.spritesheet('portal', 'assets/portal.png', {
-                    frameWidth: 250,
-                    frameHeight: 592
-                });
-            }
-
-            function create(){
-                let baseSceneTest = this.add.tilemap('baseSceneTest');
-
-                console.log(baseSceneTest);
-
-                let door = baseSceneTest.addTilesetImage('!$CC_doors_1');
-                let exteriorA = baseSceneTest.addTilesetImage('CC_City_Exterior_A2');
-                let exteriorB = baseSceneTest.addTilesetImage('CC_City_Exterior_B');
-                let exteriorC = baseSceneTest.addTilesetImage('CC_City_Exterior_C');
-                let interiorA = baseSceneTest.addTilesetImage('scifi_space_rpg_tiles_lpcized');
-                let interiorB = baseSceneTest.addTilesetImage('CC_Autoshop_Interior_B');
-
-                //layers 
-                let ground = baseSceneTest.createLayer('Ground', [interiorA, door], 0,0);
-               // let walls = baseSceneTest.createStaticLayer('Wall', [interiorA], 0,0);
-                //let decoration = baseSceneTest.createStaticLayer('Decoration', [exteriorA, exteriorB, exteriorC, interiorB], 0,0);
-                //let decoration2 = baseSceneTest.createStaticLayer('Decoration2', [exteriorA, exteriorB, exteriorC, interiorB], 0,0);
-                //let interact = baseSceneTest.createStaticLayer('Interact',  [exteriorA, exteriorB, exteriorC, interiorB], 0,0);
-            }
-
-            function update() {
-            }
+		function preload() {
+			this.load.image('!$CC_doors_1', 'assets/!$CC_doors_1.png');
+			this.load.image('CC_City_Exterior_A2', 'assets/CC_City_Exterior_A2.png');
+			this.load.image('CC_Autoshop_Interior_B', 'assets/CC_Autoshop_Interior_B.png');
+			this.load.image('CC_City_Exterior_B', 'assets/CC_City_Exterior_B.png');
+			this.load.image('CC_City_Exterior_C', 'assets/CC_City_Exterior_C.png');
+			this.load.image('scifi_space_rpg_tiles_lpcized', 'assets/scifi_space_rpg_tiles_lpcized.png');
 
 
-// Setup and config -----------------------------------------------------------------------------
-        const config = {
+			this.load.tilemapTiledJSON('baseSceneTest', 'assets/baseSceneTest.json');
+
+			this.load.spritesheet('player', 'assets/playable_charaters.png', {
+				frameWidth: 48,
+				frameHeight: 64
+			});
+
+			this.load.spritesheet('portal', 'assets/portal.png', {
+				frameWidth: 250,
+				frameHeight: 592
+			});
+		}
+
+		function create() {
+			let baseSceneTest = this.add.tilemap('baseSceneTest');
+
+			console.log(baseSceneTest);
+
+			let door = baseSceneTest.addTilesetImage('!$CC_doors_1');
+			let exteriorA = baseSceneTest.addTilesetImage('CC_City_Exterior_A2');
+			let exteriorB = baseSceneTest.addTilesetImage('CC_City_Exterior_B');
+			let exteriorC = baseSceneTest.addTilesetImage('CC_City_Exterior_C');
+			let interiorA = baseSceneTest.addTilesetImage('scifi_space_rpg_tiles_lpcized');
+			let interiorB = baseSceneTest.addTilesetImage('CC_Autoshop_Interior_B');
+
+			//layers 
+			let ground = baseSceneTest.createLayer('Ground', [interiorA, door], 0, 0);
+			let walls = baseSceneTest.createStaticLayer('Wall', [interiorA], 0, 0);
+			let decoration = baseSceneTest.createStaticLayer('Decoration', [exteriorA, exteriorB, exteriorC, interiorB], 0, 0);
+			let decoration2 = baseSceneTest.createStaticLayer('Decoration2', [exteriorA, exteriorB, exteriorC, interiorB], 0, 0);
+			let interact = baseSceneTest.createStaticLayer('Interact', [exteriorA, exteriorB, exteriorC, interiorB], 0, 0);
+		}
+
+		function update() {}
+
+
+		// Setup and config -----------------------------------------------------------------------------
+		const config = {
 			type: Phaser.AUTO,
 			width: 1600,
 			height: 1200,
-    		physics: {
-        		default: 'arcade',
-        		arcade: {
-            		debug: true
-        		}
-    		},
+			physics: {
+				default: 'arcade',
+				arcade: {
+					debug: true
+				}
+			},
 			scene: {
 				preload: preload,
 				create: create,
 				update: update
 			}
 		};
-        
-        const game = new Phaser.Game(config);
+
+		const game = new Phaser.Game(config);
 
 	</script>
 
