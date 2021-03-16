@@ -6,6 +6,7 @@
 		"start": "nodemon ./bin/www"
 	},
 	"dependencies": {
+		"3": "^2.1.0",
 		"bluetooth-serial-port": "^2.2.7",
 		"cookie-parser": "~1.4.3",
 		"debug": "~2.6.9",
