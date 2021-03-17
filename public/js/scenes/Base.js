@@ -1,7 +1,7 @@
 import { constants } from "../constants.js"
 
 let player, keys, playerAnimation, singlePress, scene,map;
-let speed = 100;
+let speed = 128;
 
 
 export class Base extends Phaser.Scene {
@@ -24,6 +24,7 @@ export class Base extends Phaser.Scene {
     create() {
         scene = this;
         player = this.physics.add.sprite(100, 100, 'player').setCollideWorldBounds(true).setScale(2);
+        player.setSize(25,50).setOffset(12,10);
         scene.cameras.main.setBounds(0, 0, 1600, 1200);
         scene.physics.world.setBounds(0, 0, 1600, 1200);
         let mainCamera = this.cameras.main
@@ -41,43 +42,46 @@ export class Base extends Phaser.Scene {
         // player movement
         this.playerControl();
     }
-    // only 4 directional for now 
+    // 8 directional  
     playerControl() {
+
+        if(singlePress(keys.sprint)) 
+        speed = 192;
+        else if (keys.sprint.isUp) speed = 128;
 
         if (keys.up.isDown) {
             player.setVelocityY(-speed);
-            playerAnimation.play('up', true);
         }
         if (keys.down.isDown) {
             player.setVelocityY(speed);
-            playerAnimation.play('down', true);
         }
-        if (keys.up.isUp && keys.down.isUp || keys.up.isDown && keys.down.isDown) {
-            player.setVelocityY(0);
-            //playerAnimation.play('turn', true);
-        }
-        // detach here for 8 directional movement, but it screw up animations because there is no sprite reset
         if (keys.left.isDown) {
             player.setVelocityX(-speed);
-            playerAnimation.playReverse('left', true);
-
         }
         if (keys.right.isDown) {
             player.setVelocityX(speed);
-            playerAnimation.play('right', true);
         }
-        if (keys.right.isUp && keys.left.isUp || keys.right.isDown && keys.left.isDown) {
+        if (keys.up.isUp && keys.down.isUp) {
+            player.setVelocityY(0);
+            //playerAnimation.play('turn', true);
+        }
+        if (keys.right.isUp && keys.left.isUp) {
             player.setVelocityX(0);
             //playerAnimation.play('turn', true);
         }
-
-
+        // other inputs than movement 
         if (singlePress(keys.interact)) {
             console.log(player);
             //console.log(keys.interact);
             //checkColliders()
         }
-        //if(player.velocity == 0) 
+        if(player.body.velocity.x > 0) playerAnimation.play('right', true);
+        else if(player.body.velocity.x < 0) playerAnimation.playReverse('left', true);
+        else if(player.body.velocity.y > 0) playerAnimation.play('down', true);
+        else if(player.body.velocity.y < 0) playerAnimation.play('up', true);
+        else{
+            playerAnimation.stop();
+        }
     }
     animationSetup(scene) {
         scene.anims.create({
@@ -97,7 +101,6 @@ export class Base extends Phaser.Scene {
                 end: 17
             }),
             frameRate: 6,
-            repeat: -1
         });
 
         scene.anims.create({
@@ -107,7 +110,6 @@ export class Base extends Phaser.Scene {
                 end: 29
             }),
             frameRate: 6,
-            repeat: -1
         });
         scene.anims.create({
             key: 'down',
@@ -116,7 +118,6 @@ export class Base extends Phaser.Scene {
                 end: 5
             }),
             frameRate: 6,
-            repeat: -1
         });
         scene.anims.create({
             key: 'up',
@@ -125,7 +126,6 @@ export class Base extends Phaser.Scene {
                 end: 41
             }),
             frameRate: 4,
-            repeat: -1
         });
         scene.anims.create({
             key: 'turn',

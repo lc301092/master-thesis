@@ -11,7 +11,8 @@ export const constants = {
             down: 'S',
             left: 'A',
             right: 'D',
-            interact: 'E'
+            interact: 'E',
+            sprint: 'shift'
 
         }, 
 
