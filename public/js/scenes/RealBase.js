@@ -18,22 +18,22 @@
 
 
 		function preload() {
-			this.load.image('!$CC_doors_1', 'assets/!$CC_doors_1.png');
-			this.load.image('CC_City_Exterior_A2', 'assets/CC_City_Exterior_A2.png');
-			this.load.image('CC_Autoshop_Interior_B', 'assets/CC_Autoshop_Interior_B.png');
-			this.load.image('CC_City_Exterior_B', 'assets/CC_City_Exterior_B.png');
-			this.load.image('CC_City_Exterior_C', 'assets/CC_City_Exterior_C.png');
-			this.load.image('scifi_space_rpg_tiles_lpcized', 'assets/scifi_space_rpg_tiles_lpcized.png');
+			this.load.image('!$CC_doors_1', 'assets/image/!$CC_doors_1.png');
+			this.load.image('CC_City_Exterior_A2', 'assets/image/CC_City_Exterior_A2.png');
+			this.load.image('CC_Autoshop_Interior_B', 'assets/image/CC_Autoshop_Interior_B.png');
+			this.load.image('CC_City_Exterior_B', 'assets/image/CC_City_Exterior_B.png');
+			this.load.image('CC_City_Exterior_C', 'assets/image/CC_City_Exterior_C.png');
+			this.load.image('scifi_space_rpg_tiles_lpcized', 'assets/image/scifi_space_rpg_tiles_lpcized.png');
 
 
 			this.load.tilemapTiledJSON('baseSceneTest', 'assets/baseSceneTest.json');
 
-			this.load.spritesheet('player', 'assets/playable_charaters.png', {
+			this.load.spritesheet('player', 'assets/sprite/playable_charaters.png', {
 				frameWidth: 48,
 				frameHeight: 64
 			});
 
-			this.load.spritesheet('portal', 'assets/portal.png', {
+			this.load.spritesheet('portal', 'assets/sprite/portal.png', {
 				frameWidth: 250,
 				frameHeight: 592
 			});
@@ -63,7 +63,6 @@
 			scene.cameras.main.setBounds(0, 0, 1920 * 2, 1080 * 2);
 			scene.physics.world.setBounds(0, 0, 1920 * 2, 1080 * 2);
 
-			let map = scene.add.image(0, 0, 'baseSceneTest').setOrigin(0);
 			//let playerspawn = <ObjectEntity>scene.baseSceneTest.object['PlayerSpawn'][0];
 
 			scene.player = scene.physics.add.sprite(400, 300, 'player');

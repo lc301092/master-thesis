@@ -1,5 +1,4 @@
 /** @type {import("../lib/phaser-3.53.1/types/phaser")} */ 
-console.log('ready');
 
 import {LoadScene} from './scenes/LoadScene.js'; 
 import {MenuScene} from './scenes/MenuScene.js';

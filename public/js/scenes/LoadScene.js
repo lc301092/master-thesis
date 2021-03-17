@@ -10,37 +10,54 @@ export class LoadScene extends Phaser.Scene {
     }
     loadResources(type, resources_config = null) {
 
-        let pathString = './assets/' + type
+        let pathString = '/assets/' + type
         console.log(pathString);
         this.load.setPath(pathString);
 
         switch (type) {
             case 'image':
                 for (const key in constants.IMAGES) {
-                    this.load.image(constants.IMAGES[key], constants.IMAGES[key])
+                    let imageString = constants.IMAGES[key];
+                    console.log(imageString);
+                    // check if normal image or tileImage
+                    if (imageString.split('.png').length > 1) {
+                        // normal image
+                        this.load.image(imageString, imageString);
+                    }
+                        // tileImage add .png at second param
+                    else {
+                        this.load.image(imageString, imageString + '.png')
+                    }
                 }
                 break;
             case 'audio':
                 for (const key in constants.AUDIO) {
                     this.load.image(constants.AUDIO[key], constants.AUDIO[key])
                 }
+                break;
             case 'sprite':
                 // remember to use configs
                 // for (const key in constants.IMAGES) {
                 //     this.load.image(constants.IMAGES[key], constants.IMAGES[key])
                 // } 
+                break;
+                case 'tilemap':
+                    for (const key in constants.TILEMAPS) {
+                        let tileMapString = constants.TILEMAPS[key];
+                        this.load.tilemapTiledJSON(tileMapString, tileMapString+'.json');
+                    }
         };
+        this.load.setPath();
     }
-    
+
     preload() {
         this.load.spritesheet('player', '/assets/sprite/playable_charaters.png', {
             frameWidth: 48,
             frameHeight: 62
-        });    
+        });
         this.loadResources('image');
-        // this.loadResources('audio');
-        // this.loadResources('sprite');
-     
+        this.loadResources('tilemap');
+
         let width = this.cameras.main.width;
         let height = this.cameras.main.height;
         let loadingText = this.make.text({

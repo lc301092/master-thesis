@@ -1,6 +1,6 @@
 import { constants } from "../constants.js"
 
-let player, keys, playerAnimation, singlePress, scene,map;
+let player, keys, playerAnimation, singlePress, scene, map;
 let speed = 128;
 
 
@@ -15,28 +15,103 @@ export class Base extends Phaser.Scene {
         console.log(data)
     }
     preload() {
-       let map =  this.add.image(0, 0, constants.IMAGES.BASE_MAP).setOrigin(0).setScale(2);
 
+        
+        console.log(this.load);
 
-        //this.player = this.add.
-        // tilemaps
+        this.load.spritesheet('player', 'assets/sprite/playable_charaters.png', {
+            frameWidth: 48,
+            frameHeight: 64
+        });
+
+        this.load.spritesheet('portal', 'assets/sprite/portal.png', {
+            frameWidth: 250,
+            frameHeight: 592
+        });
     }
     create() {
         scene = this;
-        player = this.physics.add.sprite(100, 100, 'player').setCollideWorldBounds(true).setScale(2);
-        player.setSize(25,50).setOffset(12,10);
+        
+        // tilemap configurations
+       
+        let baseSceneTest = this.add.tilemap('baseSceneTest');
+        
+        // add tileset image
+
+        let tileImages = constants.TILEIMAGES.BASE_LVL;
+        let images = constants.IMAGES;
+        let tileObj = {};
+        for (const key in tileImages) {
+            let tileImageString = images[key];
+            let tilesetImage = baseSceneTest.addTilesetImage(tileImageString);
+            tileObj[key] = tilesetImage; 
+        }
+        console.log(tileObj);
+
+        let DOORS1 = tileObj.DOORS1;
+        let EXTERIOR_A2 = tileObj.EXTERIOR_A2;
+        let INTERIOR_B = tileObj.INTERIOR_B;
+        let EXTERIOR_B = tileObj.EXTERIOR_B;
+        let EXTERIOR_C = tileObj.EXTERIOR_C;
+        let SCIFI = tileObj.SCIFI;
+    
+        //layers 
+        let ground = baseSceneTest.createLayer('Ground', [SCIFI, DOORS1], 0, 0).setDepth(-1);
+        let walls = baseSceneTest.createLayer('Wall', [SCIFI], 0, 0);
+        let decoration = baseSceneTest.createLayer('Decoration', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B, SCIFI], 0, 0);
+        let decoration2 = baseSceneTest.createLayer('Decoration2', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B], 0, 0);
+        let interact = baseSceneTest.createLayer('Interact', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B], 0, 0);
+
+        player = scene.physics.add.sprite(150, 150, 'player').setCollideWorldBounds(true); //.setScale(2);
+        player.setSize(25, 50).setOffset(12, 10);
         scene.cameras.main.setBounds(0, 0, 1600, 1200);
         scene.physics.world.setBounds(0, 0, 1600, 1200);
-        let mainCamera = this.cameras.main
-        mainCamera.startFollow(player,true,0.05,0.05);
-        // tilemap configurations
-
-        // animations
-        this.animationSetup(this);
+        let mainCamera = scene.cameras.main;
+        mainCamera.startFollow(player, true, 0.05, 0.05);
+       
+        scene.animationSetup(this);
         playerAnimation = player.anims;
         // keyobject for movement
-        keys = this.input.keyboard.addKeys(constants.KEYS.WASD_MOVEMENT);
-        singlePress = constants.KEYS.SINGLEPRESS;
+        keys = scene.input.keyboard.addKeys(constants.USERINPUT.WASD_MOVEMENT);
+        singlePress = constants.USERINPUT.SINGLEPRESS;
+        
+        // map collisions
+			let borders = [walls, decoration, decoration2, interact];
+			scene.physics.add.collider(player, borders);
+
+			for (let i=0; i<borders.length; i++){
+				borders[i].setCollisionByProperty({ border: true});
+			}
+
+			
+		// map collision interactives
+			scene.physics.add.collider(player, interact);
+			interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1760, 1761]);
+
+			// indstil tidsmaskine
+			interact.setTileLocationCallback(10, 5, 6, 1, () => {
+				if (singlePress(keys.interact)){
+					console.log('indstil din tidsmaskine her');
+					// --- indstil tidsmaskine "scene" kode her ---
+				};
+			});
+
+			// Tidsmaskinen
+			interact.setTileLocationCallback(23, 6, 3, 2, () => {
+				if (singlePress(keys.interact)){
+					console.log('Start træningssimulator');
+					// --- Åbn træningssimulator kode her ---
+				};
+			});
+
+			// træningssimulator
+			interact.setTileLocationCallback(22, 18, 2, 2, () => {
+				if (singlePress(keys.interact)){
+					console.log('Tidsmaskine aktiveret');
+					// --- skift scene til laboratorie kode her ---
+				};
+			});
+     
     }
     update() {
         // player movement
@@ -45,8 +120,8 @@ export class Base extends Phaser.Scene {
     // 8 directional  
     playerControl() {
 
-        if(singlePress(keys.sprint)) 
-        speed = 192;
+        if (singlePress(keys.sprint))
+            speed = 192;
         else if (keys.sprint.isUp) speed = 128;
 
         if (keys.up.isDown) {
@@ -75,11 +150,11 @@ export class Base extends Phaser.Scene {
             //console.log(keys.interact);
             //checkColliders()
         }
-        if(player.body.velocity.x > 0) playerAnimation.play('right', true);
-        else if(player.body.velocity.x < 0) playerAnimation.playReverse('left', true);
-        else if(player.body.velocity.y > 0) playerAnimation.play('down', true);
-        else if(player.body.velocity.y < 0) playerAnimation.play('up', true);
-        else{
+        if (player.body.velocity.x > 0) playerAnimation.play('right', true);
+        else if (player.body.velocity.x < 0) playerAnimation.playReverse('left', true);
+        else if (player.body.velocity.y > 0) playerAnimation.play('down', true);
+        else if (player.body.velocity.y < 0) playerAnimation.play('up', true);
+        else {
             playerAnimation.stop();
         }
     }
