@@ -4,6 +4,19 @@ export const constants = {
         MENU: "MENU",
         PLAY: "PLAY"
     },
+    KEYS: {
+        SINGLEPRESS: Phaser.Input.Keyboard.JustDown,
+        WASD_MOVEMENT: {
+            up: 'W',
+            down: 'S',
+            left: 'A',
+            right: 'D',
+            interact: 'E',
+            sprint: 'shift'
+
+        }, 
+
+    },
     AUDIO:{},
     IMAGES:{
         BASE_MAP: 'map.png',

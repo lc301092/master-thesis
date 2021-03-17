@@ -33,12 +33,14 @@ export class LoadScene extends Phaser.Scene {
     }
     
     preload() {
-
+        this.load.spritesheet('player', '/assets/sprite/playable_charaters.png', {
+            frameWidth: 48,
+            frameHeight: 62
+        });    
         this.loadResources('image');
-        this.loadResources('audio');
+        // this.loadResources('audio');
         // this.loadResources('sprite');
-
-    
+     
         let width = this.cameras.main.width;
         let height = this.cameras.main.height;
         let loadingText = this.make.text({
