@@ -1,23 +1,3 @@
-<!doctype html>
-<html lang="en">
-
-<head>
-	<meta charset="UTF-8" />
-	<title>Game 1 </title>
-	<!-- <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script> -->
-	<script src="/lib/phaser-3.53.1/dist/phaser.min.js"></script>
-	<!-- <script type="module" src="js/mainGame.js"> </script> -->
-	<style type="text/css">
-		body {
-			margin: 0;
-		}
-	</style>
-	<style href="stylesheets/style"></style>
-</head>
-
-<body>
-
-	<script type="text/javascript">
 		let cursors;
 		let scene;
 		let player;
@@ -264,8 +244,3 @@
 
 		const game = new Phaser.Game(config);
 
-	</script>
-
-</body>
-
-</html>
