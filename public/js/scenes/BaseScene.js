@@ -16,7 +16,7 @@ export class Base extends Phaser.Scene {
     }
     preload() {
 
-        
+
         console.log(this.load);
 
         this.load.spritesheet('player', 'assets/sprite/playable_charaters.png', {
@@ -31,11 +31,11 @@ export class Base extends Phaser.Scene {
     }
     create() {
         scene = this;
-        
+
         // tilemap configurations
-       
+
         let baseSceneTest = this.add.tilemap('baseSceneTest');
-        
+
         // add tileset image
 
         let tileImages = constants.TILEIMAGES.BASE_LVL;
@@ -44,7 +44,7 @@ export class Base extends Phaser.Scene {
         for (const key in tileImages) {
             let tileImageString = images[key];
             let tilesetImage = baseSceneTest.addTilesetImage(tileImageString);
-            tileObj[key] = tilesetImage; 
+            tileObj[key] = tilesetImage;
         }
         console.log(tileObj);
 
@@ -54,7 +54,7 @@ export class Base extends Phaser.Scene {
         let EXTERIOR_B = tileObj.EXTERIOR_B;
         let EXTERIOR_C = tileObj.EXTERIOR_C;
         let SCIFI = tileObj.SCIFI;
-    
+
         //layers 
         let ground = baseSceneTest.createLayer('Ground', [SCIFI, DOORS1], 0, 0).setDepth(-1);
         let walls = baseSceneTest.createLayer('Wall', [SCIFI], 0, 0);
@@ -69,49 +69,52 @@ export class Base extends Phaser.Scene {
         scene.physics.world.setBounds(0, 0, 1600, 1200);
         let mainCamera = scene.cameras.main;
         mainCamera.startFollow(player, true, 0.05, 0.05);
-       
+
         scene.animationSetup(this);
         playerAnimation = player.anims;
         // keyobject for movement
         keys = scene.input.keyboard.addKeys(constants.USERINPUT.WASD_MOVEMENT);
         singlePress = constants.USERINPUT.SINGLEPRESS;
-        
+
         // map collisions
-			let borders = [walls, decoration, decoration2, interact];
-			scene.physics.add.collider(player, borders);
+        let borders = [walls, decoration, decoration2, interact];
+        scene.physics.add.collider(player, borders);
 
-			for (let i=0; i<borders.length; i++){
-				borders[i].setCollisionByProperty({ border: true});
-			}
-			
-		// map collision interactives
-			scene.physics.add.collider(player, interact);
-			interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1665, 1666, 1713, 1714]);
+        for (let i = 0; i < borders.length; i++) {
+            borders[i].setCollisionByProperty({ border: true });
+        }
 
-			// indstil tidsmaskine
-			interact.setTileLocationCallback(10, 5, 6, 1, () => {
-				if (singlePress(keys.interact)){
-					console.log('indstil din tidsmaskine her');
-					// --- indstil tidsmaskine "scene" kode her ---
-				};
-			});
+        // map collision interactives
+        scene.physics.add.collider(player, interact);
+        interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1665, 1666, 1713, 1714]);
 
-			// Tidsmaskinen
-			interact.setTileLocationCallback(23, 6, 3, 2, () => {
-				if (singlePress(keys.interact)){
-					console.log('Start træningssimulator');
-					// --- Åbn træningssimulator kode her ---
-				};
-			});
+        // indstil tidsmaskine
+        interact.setTileLocationCallback(10, 5, 6, 1, () => {
+            if (singlePress(keys.interact)) {
+                console.log('indstil din tidsmaskine her');
+                // --- indstil tidsmaskine "scene" kode her ---
+            };
+        });
 
-			// træningssimulator
-			interact.setTileLocationCallback(22, 18, 1, 1, () => {
-				if (singlePress(keys.interact)){
-					console.log('Tidsmaskine aktiveret');
-					// --- skift scene til laboratorie kode her ---
-				};
-			});
-     
+        // træningssimulator
+        interact.setTileLocationCallback(23, 6, 3, 2, () => {
+            if (singlePress(keys.interact)) {
+                console.log('Start træningssimulator');
+                this.scene.start(constants.SCENES.TRANING, 'from base scene');
+
+                // --- Åbn træningssimulator kode her ---
+            };
+        });
+
+        // Tidsmaskinen
+        interact.setTileLocationCallback(22, 18, 1, 1, () => {
+            if (singlePress(keys.interact)) {
+                console.log('Tidsmaskine aktiveret');
+
+                // --- skift scene til laboratorie kode her ---
+            };
+        });
+
     }
     update() {
         // player movement

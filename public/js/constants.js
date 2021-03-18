@@ -4,6 +4,7 @@ export const constants = {
         MENU: "MENU",
         PLAY: "PLAY",
         UI: "UI",
+        TRANING: "TRANING"
     },
     USERINPUT: {
         SINGLEPRESS: Phaser.Input.Keyboard.JustDown,
@@ -33,7 +34,8 @@ export const constants = {
         MEDLAB_INTERIOR_2: 'walls1',
         MED1: 'med1',
         MED2: 'med2',
-        MED3: 'med3'
+        MED3: 'med3',
+        TRAINING_COMPUTER: 'trainingComputer.png'
     },
     SPRITES: {
         PC: 'playable_charaters.png',
