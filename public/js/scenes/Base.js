@@ -86,7 +86,7 @@ export class Base extends Phaser.Scene {
 			
 		// map collision interactives
 			scene.physics.add.collider(player, interact);
-			interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1713]);
+			interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1713, 1714]);
 
 			// indstil tidsmaskine
 			interact.setTileLocationCallback(10, 5, 6, 1, () => {
