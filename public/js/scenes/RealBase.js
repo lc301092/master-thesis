@@ -26,7 +26,7 @@
 			this.load.image('scifi_space_rpg_tiles_lpcized', 'assets/image/scifi_space_rpg_tiles_lpcized.png');
 
 
-			this.load.tilemapTiledJSON('baseSceneTest', 'assets/baseSceneTest.json');
+			this.load.tilemapTiledJSON('baseSceneFinal', 'assets/baseSceneFinal.json');
 
 			this.load.spritesheet('player', 'assets/sprite/playable_charaters.png', {
 				frameWidth: 48,
@@ -111,7 +111,7 @@
 			});
 
 			// træningssimulator
-			interact.setTileLocationCallback(22, 18, 2, 2, () => {
+			interact.setTileLocationCallback(22, 17, 1, 1, () => {
 				if (singlePress(keys.interact)){
 					console.log('Tidsmaskine aktiveret');
 					// --- skift scene til laboratorie kode her ---

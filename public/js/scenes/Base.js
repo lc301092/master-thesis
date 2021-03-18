@@ -61,6 +61,7 @@ export class Base extends Phaser.Scene {
         let decoration = baseSceneTest.createLayer('Decoration', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B, SCIFI], 0, 0);
         let decoration2 = baseSceneTest.createLayer('Decoration2', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B], 0, 0);
         let interact = baseSceneTest.createLayer('Interact', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B], 0, 0);
+        let layers = baseSceneTest.createLayer('Layercontrol', EXTERIOR_C, 0, 0).setDepth(1);
 
         player = scene.physics.add.sprite(150, 150, 'player').setCollideWorldBounds(true); //.setScale(2);
         player.setSize(25, 50).setOffset(12, 10);
@@ -82,11 +83,10 @@ export class Base extends Phaser.Scene {
 			for (let i=0; i<borders.length; i++){
 				borders[i].setCollisionByProperty({ border: true});
 			}
-
 			
 		// map collision interactives
 			scene.physics.add.collider(player, interact);
-			interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1760, 1761]);
+			interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1713]);
 
 			// indstil tidsmaskine
 			interact.setTileLocationCallback(10, 5, 6, 1, () => {
@@ -105,7 +105,7 @@ export class Base extends Phaser.Scene {
 			});
 
 			// træningssimulator
-			interact.setTileLocationCallback(22, 18, 2, 2, () => {
+			interact.setTileLocationCallback(22, 18, 1, 1, () => {
 				if (singlePress(keys.interact)){
 					console.log('Tidsmaskine aktiveret');
 					// --- skift scene til laboratorie kode her ---
