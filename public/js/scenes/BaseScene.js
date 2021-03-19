@@ -92,7 +92,7 @@ export class Base extends Phaser.Scene {
         interact.setTileLocationCallback(10, 5, 6, 1, () => {
             if (singlePress(keys.interact)) {
                 console.log('indstil din tidsmaskine her');
-                this.scene.start(constants.SCENES.CHEMIST, 'from base scene');
+                this.scene.start(constants.SCENES.TIMELINE, 'from base scene');
                 // --- indstil tidsmaskine "scene" kode her ---
             };
         });
@@ -111,7 +111,7 @@ export class Base extends Phaser.Scene {
         interact.setTileLocationCallback(22, 18, 1, 1, () => {
             if (singlePress(keys.interact)) {
                 console.log('Tidsmaskine aktiveret');
-
+                this.scene.start(constants.SCENES.CHEMIST, 'from base scene');
                 // --- skift scene til laboratorie kode her ---
             };
         });

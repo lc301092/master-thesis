@@ -5,7 +5,8 @@ export const constants = {
         PLAY: "PLAY",
         UI: "UI",
         TRANING: "TRANING",
-        CHEMIST: "CHEMIST"
+        CHEMIST: "CHEMIST",
+        TIMELINE: "TIMELINE"
     },
     USERINPUT: {
         SINGLEPRESS: Phaser.Input.Keyboard.JustDown,
@@ -24,6 +25,8 @@ export const constants = {
         BASE_MAP: 'map.png',
         BASE_MAP2: 'map2.png',
         SKY: 'sky.png',
+        SCREEN: 'screen.png',
+        EVENTPIC: 'eventSprite.png',
         PORTAL: 'portal_u',
         DOORS1: '!$CC_doors_1',
         EXTERIOR_A2: 'CC_City_Exterior_A2',
