@@ -4,10 +4,10 @@ let player, keys, playerAnimation, singlePress, scene, map;
 let speed = 128;
 
 
-export class Base extends Phaser.Scene {
+export class ChemistLevel extends Phaser.Scene {
     constructor() {
         super({
-            key: constants.SCENES.PLAY,
+            key: constants.SCENES.CHEMIST,
         })
     }
     init(data) {
@@ -56,14 +56,16 @@ export class Base extends Phaser.Scene {
         let PORTAL = tileObj.PORTAL;
     
         //layers 
-        let ground = chemist_lvl.createLayer('ground', [MEDLAB_INTERIOR_1], 0, 0).setDepth(-1);
-        let walls = chemist_lvl.createLayer('walls', [MEDLAB_INTERIOR_1], 0, 0);
+        let ground = chemist_lvl.createLayer('ground', [MEDLAB_INTERIOR_1], 0, 0).setDepth(-2);
+        let walls = chemist_lvl.createLayer('walls', [MEDLAB_INTERIOR_1, MEDLAB_INTERIOR_2], 0, 0).setDepth(-2);
         let deco = chemist_lvl.createLayer('deco', [MEDLAB_INTERIOR_2], 0, 0);
         let deco1 = chemist_lvl.createLayer('deco1', [MEDLAB_INTERIOR_1, MEDLAB_INTERIOR_2], 0, 0);
         let deco2 = chemist_lvl.createLayer('deco2', [MEDLAB_INTERIOR_1], 0, 0);
-        let interact = chemist_lvl.createLayer('interact', [MED1, MED2, MED3, PORTAL], 0, 0);
+        let interact = chemist_lvl.createLayer('interact', [MED1, MED2, MED3, PORTAL], 0, 0).setDepth(1);
+        let interact2 = chemist_lvl.createLayer('interact2', [PORTAL],0,0).setDepth(-1);
 
-        player = scene.physics.add.sprite(150, 150, 'player').setCollideWorldBounds(true); //.setScale(2);
+        player = scene.physics.add.sprite(150, 450, 'player').setCollideWorldBounds(true); //.setScale(2);
+        let npc = scene.physics.add.sprite(550,350,'chemist-npc').setCollideWorldBounds(true).setImmovable(true).setScale(2);
         player.setSize(25, 50).setOffset(12, 10);
         scene.cameras.main.setBounds(0, 0, 1600, 1200);
         scene.physics.world.setBounds(0, 0, 1600, 1200);
@@ -77,7 +79,7 @@ export class Base extends Phaser.Scene {
         singlePress = constants.USERINPUT.SINGLEPRESS;
         
         // map collisions
-			let borders = [walls, deco, deco1, deco2, ground];
+			let borders = [walls, ground, deco, deco1, deco2];
 			scene.physics.add.collider(player, borders);
 
 			for (let i=0; i<borders.length; i++){
@@ -85,32 +87,47 @@ export class Base extends Phaser.Scene {
 			}
 			
 		// map collision interactives
-			/* scene.physics.add.collider(player, interact);
-			interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1665, 1666, 1713, 1714]);
-
-			// indstil tidsmaskine
-			interact.setTileLocationCallback(10, 5, 6, 1, () => {
+			scene.physics.add.collider(player, interact);
+            scene.physics.add.collider(player, interact2);
+ 
+			// gul medicin
+			interact.setTileLocationCallback(22, 27, 2, 2, () => {
 				if (singlePress(keys.interact)){
-					console.log('indstil din tidsmaskine her');
-					// --- indstil tidsmaskine "scene" kode her ---
+					console.log('Du interagerer med GUL medicin');
+					// --- dataset til gul medicin kode her ---
 				};
 			});
 
-			// Tidsmaskinen
-			interact.setTileLocationCallback(23, 6, 3, 2, () => {
+			// rød medicin
+			interact.setTileLocationCallback(30, 27, 2, 2, () => {
 				if (singlePress(keys.interact)){
-					console.log('Start træningssimulator');
-					// --- Åbn træningssimulator kode her ---
+					console.log('Du interagerer med RØD medicin');
+					// --- dataset til rød medicin kode her---
 				};
 			});
 
-			// træningssimulator
-			interact.setTileLocationCallback(22, 18, 1, 1, () => {
+			// blå medicin
+			interact.setTileLocationCallback(26, 27, 2, 2, () => {
 				if (singlePress(keys.interact)){
-					console.log('Tidsmaskine aktiveret');
-					// --- skift scene til laboratorie kode her ---
+					console.log('Du interagerer med BLÅ medicin');
+					// --- dataset til blå medicin kode her ---
 				};
-			}); */
+			});  
+
+            interact2.setTileLocationCallback(15,13,3,4, ()=> {
+                
+                if (singlePress(keys.interact)){
+                    if (confirm('Vil du gerne rejse tilbage til år 2200?')) {
+                        // Save it!
+                        console.log('Rejser tilbage');
+                        //interact.setTileLocationCallback(7,25,1,4, null);
+                      } else {
+                        // Do nothing!
+                        console.log('Bliv i år 1930');
+                        //interact.setTileLocationCallback(7,25,1,4, null);
+                      }
+				};
+            });
      
     }
     update() {

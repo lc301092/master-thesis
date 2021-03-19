@@ -4,11 +4,13 @@ import {LoadScene} from './scenes/LoadScene.js';
 import {MenuScene} from './scenes/MenuScene.js';
 import {Base} from './scenes/BaseScene.js';
 import {TraningScene} from './scenes/TraningScene.js';
+import {ChemistLevel} from './scenes/chemistLvl.js'
+
 
 let game = new Phaser.Game({
     width: 800,
     height: 600,
-    scene: [LoadScene, MenuScene, Base, TraningScene], 
+    scene: [LoadScene, MenuScene, Base, TraningScene, ChemistLevel], 
     physics: {
         default: 'arcade',
         arcade: {

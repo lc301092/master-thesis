@@ -55,6 +55,10 @@ export class LoadScene extends Phaser.Scene {
             frameWidth: 48,
             frameHeight: 62
         });
+        this.load.spritesheet('chemist-npc', '/assets/sprite/chemist-npc.png', {
+            frameWidth: 24,
+            frameHeight: 32
+        });
         this.loadResources('image');
         this.loadResources('tilemap');
 
