@@ -75,7 +75,7 @@ export class LoadScene extends Phaser.Scene {
                 color: 0xffffff //white
             }
         });
-
+        console.log(this);
         this.load.on('progress', (percent) => {
             loadingBar.fillRect(200, this.game.renderer.height / 2, this.game.renderer.width * percent / 2, 20);
         })

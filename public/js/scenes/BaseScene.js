@@ -2,6 +2,7 @@ import { constants } from "../constants.js"
 
 let player, keys, playerAnimation, singlePress, scene, map;
 let speed = 128;
+let isPlayerDisabled;
 
 
 export class Base extends Phaser.Scene {
@@ -12,32 +13,26 @@ export class Base extends Phaser.Scene {
     }
     init(data) {
         // tell progress from 
+        player = this.physics.add.sprite(150, 150, 'player').setCollideWorldBounds(true).setDepth(1); //.setScale(2);
+
         console.log(data)
+        if(data.playerPosition) {
+            player.x = playerPosition.x;
+            player.y = playerPosition.y;
+        } 
     }
     preload() {
-
-
-        console.log(this.load);
-
-        this.load.spritesheet('player', 'assets/sprite/playable_charaters.png', {
-            frameWidth: 48,
-            frameHeight: 64
-        });
-
-        this.load.spritesheet('portal', 'assets/sprite/portal.png', {
-            frameWidth: 250,
-            frameHeight: 592
-        });
     }
     create() {
         scene = this;
-
+        isPlayerDisabled = false;
         // tilemap configurations
 
         let baseSceneTest = this.add.tilemap('baseSceneTest');
+        //baseSceneTest.set
 
         // add tileset image
-
+        //#region tilsets and layers
         let tileImages = constants.TILEIMAGES.BASE_LVL;
         let images = constants.IMAGES;
         let tileObj = {};
@@ -63,14 +58,16 @@ export class Base extends Phaser.Scene {
         let interact = baseSceneTest.createLayer('Interact', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B], 0, 0);
         let layers = baseSceneTest.createLayer('Layercontrol', EXTERIOR_C, 0, 0).setDepth(1);
 
-        player = scene.physics.add.sprite(150, 150, 'player').setCollideWorldBounds(true); //.setScale(2);
+        //#endregion tilsets and layers
+      
+        //player = scene.physics.add.sprite(150, 150, 'player').setCollideWorldBounds(true); //.setScale(2);
         player.setSize(25, 50).setOffset(12, 10);
         scene.cameras.main.setBounds(0, 0, 1600, 1200);
         scene.physics.world.setBounds(0, 0, 1600, 1200);
         let mainCamera = scene.cameras.main;
         mainCamera.startFollow(player, true, 0.05, 0.05);
 
-        scene.animationSetup(this);
+        animationSetup(this);
         playerAnimation = player.anims;
         // keyobject for movement
         keys = scene.input.keyboard.addKeys(constants.USERINPUT.WASD_MOVEMENT);
@@ -100,8 +97,17 @@ export class Base extends Phaser.Scene {
         interact.setTileLocationCallback(23, 6, 3, 2, () => {
             if (singlePress(keys.interact)) {
                 console.log('Start træningssimulator');
-                this.scene.start(constants.SCENES.TRANING, 'from base scene');
-
+                
+                //let newScene = this.scene.launch(constants.SCENES.TRANING, 'from base scene');
+               // isPlayerDisabled = true;
+                //this.scene.pause();
+                // this.scene.launch(constants.SCENES.TRANING);
+                
+                // this.scene.transition({target: constants.SCENES.TRANING, 
+                //     duration: 300, 
+                //     sleep: false, 
+                //     allowInput: false, 
+                //     moveAbove: true});
                 // --- Åbn træningssimulator kode her ---
             };
         });
@@ -118,101 +124,104 @@ export class Base extends Phaser.Scene {
     }
     update() {
         // player movement
-        this.playerControl();
+        playerControl();
     }
     // 8 directional  
-    playerControl() {
+    
+}
+function playerControl() {
+        
+    if(isPlayerDisabled) return;
 
-        if (singlePress(keys.sprint))
-            speed = 192;
-        else if (keys.sprint.isUp) speed = 128;
+    if (singlePress(keys.sprint))
+        speed = 192;
+    else if (keys.sprint.isUp) speed = 128;
 
-        if (keys.up.isDown) {
-            player.setVelocityY(-speed);
-        }
-        if (keys.down.isDown) {
-            player.setVelocityY(speed);
-        }
-        if (keys.left.isDown) {
-            player.setVelocityX(-speed);
-        }
-        if (keys.right.isDown) {
-            player.setVelocityX(speed);
-        }
-        if (keys.up.isUp && keys.down.isUp) {
-            player.setVelocityY(0);
-            //playerAnimation.play('turn', true);
-        }
-        if (keys.right.isUp && keys.left.isUp) {
-            player.setVelocityX(0);
-            //playerAnimation.play('turn', true);
-        }
-        // other inputs than movement 
-        if (singlePress(keys.interact)) {
-            console.log(player);
-            //console.log(keys.interact);
-            //checkColliders()
-        }
-        if (player.body.velocity.x > 0) playerAnimation.play('right', true);
-        else if (player.body.velocity.x < 0) playerAnimation.playReverse('left', true);
-        else if (player.body.velocity.y > 0) playerAnimation.play('down', true);
-        else if (player.body.velocity.y < 0) playerAnimation.play('up', true);
-        else {
-            playerAnimation.stop();
-        }
+    if (keys.up.isDown) {
+        player.setVelocityY(-speed);
     }
-    animationSetup(scene) {
-        scene.anims.create({
-            key: 'idle',
-            frames: scene.anims.generateFrameNumbers('portal', {
-                start: 0,
-                end: 3
-            }),
-            frameRate: 6,
-            repeat: -1
-        });
-
-        scene.anims.create({
-            key: 'left',
-            frames: scene.anims.generateFrameNumbers('player', {
-                start: 15,
-                end: 17
-            }),
-            frameRate: 6,
-        });
-
-        scene.anims.create({
-            key: 'right',
-            frames: scene.anims.generateFrameNumbers('player', {
-                start: 27,
-                end: 29
-            }),
-            frameRate: 6,
-        });
-        scene.anims.create({
-            key: 'down',
-            frames: scene.anims.generateFrameNumbers('player', {
-                start: 3,
-                end: 5
-            }),
-            frameRate: 6,
-        });
-        scene.anims.create({
-            key: 'up',
-            frames: scene.anims.generateFrameNumbers('player', {
-                start: 39,
-                end: 41
-            }),
-            frameRate: 4,
-        });
-        scene.anims.create({
-            key: 'turn',
-            frames: [{
-                key: 'player',
-                frame: 4
-            }],
-            frameRate: 10,
-            repeat: -1
-        });
+    if (keys.down.isDown) {
+        player.setVelocityY(speed);
     }
+    if (keys.left.isDown) {
+        player.setVelocityX(-speed);
+    }
+    if (keys.right.isDown) {
+        player.setVelocityX(speed);
+    }
+    if (keys.up.isUp && keys.down.isUp) {
+        player.setVelocityY(0);
+        //playerAnimation.play('turn', true);
+    }
+    if (keys.right.isUp && keys.left.isUp) {
+        player.setVelocityX(0);
+        //playerAnimation.play('turn', true);
+    }
+    // other inputs than movement 
+    if (singlePress(keys.interact)) {
+        console.log(player);
+        //console.log(keys.interact);
+        //checkColliders()
+    }
+    if (player.body.velocity.x > 0) playerAnimation.play('right', true);
+    else if (player.body.velocity.x < 0) playerAnimation.playReverse('left', true);
+    else if (player.body.velocity.y > 0) playerAnimation.play('down', true);
+    else if (player.body.velocity.y < 0) playerAnimation.play('up', true);
+    else {
+        playerAnimation.stop();
+    }
+}
+function animationSetup(scene) {
+    scene.anims.create({
+        key: 'idle',
+        frames: scene.anims.generateFrameNumbers('portal', {
+            start: 0,
+            end: 3
+        }),
+        frameRate: 6,
+        repeat: -1
+    });
+
+    scene.anims.create({
+        key: 'left',
+        frames: scene.anims.generateFrameNumbers('player', {
+            start: 15,
+            end: 17
+        }),
+        frameRate: 6,
+    });
+
+    scene.anims.create({
+        key: 'right',
+        frames: scene.anims.generateFrameNumbers('player', {
+            start: 27,
+            end: 29
+        }),
+        frameRate: 6,
+    });
+    scene.anims.create({
+        key: 'down',
+        frames: scene.anims.generateFrameNumbers('player', {
+            start: 3,
+            end: 5
+        }),
+        frameRate: 6,
+    });
+    scene.anims.create({
+        key: 'up',
+        frames: scene.anims.generateFrameNumbers('player', {
+            start: 39,
+            end: 41
+        }),
+        frameRate: 4,
+    });
+    scene.anims.create({
+        key: 'turn',
+        frames: [{
+            key: 'player',
+            frame: 4
+        }],
+        frameRate: 10,
+        repeat: -1
+    });
 }

@@ -14,6 +14,7 @@ export const constants = {
             left: 'A',
             right: 'D',
             interact: 'E',
+            alt_interact: 'enter',
             sprint: 'shift'
         },
 
@@ -29,7 +30,7 @@ export const constants = {
         EXTERIOR_B: 'CC_City_Exterior_B',
         EXTERIOR_C: 'CC_City_Exterior_C',
         SCIFI: 'scifi_space_rpg_tiles_lpcized',
-        TRAINING_COMPUTER: 'trainingComputer.png'
+        TRAINING_COMPUTER: 'trainingComputer4-3.png'
     },
     SPRITES: {
         PC: 'playable_charaters.png'
