@@ -44,7 +44,8 @@ export const constants = {
         MED1: 'med1_32',
         MED2: 'med2_32',
         MED3: 'med3_32',
-        TRAINING_COMPUTER: 'trainingComputer.png'
+        TRAINING_COMPUTER: 'trainingComputer.png',
+        BG_TIME_MACHINE: 'bg_time_device.png' 
     },
     SPRITES: {
         PC: 'playable_charaters.png',
