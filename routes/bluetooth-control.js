@@ -1,5 +1,5 @@
-const BTSP = require('bluetooth-serial-port');
-const btSerial = new BTSP.BluetoothSerialPort();
+//const BTSP = require('bluetooth-serial-port');
+//const btSerial = new BTSP.BluetoothSerialPort();
 
 const express = require('express');
 const router = express.Router();
