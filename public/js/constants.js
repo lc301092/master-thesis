@@ -35,7 +35,7 @@ export const constants = {
         EXTERIOR_B: 'CC_City_Exterior_B',
         EXTERIOR_C: 'CC_City_Exterior_C',
         SCIFI: 'scifi_space_rpg_tiles_lpcized',
-        TRAINING_COMPUTER: 'trainingComputer4-3.png'
+        TRAINING_COMPUTER: 'trainingComputer4-3.png',
         MEDLAB_INTERIOR_1: 'interior1', 
         MEDLAB_INTERIOR_2: 'walls1',
         MED1: 'med1_32',
@@ -46,7 +46,7 @@ export const constants = {
     SPRITES: {
         PC: 'playable_charaters.png',
         PORTAL: 'portal_u.png',
-        CHEMIST_NPC: 'chemist-npc.png'
+        CHEMIST_NPC: 'professor-npc.png'
     },
     TILEIMAGES: {
         BASE_LVL: {
@@ -69,6 +69,10 @@ export const constants = {
     TILEMAPS: {
         BASE_LVL: 'baseSceneTest',
         CHEMIST_LVL: 'scenarie1' 
+    },
+    TEXT_STYLE: {
+        NPC: {},
+        COMPUTER: {}
     }
 
 }

@@ -1,7 +1,18 @@
 import { constants } from "../constants.js"
 
-let player, keys, playerAnimation, singlePress, scene, map;
+let player, keys, playerAnimation, singlePress, scene;
 let speed = 128;
+let npc;
+let npcText;
+let playerInteractionCollider;
+let interactionRangeY = 30;
+let interactionRangeX = 15;
+let objective = {
+    medY: {isApproved: ''},
+    medR: {isApproved: ''},
+    medB: {isApproved: ''}
+}
+
 
 
 export class ChemistLevel extends Phaser.Scene {
@@ -11,23 +22,8 @@ export class ChemistLevel extends Phaser.Scene {
         })
     }
     init(data) {
-        // tell progress from 
-        console.log(data)
     }
-    preload() {
-
-        
-        console.log(this.load);
-
-        this.load.spritesheet('player', 'assets/sprite/playable_charaters.png', {
-            frameWidth: 48,
-            frameHeight: 64
-        });
-
-        this.load.spritesheet('portal', 'assets/sprite/portal.png', {
-            frameWidth: 250,
-            frameHeight: 592
-        });
+    preload() {   
     }
     create() {
         scene = this;
@@ -41,12 +37,12 @@ export class ChemistLevel extends Phaser.Scene {
         let tileImages = constants.TILEIMAGES.CHEMIST_LVL;
         let images = constants.IMAGES;
         let tileObj = {};
+
         for (const key in tileImages) {
             let tileImageString = images[key];
             let tilesetImage = chemist_lvl.addTilesetImage(tileImageString);
             tileObj[key] = tilesetImage; 
         }
-        console.log(tileObj);
 
         let MEDLAB_INTERIOR_1 = tileObj.MEDLAB_INTERIOR_1;
         let MEDLAB_INTERIOR_2 = tileObj.MEDLAB_INTERIOR_2;
@@ -54,7 +50,7 @@ export class ChemistLevel extends Phaser.Scene {
         let MED2 = tileObj.MED2;
         let MED3 = tileObj.MED3;
         let PORTAL = tileObj.PORTAL;
-    
+        
         //layers 
         let ground = chemist_lvl.createLayer('ground', [MEDLAB_INTERIOR_1], 0, 0).setDepth(-2);
         let walls = chemist_lvl.createLayer('walls', [MEDLAB_INTERIOR_1, MEDLAB_INTERIOR_2], 0, 0).setDepth(-2);
@@ -64,16 +60,27 @@ export class ChemistLevel extends Phaser.Scene {
         let interact = chemist_lvl.createLayer('interact', [MED1, MED2, MED3, PORTAL], 0, 0).setDepth(1);
         let interact2 = chemist_lvl.createLayer('interact2', [PORTAL],0,0).setDepth(-1);
 
-        player = scene.physics.add.sprite(150, 450, 'player').setCollideWorldBounds(true); //.setScale(2);
-        let npc = scene.physics.add.sprite(550,350,'chemist-npc').setCollideWorldBounds(true).setImmovable(true).setScale(2);
+        player = scene.physics.add.sprite(265, 250, 'player').setCollideWorldBounds(true); //.setScale(2);
+        playerInteractionCollider = this.add.rectangle(player.x,player.y + interactionRangeY,player.width/2,player.height/2 ,0xff0000,0.5);
+        let dynmaicCollider = this.physics.add.group();
+        dynmaicCollider.add(playerInteractionCollider);
+        npc = scene.physics.add.sprite(550,350, 'professor-npc',9);
+        let collideables = this.physics.add.staticGroup();
+        let npcCollider =this.add.rectangle(npc.x,npc.y,npc.width/2,npc.height,0xff0000,0.5);
+        collideables.add(npcCollider);
+        //npcCollider.setCollideWorldBounds(true)
+        //npcCollider.setImmovable(true);
         player.setSize(25, 50).setOffset(12, 10);
-        scene.cameras.main.setBounds(0, 0, 1600, 1200);
-        scene.physics.world.setBounds(0, 0, 1600, 1200);
+        scene.cameras.main.setBounds(0, 0, 600, 600);
+        scene.physics.world.setBounds(0, 0, 600, 600);
         let mainCamera = scene.cameras.main;
         mainCamera.startFollow(player, true, 0.05, 0.05);
-       
-        scene.animationSetup(this);
+        //scene.animationSetup(this);
         playerAnimation = player.anims;
+        
+        npcText = this.add.text(110,485,'Vi skal have analyseret medikamenterne\nobjektivt, så resultaterne ikke er farvede');
+        npcText.visible = false;
+
         // keyobject for movement
         keys = scene.input.keyboard.addKeys(constants.USERINPUT.WASD_MOVEMENT);
         singlePress = constants.USERINPUT.SINGLEPRESS;
@@ -89,43 +96,62 @@ export class ChemistLevel extends Phaser.Scene {
 		// map collision interactives
 			scene.physics.add.collider(player, interact);
             scene.physics.add.collider(player, interact2);
- 
+            scene.physics.add.overlap(playerInteractionCollider,npcCollider,npcInteraction,null, this);
+            scene.physics.add.collider(player, npcCollider, npcInteraction2 );
 			// gul medicin
 			interact.setTileLocationCallback(22, 27, 2, 2, () => {
 				if (singlePress(keys.interact)){
-					console.log('Du interagerer med GUL medicin');
+					alert('Du interagerer med GUL medicin');
 					// --- dataset til gul medicin kode her ---
-				};
-			});
+                    if (confirm('Vil du acceptere dette medikament? \nTryk på [annuller] for nej eller vente med svare')) {
+                        objective.medY.isApproved = true;
+                    }
+                    else {
+                        objective.medY.isApproved = false;
+                    }
+				    
+                }
+            });
 
 			// rød medicin
 			interact.setTileLocationCallback(30, 27, 2, 2, () => {
 				if (singlePress(keys.interact)){
-					console.log('Du interagerer med RØD medicin');
+					alert('Du interagerer med RØD medicin');
 					// --- dataset til rød medicin kode her---
+                    if (confirm('Vil du acceptere dette medikament? \nTryk på [annuller] for nej eller vente med svare')) {
+                        objective.medR.isApproved = true;
+                    }
+                    else {
+                        objective.medR.isApproved = false;
+                    }
 				};
 			});
 
 			// blå medicin
 			interact.setTileLocationCallback(26, 27, 2, 2, () => {
 				if (singlePress(keys.interact)){
-					console.log('Du interagerer med BLÅ medicin');
+					alert('Du interagerer med BLÅ medicin');
 					// --- dataset til blå medicin kode her ---
+                    if (confirm('Vil du acceptere dette medikament? \nTryk på [annuller] for nej eller vente med svare')) {
+                        objective.medB.isApproved = true;
+                    }
+                    else {
+                        objective.medB.isApproved = false;
+                    }
 				};
 			});  
 
             interact2.setTileLocationCallback(15,13,3,4, ()=> {
                 
                 if (singlePress(keys.interact)){
-                    if (confirm('Vil du gerne rejse tilbage til år 2200?')) {
-                        // Save it!
-                        console.log('Rejser tilbage');
-                        //interact.setTileLocationCallback(7,25,1,4, null);
-                      } else {
-                        // Do nothing!
-                        console.log('Bliv i år 1930');
-                        //interact.setTileLocationCallback(7,25,1,4, null);
-                      }
+                    if (!confirm('Vil du gerne rejse tilbage til år 2200?')) return; 
+                    
+                    // Save it!
+                    localStorage.setItem('objectives',JSON.stringify(objective));
+                    console.log('Rejser tilbage');
+                    this.scene.start(constants.SCENES.PLAY);
+                    //interact.setTileLocationCallback(7,25,1,4, null);
+                    
 				};
             });
      
@@ -143,15 +169,23 @@ export class ChemistLevel extends Phaser.Scene {
 
         if (keys.up.isDown) {
             player.setVelocityY(-speed);
+            playerInteractionCollider.x = player.x;
+            playerInteractionCollider.y = player.y - interactionRangeX;
         }
         if (keys.down.isDown) {
             player.setVelocityY(speed);
+            playerInteractionCollider.x = player.x;
+            playerInteractionCollider.y = player.y + interactionRangeY;
         }
         if (keys.left.isDown) {
             player.setVelocityX(-speed);
+            playerInteractionCollider.x = player.x - interactionRangeX;
+            playerInteractionCollider.y = player.y;
         }
         if (keys.right.isDown) {
             player.setVelocityX(speed);
+            playerInteractionCollider.x = player.x + interactionRangeX;
+            playerInteractionCollider.y = player.y;
         }
         if (keys.up.isUp && keys.down.isUp) {
             player.setVelocityY(0);
@@ -228,5 +262,31 @@ export class ChemistLevel extends Phaser.Scene {
             frameRate: 10,
             repeat: -1
         });
+        scene.anims.create({
+            key: 'idle',
+            frames: [{
+                key: constants.SPRITES.CHEMIST_NPC,
+                frame: 10
+            }],
+            frameRate: 10,
+            repeat: -1
+        });
     }
+}
+function npcInteraction2(){
+    console.log('touching');
+ }
+
+function npcInteraction(){
+   // console.log('touching');
+    if (singlePress(keys.interact)){
+        // alert('"Vi skal have analyseret medikamenterne objektivt, så resultaterne ikke er farvede"');
+        if(npcText.visible) return;
+        // determine what npc will say 
+
+        // set text to visible for a period of time
+        npcText.visible = true;
+        setTimeout(()=>{npcText.visible = false}, 5000);
+    }
+
 }
