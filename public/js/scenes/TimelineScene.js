@@ -11,7 +11,7 @@ export class Timeline extends Phaser.Scene {
 	init(data) {
 		console.log(data)
 
-		this.add.image(0, 0, 'screen.png').setOrigin(0);
+		this.add.image(0, 0, constants.IMAGES.SCREEN).setOrigin(0);
 	}
 	preload() {}
 
