@@ -3,6 +3,7 @@ import { constants } from "../constants.js"
 let player, keys, playerAnimation, singlePress, scene, map;
 let speed = 128;
 let isPlayerDisabled;
+let playerProgression;
 
 
 export class Base extends Phaser.Scene {
@@ -22,7 +23,10 @@ export class Base extends Phaser.Scene {
         } 
     }
     preload() {
+        playerProgression = JSON.parse(localStorage.getItem("objectives"));
+        console.log("JSON parser: ", playerProgression);
     }
+
     create() {
         scene = this;
         isPlayerDisabled = false;
