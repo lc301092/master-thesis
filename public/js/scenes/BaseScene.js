@@ -51,7 +51,7 @@ export class Base extends Phaser.Scene {
         let SCIFI = tileObj.SCIFI;
 
         //layers 
-        let ground = baseSceneTest.createLayer('Ground', [SCIFI, DOORS1], 0, 0).setDepth(-1);
+        let ground = baseSceneTest.createLayer('Ground', [SCIFI, DOORS1], 0, 0);
         let walls = baseSceneTest.createLayer('Wall', [SCIFI], 0, 0);
         let decoration = baseSceneTest.createLayer('Decoration', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B, SCIFI], 0, 0);
         let decoration2 = baseSceneTest.createLayer('Decoration2', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B], 0, 0);
@@ -74,7 +74,7 @@ export class Base extends Phaser.Scene {
         singlePress = constants.USERINPUT.SINGLEPRESS;
 
         // map collisions
-        let borders = [walls, decoration, decoration2, interact];
+        let borders = [ground, walls, decoration, decoration2, interact];
         scene.physics.add.collider(player, borders);
 
         for (let i = 0; i < borders.length; i++) {
