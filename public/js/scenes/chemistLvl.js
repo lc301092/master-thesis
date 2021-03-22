@@ -61,12 +61,17 @@ export class ChemistLevel extends Phaser.Scene {
         let interact2 = chemist_lvl.createLayer('interact2', [PORTAL],0,0).setDepth(-1);
 
         player = scene.physics.add.sprite(265, 250, 'player').setCollideWorldBounds(true); //.setScale(2);
-        playerInteractionCollider = this.add.rectangle(player.x,player.y + interactionRangeY,player.width/2,player.height/2 ,0xff0000,0.5);
+        playerInteractionCollider = this.add.rectangle(player.x,player.y + interactionRangeY,player.width/2,player.height/2 ,
+           // 0xff0000,0.5  // debugging purposes
+            );
         let dynmaicCollider = this.physics.add.group();
         dynmaicCollider.add(playerInteractionCollider);
         npc = scene.physics.add.sprite(550,350, 'professor-npc',9);
         let collideables = this.physics.add.staticGroup();
-        let npcCollider =this.add.rectangle(npc.x,npc.y,npc.width/2,npc.height,0xff0000,0.5);
+        let npcCollider =this.add.rectangle(npc.x,npc.y,npc.width/2,npc.height,
+            // 0xff0000,0.5 // debugging purposes
+            );
+
         collideables.add(npcCollider);
         //npcCollider.setCollideWorldBounds(true)
         //npcCollider.setImmovable(true);
