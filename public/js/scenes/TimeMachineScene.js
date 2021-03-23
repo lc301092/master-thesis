@@ -70,7 +70,7 @@ function checkTimeSettings(){
 }
 function promptXValue(){
     
-    let promptVal = parseInt(prompt('Du kan dreje og denne knap. Indtast et positivt tal for at dreje den et hak med urets retning eller et negativt tal for at dreje den et hak mod urets retning'));
+    let promptVal = parseInt(prompt('Du kan dreje og denne knap. Indtast et *positivt tal* for at dreje den tilsvarende antal hak [med urets retning] eller et *negativt tal* for at dreje tilsvarende hak [mod urets retning]'));
     if(isNaN(promptVal)) {
         alert('du kan kun skrive et tal, prøv igen');
         promptXValue();
