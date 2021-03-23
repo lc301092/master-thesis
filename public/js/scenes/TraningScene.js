@@ -21,6 +21,7 @@ export class TraningScene extends Phaser.Scene {
         
     }
     preload() {
+        this.add.image(0, 0, constants.IMAGES.SCREEN).setOrigin(0);
     }
     create() {
         let computer =this.add.image(400, 100, constants.IMAGES.TRAINING_COMPUTER).setOrigin(0).setScale(0);

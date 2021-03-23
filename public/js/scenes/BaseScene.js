@@ -102,7 +102,8 @@ export class Base extends Phaser.Scene {
         interact.setTileLocationCallback(23, 6, 3, 2, () => {
             if (singlePress(keys.interact)) {
                 console.log('Start træningssimulator');
-                
+                this.scene.start(constants.SCENES.TRAININGSIMULATORSCENE, 'from base scene');
+
                 //let newScene = this.scene.launch(constants.SCENES.TRANING, 'from base scene');
                // isPlayerDisabled = true;
                 //this.scene.pause();
