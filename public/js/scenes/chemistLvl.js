@@ -1,9 +1,10 @@
 import { constants } from "../constants.js"
 
-let player, keys, playerAnimation, singlePress, scene;
+let player, keys, playerAnimation, singlePress, scene, playerPosition;
 let speed = 128;
 let npc;
 let npcText;
+let npcState;
 let tickY;
 let tickB;
 let tickR;
@@ -31,6 +32,7 @@ export class ChemistLevel extends Phaser.Scene {
         })
     }
     init(data) {
+        if(data.playerPosition) playerPosition = data.playerPosition;
     }
     preload() {
     }
@@ -69,7 +71,7 @@ export class ChemistLevel extends Phaser.Scene {
         let interact = chemist_lvl.createLayer('interact', [MED1, MED2, MED3, PORTAL], 0, 0).setDepth(1);
         let interact2 = chemist_lvl.createLayer('interact2', [PORTAL], 0, 0).setDepth(-1);
 
-        player = scene.physics.add.sprite(265, 250, 'player').setCollideWorldBounds(true); //.setScale(2);
+        player = scene.physics.add.sprite(265, 250, 'player',4).setCollideWorldBounds(true); //.setScale(2);
         playerInteractionCollider = this.add.rectangle(player.x,player.y + interactionRangeY,player.width/2,player.height/2 ,
            // 0xff0000,0.5  // debugging purposes
             );
@@ -92,8 +94,9 @@ export class ChemistLevel extends Phaser.Scene {
         //scene.animationSetup(this);
         playerAnimation = player.anims;
 
-        npcText = this.add.text(110, 485, 'Vi skal have analyseret medikamenterne\nobjektivt, så resultaterne ikke er farvede');
+        npcText = this.add.text(110, 485, '', {color: 'black'});
         npcText.visible = false;
+        npcState = 0;
 
         // keyobject for movement
         keys = scene.input.keyboard.addKeys(constants.USERINPUT.WASD_MOVEMENT);
@@ -111,7 +114,7 @@ export class ChemistLevel extends Phaser.Scene {
         scene.physics.add.collider(player, interact);
         scene.physics.add.collider(player, interact2);
         scene.physics.add.overlap(playerInteractionCollider, npcCollider, npcInteraction, null, this);
-        scene.physics.add.collider(player, npcCollider, npcInteraction2);
+        scene.physics.add.collider(player, npcCollider);
 
 
         // instantiering af tick og x 
@@ -212,7 +215,7 @@ interact2.setTileLocationCallback(15, 13, 3, 4, () => {
         // Save answers!
         localStorage.setItem('objectives', JSON.stringify(objective));
         console.log('Rejser tilbage');
-        this.scene.start(constants.SCENES.PLAY);
+        this.scene.start(constants.SCENES.PLAY, {playerPosition});
         //interact.setTileLocationCallback(7,25,1,4, null);
 
     };
@@ -336,20 +339,19 @@ animationSetup(scene) {
     });
 }
 }
-function npcInteraction2() {
+/*function npcInteraction2() {
     console.log('touching');
-}
+}*/
 
 function npcInteraction() {
-    // console.log('touching');
     if (singlePress(keys.interact)) {
-        // alert('"Vi skal have analyseret medikamenterne objektivt, så resultaterne ikke er farvede"');
         if (npcText.visible) return;
+        npcText.text = getNpcText(npcState);
         // determine what npc will say 
 
         // set text to visible for a period of time
         npcText.visible = true;
-        setTimeout(() => { npcText.visible = false }, 5000);
+        setTimeout(() => { npcText.visible = false; npcState ++; }, npcText.text.length * 70);
     }
 
 }
@@ -360,4 +362,15 @@ async function toggleImage(image, callback) {
     setTimeout(() => {
         return callback();
     }, 50);
+}
+
+function getNpcText(state){
+    switch(state){
+        case 0:
+            return 'Det må være dig, der skal analysere medikamenterne\nobjektivt, så resultaterne ikke er farvede'; 
+        case 1: 
+            return 'Hvis en medicin skal kunne godkendes,skal det\noverholde følgende to regler';
+        case 2: return 'Regel #1: Den midterste halvdel af spredning for\nmedikamentets evne til febernedsættelse,\nskal være større end det ydre';
+        case 3: npcState = 0; return 'Regel #2: For bivirkninger gælder det, at medianen\nIKKE må overskride mere end 5 bivirkninger, dvs. 50%\naf de rapportede bivirkninger skal være under 5';
+    }
 }

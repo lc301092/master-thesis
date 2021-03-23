@@ -1,6 +1,7 @@
 import { constants } from "../constants.js"
 
 let playerProgression;
+let playerPosition;
 let eventPic;
 let secondEventPic;
 
@@ -13,6 +14,7 @@ export class Timeline extends Phaser.Scene {
 
     init(data) {
         console.log(data)
+        if(data.playerPosition) playerPosition = data.playerPosition;    
         this.add.image(0, 0, constants.IMAGES.SCREEN).setOrigin(0);
             }
     preload() {
@@ -78,7 +80,7 @@ export class Timeline extends Phaser.Scene {
         });
 
         btn.on('pointerdown', () => {
-            scene.scene.start(constants.SCENES.PLAY, 'from base scene');
+            scene.scene.start(constants.SCENES.PLAY, {playerPosition});
         });
     }
 
