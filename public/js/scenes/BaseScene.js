@@ -3,6 +3,7 @@ import { constants } from "../constants.js"
 let player, keys, playerAnimation, singlePress, scene, map;
 let speed = 128;
 let isPlayerDisabled;
+let playerProgression;
 
 
 export class Base extends Phaser.Scene {
@@ -13,16 +14,19 @@ export class Base extends Phaser.Scene {
     }
     init(data) {
         // tell progress from 
-        player = this.physics.add.sprite(150, 150, 'player').setCollideWorldBounds(true).setDepth(1); //.setScale(2);
+        player = this.physics.add.sprite(150, 150, 'player',4).setCollideWorldBounds(true).setDepth(1); //.setScale(2);
 
         console.log(data)
         if(data.playerPosition) {
-            player.x = playerPosition.x;
-            player.y = playerPosition.y;
+            player.x = data.playerPosition.x;
+            player.y = data.playerPosition.y;
         } 
     }
     preload() {
+        playerProgression = JSON.parse(localStorage.getItem("objectives"));
+        console.log("JSON parser: ", playerProgression);
     }
+
     create() {
         scene = this;
         isPlayerDisabled = false;
@@ -89,7 +93,7 @@ export class Base extends Phaser.Scene {
         interact.setTileLocationCallback(10, 5, 6, 1, () => {
             if (singlePress(keys.interact)) {
                 console.log('Observér tidslinjen');
-                this.scene.start(constants.SCENES.TIMELINE, 'from base scene');
+                this.scene.start(constants.SCENES.TIMELINE, {playerPosition: {x: player.x, y: player.y}});
                 // --- indstil tidsmaskine "scene" kode her ---
             };
         });
@@ -118,7 +122,7 @@ export class Base extends Phaser.Scene {
             if (singlePress(keys.interact)) {
                 console.log('Tidsmaskine aktiveret');
                 //this.scene.
-                this.scene.start(constants.SCENES.CHEMIST, 'from base scene');
+                this.scene.start(constants.SCENES.TIME_MACHINE, {playerPosition: {x: player.x, y: player.y}});
                 // --- skift scene til laboratorie kode her ---
             };
         });
