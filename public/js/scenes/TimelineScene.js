@@ -46,7 +46,7 @@ export class Timeline extends Phaser.Scene {
         scene.label.setWordWrapWidth(600);
         
         eventPic.disableInteractive();
-        this.typewriteText('ADVARSEL: \nDER ER GÅET ROD I MEDICINFREMSTILLINGEN! \nHJÆLP KEMIKERNE MED AT VÆLGE DEN RETTE MEDICIN! \n\nÅRSTAL: 1930 \nMATEMATIK: SANDSYNLIGHED 1');
+        this.typewriteText('ADVARSEL: \nDER ER GÅET ROD I MEDICINFREMSTILLINGEN! \nHJÆLP LABORANTEN MED AT VÆLGE DEN RETTE MEDICIN! \n\nÅRSTAL: 1930 \nMATEMATIK: STATISTIK');
         });
 
         // event billede til andet scenarie

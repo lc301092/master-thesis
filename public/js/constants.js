@@ -7,7 +7,8 @@ export const constants = {
         TRANING: "TRANING",
         CHEMIST: "CHEMIST",
         TIMELINE: "TIMELINE",
-        TIME_MACHINE: 'TIME_MACHINE'
+        TIME_MACHINE: 'TIME_MACHINE',
+        TRAININGSIMULATORSCENE: "TRAININGSIMULATORSCENE"
     },
     USERINPUT: {
         SINGLEPRESS: Phaser.Input.Keyboard.JustDown,
