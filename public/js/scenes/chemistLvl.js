@@ -371,6 +371,6 @@ function getNpcText(state){
         case 1: 
             return 'Hvis en medicin skal kunne godkendes,skal det\noverholde følgende to regler';
         case 2: return 'Regel #1: For bivirkninger gælder det, at medianen\nIKKE må overskride mere end 5 bivirkninger, dvs. 50%\naf de rapportede bivirkninger skal være under 5';
-        case 3: npcState = 0; return 'Regel #2: Den midterste halvdel af spredning for\nmedikamentets evne til febernedsættelse,\nskal være større end det ydre';
+        case 3: npcState = 0; return 'Regel #2: Den midterste halvdel af spredning for\nmedikamentets temperaturmæssige evne til febernedsættelse,\nskal være større end det ydre';
     }
 }
