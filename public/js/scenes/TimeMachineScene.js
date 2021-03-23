@@ -39,7 +39,7 @@ export class TimeMachineScene extends Phaser.Scene {
      displayFunction = this.add.text(160, 300, 'f(x) = -15x + 2200', compupterStyle);
      displayUnits = this.add.text(180,385,'x     y      a     b', compupterStyle);
 
-     btnXCircle = this.add.circle(125,140,50,0xff0000,0.5).setOrigin(0).setInteractive({useHandCursor: true});
+     btnXCircle = this.add.circle(125,140,50).setOrigin(0).setInteractive({useHandCursor: true});
      btnXCircle.on('pointerdown',promptXValue,this);
      const backBtn = this.add.text(50, 550, 'Tilbage', { fill: '#0f0' });    
      backBtn.setInteractive({ useHandCursor: true });

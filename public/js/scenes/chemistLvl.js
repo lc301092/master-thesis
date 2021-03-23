@@ -134,8 +134,8 @@ export class ChemistLevel extends Phaser.Scene {
 
         // medikament datasæt billede 
         dataY = scene.add.image(0,100, 'yellow.png').setScale(0.8).setOrigin(0).setDepth(10);
-        dataR = scene.add.image(0, 100, 'blue.png').setScale(0.8).setOrigin(0).setDepth(10);
-        dataB = scene.add.image(0, 100, 'red.png').setScale(0.8).setOrigin(0).setDepth(10);
+        dataR = scene.add.image(0, 100, 'red.png').setScale(0.8).setOrigin(0).setDepth(10);
+        dataB = scene.add.image(0, 100, 'blue.png').setScale(0.8).setOrigin(0).setDepth(10);
         dataY.visible = false;
         dataR.visible = false; 
         dataB.visible = false; 
