@@ -98,26 +98,6 @@ export class Base extends Phaser.Scene {
             };
         });
 
-        // træningssimulator
-        interact.setTileLocationCallback(23, 6, 3, 2, () => {
-            if (singlePress(keys.interact)) {
-                console.log('Start træningssimulator');
-                this.scene.start(constants.SCENES.TRAININGSIMULATORSCENE, 'from base scene');
-
-                //let newScene = this.scene.launch(constants.SCENES.TRANING, 'from base scene');
-               // isPlayerDisabled = true;
-                //this.scene.pause();
-                // this.scene.launch(constants.SCENES.TRANING);
-                
-                // this.scene.transition({target: constants.SCENES.TRANING, 
-                //     duration: 300, 
-                //     sleep: false, 
-                //     allowInput: false, 
-                //     moveAbove: true});
-                // --- Åbn træningssimulator kode her ---
-            };
-        });
-
         // Tidsmaskinen
         interact.setTileLocationCallback(22, 18, 1, 1, () => {
             if (singlePress(keys.interact)) {

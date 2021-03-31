@@ -70,12 +70,14 @@ function checkTimeSettings(){
 }
 function promptXValue(){
     
-    let promptVal = parseInt(prompt('Du kan dreje og denne knap. Indtast et positivt tal for at dreje den et hak med urets retning eller et negativt tal for at dreje den et hak mod urets retning'));
+    let promptVal = prompt('\nDrejeknappen står på: '+ btnXValue +'\n\nDu kan dreje og denne knap. Indtast et positivt tal for at dreje den et hak med urets retning eller et negativt tal for at dreje den et hak mod urets retning');
+    if(!promptVal) return;
+    
     if(isNaN(promptVal)) {
         alert('du kan kun skrive et tal, prøv igen');
         promptXValue();
     }
-    btnXValue += promptVal;
+    btnXValue += parseInt(promptVal);
     // update 
     console.log(btnXValue);
 }
