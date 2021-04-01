@@ -6,7 +6,8 @@ let eventPic;
 let currentYearPic;
 let secondEventPic;
 let eventText;
-let welcome = true; 
+let welcome = true;
+let isWriting;
 
 export class Timeline extends Phaser.Scene {
     constructor() {
@@ -19,6 +20,7 @@ export class Timeline extends Phaser.Scene {
         console.log(data)
         if (data.playerPosition) playerPosition = data.playerPosition;
         this.add.image(0, 0, constants.IMAGES.SCREEN).setOrigin(0);
+        isWriting = false;
     }
     preload() {
         // get progression from localstorage
@@ -27,6 +29,8 @@ export class Timeline extends Phaser.Scene {
     }
 
     create() {
+        console.log('kommer den hertil? 1');
+
         let scene = this;
         const header = scene.add.text(330, 50, 'Tidslinje', { fill: '#31FDF0', fontSize: '25px' });
         //const year = scene.add.text(150, 100, 'År: 1930', { fill: '#31FDF0'});
@@ -34,7 +38,7 @@ export class Timeline extends Phaser.Scene {
         // set text label
         scene.label = this.add.text(100, 270, '');
         scene.label.setWordWrapWidth(600);
-      
+
         // --------------- hjælp mig lige her luca ------------
         // hvor skal nedestående kode placeres henne? Den gør alle knapper interaktive, og skal først sættes interaktiv, når teksten er færdig med at blive displayed. 
         //this.setInteractive();
@@ -50,7 +54,11 @@ export class Timeline extends Phaser.Scene {
         });
         eventPic.on('pointerdown', () => {
             // Dynamisk tekst
+
+            if (isWriting) return;
+            isWriting = true;
             this.typewriteText('ADVARSEL: \nDER ER GÅET ROD I MEDICINFREMSTILLINGEN! \nHJÆLP LABORANTEN MED AT VÆLGE DEN RETTE MEDICIN! \n\nÅRSTAL: <span style="color: #ff0000">1930</span> \nMATEMATIK: STATISTIK');
+
         });
 
 
@@ -65,7 +73,10 @@ export class Timeline extends Phaser.Scene {
         });
         currentYearPic.on('pointerdown', () => {
             // Dynamisk tekst
+            if (isWriting) return;
+            isWriting = true;
             this.typewriteText('DIN NUVÆRENDE LOKATION: BASE FOR TIDSREJSER. \n\nÅRSTAL: 2200.');
+
         });
 
 
@@ -82,16 +93,23 @@ export class Timeline extends Phaser.Scene {
                 secondEventPic.setScale(1);
             });
             secondEventPic.on('pointerdown', () => {
-                // Dynamisk tekst
+                // Dynamisk tekst   
+                if (isWriting) return;
+                isWriting = true;
                 this.typewriteText('ADVARSEL: \nDER ER SKET ET SPILD AF MEDIKAMENTER, SOM HAR FØRT TIL FORURENING AF GRUNDVANDET. \nHJÆLP BIOLOGERNE MED AT RENSE GRUNDVANDET. \n\nÅRSTAL: 2000 \nMATEMATIK: STATISTIK');
+
             });
         }
 
-        if (welcome){
-            this.typewriteText('VELKOMMEN HJEM REKRUT! \n\nHER KAN DU SE DIN TIDSLINJE! \nTRYK PÅ IKONERNE, FOR AT FINDE UD AF HVAD DER SKABER PROBLEMER I TIDSLINJEN OG RET OP PÅ DEM, VED AT REJSE TILBAGE I TIDEN! \n\nHELD OG LYKKE!');
-            welcome = false;
-        }   
+        if (!welcome) return;
+        welcome = false;
 
+        if (isWriting) return;
+        isWriting = true;
+        this.typewriteText('VELKOMMEN HJEM REKRUT! \n\nHER KAN DU SE DIN TIDSLINJE! \nTRYK PÅ IKONERNE, FOR AT FINDE UD AF HVAD DER SKABER PROBLEMER I TIDSLINJEN OG RET OP PÅ DEM, VED AT REJSE TILBAGE I TIDEN! \n\nHELD OG LYKKE!');
+
+
+        console.log('kommer den hertil? 2');
         // tilbage knap 
         const btn = scene.add.text(70, 400, 'Tilbage', { fill: '#0f0' });
         btn.setInteractive({ useHandCursor: true });
@@ -111,16 +129,17 @@ export class Timeline extends Phaser.Scene {
         // reset tekst
         this.label.text = '';
         //this.disableInteractiveEvents();
-        const length = text.length
-        let i = 0
+        const length = text.length;
+        let i = 0;
         this.time.addEvent({
             callback: () => {
-                this.label.text += text[i]
-                ++i
+                this.label.text += text[i];
+                ++i;
+                if(length == i) isWriting = false;
             },
             repeat: length - 1,
             delay: 70
-        })
+        });
     }
 
     typewriteTextWrapped(text) {
