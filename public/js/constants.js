@@ -4,11 +4,9 @@ export const constants = {
         MENU: "MENU",
         PLAY: "PLAY",
         UI: "UI",
-        TRANING: "TRANING",
         CHEMIST: "CHEMIST",
         TIMELINE: "TIMELINE",
         TIME_MACHINE: 'TIME_MACHINE',
-        TRAININGSIMULATORSCENE: "TRAININGSIMULATORSCENE"
     },
     USERINPUT: {
         SINGLEPRESS: Phaser.Input.Keyboard.JustDown,
@@ -50,6 +48,7 @@ export const constants = {
         TRAINING_COMPUTER: 'trainingComputer.png',
         BG_TIME_MACHINE: 'bg_time_device.png', 
         BTN_TIME_MACHINE: 'time_device_btn.png',
+        SCREEN_TIME_MACHINE: 'clear_screen.png',
         MED_DATA_YELLOW: 'yellow.png',
         MED_DATA_BLUE: 'blue.png',
         MED_DATA_RED: 'red.png'
