@@ -8,6 +8,7 @@ let secondEventPic;
 let eventText;
 let welcome = true;
 let isWriting;
+let textPlugin;
 
 export class Timeline extends Phaser.Scene {
     constructor() {
@@ -21,6 +22,7 @@ export class Timeline extends Phaser.Scene {
         if (data.playerPosition) playerPosition = data.playerPosition;
         this.add.image(0, 0, constants.IMAGES.SCREEN).setOrigin(0);
         isWriting = false;
+        textPlugin = this.plugins.get('rexbbcodetextplugin');
     }
     preload() {
         // get progression from localstorage
@@ -29,19 +31,29 @@ export class Timeline extends Phaser.Scene {
     }
 
     create() {
-        console.log('kommer den hertil? 1');
-
+        
         let scene = this;
         const header = scene.add.text(330, 50, 'Tidslinje', { fill: '#31FDF0', fontSize: '25px' });
         //const year = scene.add.text(150, 100, 'År: 1930', { fill: '#31FDF0'});
+        //var txt = scene.add.rexBBCodeText(100, 100, '[b]h[/b]ello');
 
         // set text label
-        scene.label = this.add.text(100, 270, '');
-        scene.label.setWordWrapWidth(600);
+        scene.label = this.add.rexBBCodeText(100, 270, '', {wrap: {mode: 1,width: 600}});
+       // scene.label.setWordWrapWidth(600);
 
-        // --------------- hjælp mig lige her luca ------------
-        // hvor skal nedestående kode placeres henne? Den gør alle knapper interaktive, og skal først sættes interaktiv, når teksten er færdig med at blive displayed. 
-        //this.setInteractive();
+        // tilbage knap 
+        const btn = scene.add.text(70, 400, 'Tilbage', { fill: '#0f0' });
+        btn.setInteractive({ useHandCursor: true });
+        btn.on('pointerover', () => {
+            btn.setStyle({ fontSize: '18px' });
+        });
+        btn.on('pointerout', () => {
+            btn.setStyle({ fontSize: '16px' });
+        });
+
+        btn.on('pointerdown', () => {
+            scene.scene.start(constants.SCENES.PLAY, { playerPosition });
+        });
 
         // event billede til første scenarie
         eventPic = this.add.image(150, 120, constants.IMAGES.EVENTPIC).setOrigin(0);
@@ -57,7 +69,7 @@ export class Timeline extends Phaser.Scene {
 
             if (isWriting) return;
             isWriting = true;
-            this.typewriteText('ADVARSEL: \nDER ER GÅET ROD I MEDICINFREMSTILLINGEN! \nHJÆLP LABORANTEN MED AT VÆLGE DEN RETTE MEDICIN! \n\nÅRSTAL: <span style="color: #ff0000">1930</span> \nMATEMATIK: STATISTIK');
+            this.typewriteText('ADVARSEL: \nDER ER GÅET ROD I MEDICINFREMSTILLINGEN! \nHJÆLP LABORANTEN MED AT VÆLGE DEN RETTE MEDICIN! \n\nÅRSTAL:[size=24][color=orange][b] 1930 [/b][/color][/size] \nMATEMATIK: STATISTIK');
 
         });
 
@@ -79,6 +91,7 @@ export class Timeline extends Phaser.Scene {
 
         });
 
+        console.log('kommer den hertil? 1');
 
         // event billede til andet scenarie
         if (playerProgression != null) {
@@ -101,6 +114,7 @@ export class Timeline extends Phaser.Scene {
             });
         }
 
+        // skal stå som det sidste i create metoden
         if (!welcome) return;
         welcome = false;
 
@@ -109,20 +123,6 @@ export class Timeline extends Phaser.Scene {
         this.typewriteText('VELKOMMEN HJEM REKRUT! \n\nHER KAN DU SE DIN TIDSLINJE! \nTRYK PÅ IKONERNE, FOR AT FINDE UD AF HVAD DER SKABER PROBLEMER I TIDSLINJEN OG RET OP PÅ DEM, VED AT REJSE TILBAGE I TIDEN! \n\nHELD OG LYKKE!');
 
 
-        console.log('kommer den hertil? 2');
-        // tilbage knap 
-        const btn = scene.add.text(70, 400, 'Tilbage', { fill: '#0f0' });
-        btn.setInteractive({ useHandCursor: true });
-        btn.on('pointerover', () => {
-            btn.setStyle({ fontSize: '18px' });
-        });
-        btn.on('pointerout', () => {
-            btn.setStyle({ fontSize: '16px' });
-        });
-
-        btn.on('pointerdown', () => {
-            scene.scene.start(constants.SCENES.PLAY, { playerPosition });
-        });
     }
 
     typewriteText(text) {
@@ -131,14 +131,16 @@ export class Timeline extends Phaser.Scene {
         //this.disableInteractiveEvents();
         const length = text.length;
         let i = 0;
+        //[size=24][colored][b] 1930 [/b][/color][/size]
+        // if(text[i] == '[')
         this.time.addEvent({
             callback: () => {
                 this.label.text += text[i];
                 ++i;
-                if(length == i) isWriting = false;
+                if (length == i) isWriting = false;
             },
             repeat: length - 1,
-            delay: 70
+            delay: 50
         });
     }
 
