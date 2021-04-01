@@ -32,6 +32,7 @@ export const constants = {
         EVENTPIC: 'eventSprite.png',
         TICK: 'flueben.png',
         X: 'xikon.png',
+        CURRENTYEAR: 'Du_er_her.png',
         DATASÆT: 'datasæt_placeholder.png',
         PORTAL: 'portal_u',
         DOORS1: '!$CC_doors_1',
