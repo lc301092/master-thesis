@@ -28,7 +28,7 @@ export class MenuScene extends Phaser.Scene {
 
         this.input.on('pointerdown', (pointer) => {
             console.log('clicked');
-            this.scene.start(constants.SCENES.TIMELINE, 'Start');
+            this.scene.start(constants.SCENES.CHEMIST, 'Start');
         });
     }
         

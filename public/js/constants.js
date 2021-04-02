@@ -47,7 +47,7 @@ export const constants = {
         MED3: 'med3_32',
         TRAINING_COMPUTER: 'trainingComputer.png',
         BG_TIME_MACHINE: 'bg_time_device.png', 
-        BTN_TIME_MACHINE: 'time_device_btn.png',
+        BTN_TIME_MACHINE: 'time_device_btnC.png',
         SCREEN_TIME_MACHINE: 'clear_screen.png',
         MED_DATA_YELLOW: 'yellow.png',
         MED_DATA_BLUE: 'blue.png',

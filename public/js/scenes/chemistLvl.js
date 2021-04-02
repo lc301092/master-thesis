@@ -13,14 +13,14 @@ let xB;
 let xR;
 let dataY;
 let dataR;
-let dataB; 
+let dataB;
 let playerInteractionCollider;
 let interactionRangeY = 30;
 let interactionRangeX = 15;
 let objective = {
-    medY: { isApproved: '' },
-    medR: { isApproved: '' },
-    medB: { isApproved: '' }
+    medY: {isApproved: null},
+    medR: {isApproved: null},
+    medB: {isApproved: null}
 }
 
 
@@ -32,7 +32,7 @@ export class ChemistLevel extends Phaser.Scene {
         })
     }
     init(data) {
-        if(data.playerPosition) playerPosition = data.playerPosition;
+        if (data.playerPosition) playerPosition = data.playerPosition;
     }
     preload() {
     }
@@ -71,17 +71,17 @@ export class ChemistLevel extends Phaser.Scene {
         let interact = chemist_lvl.createLayer('interact', [MED1, MED2, MED3, PORTAL], 0, 0).setDepth(1);
         let interact2 = chemist_lvl.createLayer('interact2', [PORTAL], 0, 0).setDepth(-1);
 
-        player = scene.physics.add.sprite(265, 250, 'player',4).setCollideWorldBounds(true); //.setScale(2);
-        playerInteractionCollider = this.add.rectangle(player.x,player.y + interactionRangeY,player.width/2,player.height/2 ,
-           // 0xff0000,0.5  // debugging purposes
-            );
+        player = scene.physics.add.sprite(265, 250, 'player', 4).setCollideWorldBounds(true); //.setScale(2);
+        playerInteractionCollider = this.add.rectangle(player.x, player.y + interactionRangeY, player.width / 2, player.height / 2,
+            // 0xff0000,0.5  // debugging purposes
+        );
         let dynmaicCollider = this.physics.add.group();
         dynmaicCollider.add(playerInteractionCollider);
         npc = scene.physics.add.sprite(550, 350, 'professor-npc', 9);
         let collideables = this.physics.add.staticGroup();
-        let npcCollider =this.add.rectangle(npc.x,npc.y,npc.width/2,npc.height,
+        let npcCollider = this.add.rectangle(npc.x, npc.y, npc.width / 2, npc.height,
             // 0xff0000,0.5 // debugging purposes
-            );
+        );
 
         collideables.add(npcCollider);
         //npcCollider.setCollideWorldBounds(true)
@@ -91,10 +91,10 @@ export class ChemistLevel extends Phaser.Scene {
         scene.physics.world.setBounds(0, 0, 600, 600);
         let mainCamera = scene.cameras.main;
         mainCamera.startFollow(player, true, 0.05, 0.05);
-        //scene.animationSetup(this);
+        scene.animationSetup(this);
         playerAnimation = player.anims;
 
-        npcText = this.add.text(110, 485, '', {color: 'black'});
+        npcText = this.add.text(110, 485, '', { color: 'black' });
         npcText.visible = false;
         npcState = 0;
 
@@ -133,12 +133,12 @@ export class ChemistLevel extends Phaser.Scene {
         xB.visible = false;
 
         // medikament datasæt billede 
-        dataY = scene.add.image(0,100, 'yellow.png').setScale(0.8).setOrigin(0).setDepth(10);
+        dataY = scene.add.image(0, 100, 'yellow.png').setScale(0.8).setOrigin(0).setDepth(10);
         dataR = scene.add.image(0, 100, 'red.png').setScale(0.8).setOrigin(0).setDepth(10);
         dataB = scene.add.image(0, 100, 'blue.png').setScale(0.8).setOrigin(0).setDepth(10);
         dataY.visible = false;
-        dataR.visible = false; 
-        dataB.visible = false; 
+        dataR.visible = false;
+        dataB.visible = false;
 
         // gul medicin
         interact.setTileLocationCallback(22, 27, 2, 2, () => {
@@ -162,182 +162,182 @@ export class ChemistLevel extends Phaser.Scene {
             }
         });
 
-    // rød medicin
-    interact.setTileLocationCallback(30, 27, 2, 2, () => {
+        // rød medicin
+        interact.setTileLocationCallback(30, 27, 2, 2, () => {
+            if (singlePress(keys.interact)) {
+                alert('Du interagerer med RØD medicin');
+                toggleImage(dataR, function () {
+                    // --- dataset til rød medicin kode her---
+                    if (confirm('Vil du acceptere dette medikament? \nTryk [ok] for ja \nTryk på [annuller] for nej')) {
+                        objective.medR.isApproved = true;
+                        if (xR.visible) xR.visible = false;
+                        tickR.visible = true;
+                        dataR.visible = false;
+                    }
+                    else {
+                        objective.medR.isApproved = false;
+                        if (tickR.visible) tickR.visible = false;
+                        xR.visible = true;
+                        dataR.visible = false;
+                    }
+                });
+            };
+        });
+
+        // blå medicin
+        interact.setTileLocationCallback(26, 27, 2, 2, () => {
+            if (singlePress(keys.interact)) {
+
+                alert('Du interagerer med BLÅ medicin');
+                toggleImage(dataB, function () {
+                    // --- dataset til blå medicin kode her ---
+                    if (confirm('Vil du acceptere dette medikament? \nTryk [ok] for ja \nTryk på [annuller] for nej')) {
+                        objective.medB.isApproved = true;
+                        if (xB.visible) xB.visible = false;
+                        tickB.visible = true;
+                        dataB.visible = false;
+                    }
+                    else {
+                        objective.medB.isApproved = false;
+                        if (tickB.visible = true) tickB.visible = false;
+                        xB.visible = true;
+                        dataB.visible = false;
+                    }
+                });
+            };
+        });
+
+        interact2.setTileLocationCallback(15, 13, 3, 4, () => {
+
+            if (singlePress(keys.interact)) {
+                if (!confirm('Vil du gerne rejse tilbage til år 2200?')) return;
+
+                // Save answers!
+                localStorage.setItem('objectives', JSON.stringify(objective));
+                console.log('Rejser tilbage');
+                this.scene.start(constants.SCENES.PLAY, { playerPosition });
+                //interact.setTileLocationCallback(7,25,1,4, null);
+
+            };
+        });
+
+    }
+    update() {
+        // player movement
+        this.playerControl();
+    }
+    // 8 directional  
+    playerControl() {
+
+        if (singlePress(keys.sprint))
+            speed = 192;
+        else if (keys.sprint.isUp) speed = 128;
+
+        if (keys.up.isDown) {
+            player.setVelocityY(-speed);
+            playerInteractionCollider.x = player.x;
+            playerInteractionCollider.y = player.y - interactionRangeX;
+        }
+        if (keys.down.isDown) {
+            player.setVelocityY(speed);
+            playerInteractionCollider.x = player.x;
+            playerInteractionCollider.y = player.y + interactionRangeY;
+        }
+        if (keys.left.isDown) {
+            player.setVelocityX(-speed);
+            playerInteractionCollider.x = player.x - interactionRangeX;
+            playerInteractionCollider.y = player.y;
+        }
+        if (keys.right.isDown) {
+            player.setVelocityX(speed);
+            playerInteractionCollider.x = player.x + interactionRangeX;
+            playerInteractionCollider.y = player.y;
+        }
+        if (keys.up.isUp && keys.down.isUp) {
+            player.setVelocityY(0);
+            //playerAnimation.play('turn', true);
+        }
+        if (keys.right.isUp && keys.left.isUp) {
+            player.setVelocityX(0);
+            //playerAnimation.play('turn', true);
+        }
+        // other inputs than movement 
         if (singlePress(keys.interact)) {
-            alert('Du interagerer med RØD medicin');
-            toggleImage(dataR, function () {
-            // --- dataset til rød medicin kode her---
-            if (confirm('Vil du acceptere dette medikament? \nTryk [ok] for ja \nTryk på [annuller] for nej')) {
-                objective.medR.isApproved = true;
-                if (xR.visible) xR.visible = false;
-                tickR.visible = true;
-                dataR.visible = false;
-            }
-            else {
-                objective.medR.isApproved = false;
-                if (tickR.visible) tickR.visible = false;
-                xR.visible = true;
-                dataR.visible = false;
-            }
-            });
-        };
-    });
-
-// blå medicin
-interact.setTileLocationCallback(26, 27, 2, 2, () => {
-    if (singlePress(keys.interact)) {
-
-        alert('Du interagerer med BLÅ medicin');
-        toggleImage(dataB, function () {
-        // --- dataset til blå medicin kode her ---
-        if (confirm('Vil du acceptere dette medikament? \nTryk [ok] for ja \nTryk på [annuller] for nej')) {
-            objective.medB.isApproved = true;
-            if (xB.visible) xB.visible = false;
-            tickB.visible = true;
-            dataB.visible = false;
+            console.log(player);
+            //console.log(keys.interact);
+            //checkColliders()
         }
+        if (player.body.velocity.x > 0) playerAnimation.play('right', true);
+        else if (player.body.velocity.x < 0) playerAnimation.playReverse('left', true);
+        else if (player.body.velocity.y > 0) playerAnimation.play('down', true);
+        else if (player.body.velocity.y < 0) playerAnimation.play('up', true);
         else {
-            objective.medB.isApproved = false;
-            if (tickB.visible = true) tickB.visible = false;
-            xB.visible = true;
-            dataB.visible = false;
+            playerAnimation.stop();
         }
-    });
-    };
-});
+    }
+    animationSetup(scene) {
+        scene.anims.create({
+            key: 'idle',
+            frames: scene.anims.generateFrameNumbers('portal', {
+                start: 0,
+                end: 3
+            }),
+            frameRate: 6,
+            repeat: -1
+        });
 
-interact2.setTileLocationCallback(15, 13, 3, 4, () => {
+        scene.anims.create({
+            key: 'left',
+            frames: scene.anims.generateFrameNumbers('player', {
+                start: 15,
+                end: 17
+            }),
+            frameRate: 6,
+        });
 
-    if (singlePress(keys.interact)) {
-        if (!confirm('Vil du gerne rejse tilbage til år 2200?')) return;
-
-        // Save answers!
-        localStorage.setItem('objectives', JSON.stringify(objective));
-        console.log('Rejser tilbage');
-        this.scene.start(constants.SCENES.PLAY, {playerPosition});
-        //interact.setTileLocationCallback(7,25,1,4, null);
-
-    };
-});
-     
+        scene.anims.create({
+            key: 'right',
+            frames: scene.anims.generateFrameNumbers('player', {
+                start: 27,
+                end: 29
+            }),
+            frameRate: 6,
+        });
+        scene.anims.create({
+            key: 'down',
+            frames: scene.anims.generateFrameNumbers('player', {
+                start: 3,
+                end: 5
+            }),
+            frameRate: 6,
+        });
+        scene.anims.create({
+            key: 'up',
+            frames: scene.anims.generateFrameNumbers('player', {
+                start: 39,
+                end: 41
+            }),
+            frameRate: 4,
+        });
+        scene.anims.create({
+            key: 'turn',
+            frames: [{
+                key: 'player',
+                frame: 4
+            }],
+            frameRate: 10,
+            repeat: -1
+        });
+        scene.anims.create({
+            key: 'idle',
+            frames: [{
+                key: constants.SPRITES.CHEMIST_NPC,
+                frame: 10
+            }],
+            frameRate: 10,
+            repeat: -1
+        });
     }
-update() {
-    // player movement
-    this.playerControl();
-}
-// 8 directional  
-playerControl() {
-
-    if (singlePress(keys.sprint))
-        speed = 192;
-    else if (keys.sprint.isUp) speed = 128;
-
-    if (keys.up.isDown) {
-        player.setVelocityY(-speed);
-        playerInteractionCollider.x = player.x;
-        playerInteractionCollider.y = player.y - interactionRangeX;
-    }
-    if (keys.down.isDown) {
-        player.setVelocityY(speed);
-        playerInteractionCollider.x = player.x;
-        playerInteractionCollider.y = player.y + interactionRangeY;
-    }
-    if (keys.left.isDown) {
-        player.setVelocityX(-speed);
-        playerInteractionCollider.x = player.x - interactionRangeX;
-        playerInteractionCollider.y = player.y;
-    }
-    if (keys.right.isDown) {
-        player.setVelocityX(speed);
-        playerInteractionCollider.x = player.x + interactionRangeX;
-        playerInteractionCollider.y = player.y;
-    }
-    if (keys.up.isUp && keys.down.isUp) {
-        player.setVelocityY(0);
-        //playerAnimation.play('turn', true);
-    }
-    if (keys.right.isUp && keys.left.isUp) {
-        player.setVelocityX(0);
-        //playerAnimation.play('turn', true);
-    }
-    // other inputs than movement 
-    if (singlePress(keys.interact)) {
-        console.log(player);
-        //console.log(keys.interact);
-        //checkColliders()
-    }
-    if (player.body.velocity.x > 0) playerAnimation.play('right', true);
-    else if (player.body.velocity.x < 0) playerAnimation.playReverse('left', true);
-    else if (player.body.velocity.y > 0) playerAnimation.play('down', true);
-    else if (player.body.velocity.y < 0) playerAnimation.play('up', true);
-    else {
-        playerAnimation.stop();
-    }
-}
-animationSetup(scene) {
-    scene.anims.create({
-        key: 'idle',
-        frames: scene.anims.generateFrameNumbers('portal', {
-            start: 0,
-            end: 3
-        }),
-        frameRate: 6,
-        repeat: -1
-    });
-
-    scene.anims.create({
-        key: 'left',
-        frames: scene.anims.generateFrameNumbers('player', {
-            start: 15,
-            end: 17
-        }),
-        frameRate: 6,
-    });
-
-    scene.anims.create({
-        key: 'right',
-        frames: scene.anims.generateFrameNumbers('player', {
-            start: 27,
-            end: 29
-        }),
-        frameRate: 6,
-    });
-    scene.anims.create({
-        key: 'down',
-        frames: scene.anims.generateFrameNumbers('player', {
-            start: 3,
-            end: 5
-        }),
-        frameRate: 6,
-    });
-    scene.anims.create({
-        key: 'up',
-        frames: scene.anims.generateFrameNumbers('player', {
-            start: 39,
-            end: 41
-        }),
-        frameRate: 4,
-    });
-    scene.anims.create({
-        key: 'turn',
-        frames: [{
-            key: 'player',
-            frame: 4
-        }],
-        frameRate: 10,
-        repeat: -1
-    });
-    scene.anims.create({
-        key: 'idle',
-        frames: [{
-            key: constants.SPRITES.CHEMIST_NPC,
-            frame: 10
-        }],
-        frameRate: 10,
-        repeat: -1
-    });
-}
 }
 /*function npcInteraction2() {
     console.log('touching');
@@ -347,11 +347,17 @@ function npcInteraction() {
     if (singlePress(keys.interact)) {
         if (npcText.visible) return;
         npcText.text = getNpcText(npcState);
+        let medicines = 0; 
+        for (const key in objective) {
+            if(objective[key].isApproved != undefined) medicines++; 
+        }
+        console.log(medicines); 
+        if(medicines == 3) npcText.text = 'Jeg kan se, at du har behandlet de tre mediciner.\nDet er kun de endelige resultater vi kommer til at bruge,\nså du kan stadigvæk nå at acceptere eller kassere endnu.\nTak for hjælpen!'
         // determine what npc will say 
 
         // set text to visible for a period of time
         npcText.visible = true;
-        setTimeout(() => { npcText.visible = false; npcState ++; }, npcText.text.length * 70);
+        setTimeout(() => { npcText.visible = false; npcState++; }, npcText.text.length * 70);
     }
 
 }
@@ -364,12 +370,11 @@ async function toggleImage(image, callback) {
     }, 50);
 }
 
-function getNpcText(state){
-    switch(state){
-        case 0:
-            return 'Det må være dig, der skal analysere medikamenterne\nobjektivt, så resultaterne ikke er farvede'; 
-        case 1: 
-            return 'Hvis en medicin skal kunne godkendes,skal det\noverholde følgende to regler';
+function getNpcText(state) {
+   
+    switch (state) {
+        case 0: return 'Det må være dig, der skal analysere vores medicin\nobjektivt';
+        case 1: return 'Hvis en medicin skal kunne godkendes,skal det\noverholde følgende to regler:';
         case 2: return 'Regel #1: For bivirkninger gælder det, at medianen\nIKKE må overskride mere end 5 bivirkninger, dvs. 50%\naf de rapportede bivirkninger skal være under 5';
         case 3: npcState = 0; return 'Regel #2: Den midterste halvdel af spredning for\nmedikamentets evne til febernedsættelse,\nskal være større end det ydre';
     }
