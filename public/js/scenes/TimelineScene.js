@@ -31,15 +31,15 @@ export class Timeline extends Phaser.Scene {
     }
 
     create() {
-        
+
         let scene = this;
         const header = scene.add.text(330, 50, 'Tidslinje', { fill: '#31FDF0', fontSize: '25px' });
         //const year = scene.add.text(150, 100, 'År: 1930', { fill: '#31FDF0'});
         //var txt = scene.add.rexBBCodeText(100, 100, '[b]h[/b]ello');
 
         // set text label
-        scene.label = this.add.rexBBCodeText(100, 270, '', {wrap: {mode: 1,width: 600}});
-       // scene.label.setWordWrapWidth(600);
+        scene.label = this.add.rexBBCodeText(100, 270, '', { wrap: { mode: 1, width: 600 } });
+        // scene.label.setWordWrapWidth(600);
 
         // tilbage knap 
         const btn = scene.add.text(70, 400, 'Tilbage', { fill: '#0f0' });
@@ -66,9 +66,6 @@ export class Timeline extends Phaser.Scene {
         });
         eventPic.on('pointerdown', () => {
             // Dynamisk tekst
-
-            if (isWriting) return;
-            isWriting = true;
             this.typewriteText('ADVARSEL: \nDER ER GÅET ROD I MEDICINFREMSTILLINGEN! \nHJÆLP LABORANTEN MED AT VÆLGE DEN RETTE MEDICIN! \n\nÅRSTAL:[size=24][color=orange][b] 1930 [/b][/color][/size] \nMATEMATIK: STATISTIK');
 
         });
@@ -85,16 +82,31 @@ export class Timeline extends Phaser.Scene {
         });
         currentYearPic.on('pointerdown', () => {
             // Dynamisk tekst
-            if (isWriting) return;
-            isWriting = true;
             this.typewriteText('DIN NUVÆRENDE LOKATION: BASE FOR TIDSREJSER. \n\nÅRSTAL: 2200.');
 
         });
 
-        console.log('kommer den hertil? 1');
 
         // event billede til andet scenarie
         if (playerProgression != null) {
+            let sceneRef = this;
+            let questGraphic = '/\\/\\/\\/\\';
+            let questText;
+            let questLabel = this.add.rexBBCodeText(eventPic.x, 225, '')
+                .setInteractive()
+                .on('areadown', function (key) {
+                    sceneRef.typewriteText(questText);
+                });
+            // resolveLastMission()
+            if (playerProgression.isCorrect) {
+                questLabel.setText(`[b][area=correct][color=lightgreen]${questGraphic}[/color][/stroke][/area][/b]`);
+                questText = 'Der ser ikke ud til at være forstyrrelser med tidslinjen i denne periode';
+            }
+            else {
+                questLabel.setText(`[b][stroke=black][area=incorrect][color=red]${questGraphic}[/color][/stroke][/area][/b]`);
+                questText = 'Der er ingen synlige ændringer';
+            }
+
             eventPic.visible = false;
 
             secondEventPic = this.add.image(400, 120, constants.IMAGES.EVENTPIC).setOrigin(0);
@@ -107,8 +119,6 @@ export class Timeline extends Phaser.Scene {
             });
             secondEventPic.on('pointerdown', () => {
                 // Dynamisk tekst   
-                if (isWriting) return;
-                isWriting = true;
                 this.typewriteText('ADVARSEL: \nDER ER SKET ET SPILD AF MEDIKAMENTER, SOM HAR FØRT TIL FORURENING AF GRUNDVANDET. \nHJÆLP BIOLOGERNE MED AT RENSE GRUNDVANDET. \n\nÅRSTAL: 2000 \nMATEMATIK: STATISTIK');
 
             });
@@ -118,14 +128,17 @@ export class Timeline extends Phaser.Scene {
         if (!welcome) return;
         welcome = false;
 
-        if (isWriting) return;
-        isWriting = true;
         this.typewriteText('VELKOMMEN HJEM REKRUT! \n\nHER KAN DU SE DIN TIDSLINJE! \nTRYK PÅ IKONERNE, FOR AT FINDE UD AF HVAD DER SKABER PROBLEMER I TIDSLINJEN OG RET OP PÅ DEM, VED AT REJSE TILBAGE I TIDEN! \n\nHELD OG LYKKE!');
 
 
     }
 
     typewriteText(text) {
+        if(isWriting) return;
+        isWriting = true;
+        this.typeWriter(text);
+    }
+    typeWriter(text) {
         // reset tekst
         this.label.text = '';
         //this.disableInteractiveEvents();
@@ -150,6 +163,10 @@ export class Timeline extends Phaser.Scene {
 
         this.typewriteText(wrappedText)
     }
+    resolveLastMission() {
+
+    }
+
 
     /* setInteractiveEvents() {
         currentYearPic.setInteractive();

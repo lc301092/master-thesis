@@ -73,7 +73,7 @@ export class ChemistLevel extends Phaser.Scene {
 
         player = scene.physics.add.sprite(265, 250, 'player', 4).setCollideWorldBounds(true); //.setScale(2);
         playerInteractionCollider = this.add.rectangle(player.x, player.y + interactionRangeY, player.width / 2, player.height / 2,
-            // 0xff0000,0.5  // debugging purposes
+             0xff0000,0.5  // debugging purposes
         );
         let dynmaicCollider = this.physics.add.group();
         dynmaicCollider.add(playerInteractionCollider);
@@ -82,8 +82,14 @@ export class ChemistLevel extends Phaser.Scene {
         let npcCollider = this.add.rectangle(npc.x, npc.y, npc.width / 2, npc.height,
             // 0xff0000,0.5 // debugging purposes
         );
+        let bookshelf = scene.add.rectangle(480,90,50,50,
+             0xff0000,0.5
+        );
+        let sink;
+        let drop;
 
         collideables.add(npcCollider);
+        collideables.add(bookshelf);
         //npcCollider.setCollideWorldBounds(true)
         //npcCollider.setImmovable(true);
         player.setSize(25, 50).setOffset(12, 10);
@@ -114,7 +120,9 @@ export class ChemistLevel extends Phaser.Scene {
         scene.physics.add.collider(player, interact);
         scene.physics.add.collider(player, interact2);
         scene.physics.add.overlap(playerInteractionCollider, npcCollider, npcInteraction, null, this);
+        scene.physics.add.collider(playerInteractionCollider, bookshelf, bookshelfInteraction, null, this);
         scene.physics.add.collider(player, npcCollider);
+
 
 
         // instantiering af tick og x 
@@ -379,3 +387,8 @@ function getNpcText(state) {
         case 3: npcState = 0; return 'Regel #2: Den midterste halvdel af spredning for\nmedikamentets evne til febernedsættelse,\nskal være større end det ydre';
     }
 }
+
+let bookshelfInteraction = () => {
+    if (singlePress(keys.interact)) 
+    alert('Du kigger i en bog. Du lægger mærke til følgende:\n "...Medianen i en sumkurve læses ud fra 50% markøren på Y aksen."');
+}; 
