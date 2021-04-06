@@ -6,6 +6,7 @@ let redButtonCircle;
 let titleText;
 let displayFunction;
 let displayUnits;
+let textPlugin;
 let compupterStyle = { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', color: 'black', fontSize: 24 };
 
 
@@ -22,7 +23,7 @@ export class TimeMachineScene extends Phaser.Scene {
         console.log(playerPosition);
         playerProgression = JSON.parse(localStorage.getItem('objectives'));
         btnXValue = 0;
-
+        textPlugin = this.plugins.get('rexbbcodetextplugin');
     }
     preload() {
         //this.player = this.add.
@@ -35,13 +36,14 @@ export class TimeMachineScene extends Phaser.Scene {
            // , 0xff0000, 0.5
             ).setInteractive({ useHandCursor: true });
         btnXCircle.on('pointerdown', promptXValue, this);
-        let screen = this.add.image(150, 200, 'clear_screen.png').setOrigin(0).setScale(0.3, 0.2);
+        let screen = this.add.image(100, 200, 'clear_screen.png').setOrigin(0).setScale(0.4, 0.2);
         titleText = this.add.text(255, 85, 'Tidsindstilling', { fontSize: 30, color: 'black' });
 
         redButtonCircle = this.add.circle(458, 180, 117).setOrigin(0).setInteractive({ useHandCursor: true });
         redButtonCircle.on('pointerdown', checkTimeSettings, this);
-
-        //  displayFunction = this.add.text(160, 300, 'f(x) = -15x + 2200', compupterStyle);
+ 
+        displayFunction = this.add.rexBBCodeText(120, 235, '', compupterStyle);
+        updateScreen();
         // displayUnits = this.add.text(180,38  5,'x     y      a     b', compupterStyle);
         const backBtn = this.add.text(50, 550, 'Tilbage', { fill: '#0f0' });
         backBtn.setInteractive({ useHandCursor: true });
@@ -72,7 +74,7 @@ function checkTimeSettings() {
 }
 function promptXValue() {
 
-    let promptVal = prompt('\nDrejeknappen står på: ' + btnXValue + '\n\nDu kan dreje og denne knap. Indtast et positivt tal for at dreje den et hak med urets retning eller et negativt tal for at dreje den et hak mod urets retning');
+    let promptVal = prompt('\nDrejeknappen står på: ' + btnXValue + '\n\nDu kan dreje på denne knap. Indtast et positivt tal for at dreje den et hak med urets retning eller et negativt tal for at dreje den et hak mod urets retning');
     if (!promptVal) return;
 
     if (isNaN(promptVal)) {
@@ -82,7 +84,7 @@ function promptXValue() {
     btnXValue += parseInt(promptVal);
     rotateBtnX(btnXValue);
     // update 
-    console.log(btnXValue);
+    updateScreen();
 }
 function calculateYValue(xValue) {
     let yValue = (-15 * xValue) + 2200;
@@ -94,4 +96,12 @@ function rotateBtnX(btnValue) {
     let rotationInterval = 45;
     let newRotation = (rotationInterval * btnValue);
     btnX.angle = newRotation;
+}
+function updateScreen(){
+    let charOrNum = (btnXValue == 0) ? 'x': btnXValue;
+    let xValue = '[color=#009900]'+ charOrNum + '[/color]';
+    let aValue = -15;
+    let bValue = 2200;
+    let functionf = '[color=orange]f([/color]'+xValue+'[color=orange])[/color] = ' + aValue+ '*'+xValue+' + '+bValue;
+    displayFunction.setText(functionf);
 }
