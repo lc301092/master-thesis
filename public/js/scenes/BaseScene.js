@@ -66,7 +66,9 @@ export class Base extends Phaser.Scene {
       
         //player = scene.physics.add.sprite(150, 150, 'player').setCollideWorldBounds(true); //.setScale(2);
         player.setSize(25, 50).setOffset(12, 10);
-        scene.cameras.main.setBounds(0, 0, 1600, 1200);
+        
+        // scene.cameras.main.setZoom(1.5);
+        scene.cameras.main.setBounds(-200,-200);
         scene.physics.world.setBounds(0, 0, 1600, 1200);
         let mainCamera = scene.cameras.main;
         mainCamera.startFollow(player, true, 0.05, 0.05);

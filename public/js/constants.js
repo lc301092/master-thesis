@@ -51,7 +51,8 @@ export const constants = {
         SCREEN_TIME_MACHINE: 'clear_screen.png',
         MED_DATA_YELLOW: 'yellow.png',
         MED_DATA_BLUE: 'blue.png',
-        MED_DATA_RED: 'red.png'
+        MED_DATA_RED: 'red.png',
+        NEW_DIALOGUE: 'exclamation.png'
     },
     SPRITES: {
         PC: 'playable_charaters.png',
