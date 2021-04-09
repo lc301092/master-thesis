@@ -1,6 +1,7 @@
 import { constants } from "../constants.js"
 
-let player, keys, playerAnimation, singlePress, scene, map;
+let player, playerData, playerAnimation, scene, map;
+let keys, singlePress, isInteracting;
 let speed = 128;
 let isPlayerDisabled;
 let playerProgression;
@@ -15,12 +16,10 @@ export class Base extends Phaser.Scene {
     init(data) {
         // tell progress from 
         player = this.physics.add.sprite(150, 150, 'player',4).setCollideWorldBounds(true).setDepth(1); //.setScale(2);
-
-        console.log(data)
-        if(data.playerPosition) {
-            player.x = data.playerPosition.x;
-            player.y = data.playerPosition.y;
-        } 
+        console.log('Base Scene', data);
+        playerData = data;
+        player.x = data.playerPosition.x;
+        player.y = data.playerPosition.y; 
     }
     preload() {
         playerProgression = JSON.parse(localStorage.getItem("objectives"));
@@ -66,7 +65,9 @@ export class Base extends Phaser.Scene {
       
         //player = scene.physics.add.sprite(150, 150, 'player').setCollideWorldBounds(true); //.setScale(2);
         player.setSize(25, 50).setOffset(12, 10);
-        scene.cameras.main.setBounds(0, 0, 1600, 1200);
+        
+        // scene.cameras.main.setZoom(1.5);
+        scene.cameras.main.setBounds(-200,-200);
         scene.physics.world.setBounds(0, 0, 1600, 1200);
         let mainCamera = scene.cameras.main;
         mainCamera.startFollow(player, true, 0.05, 0.05);
@@ -74,9 +75,13 @@ export class Base extends Phaser.Scene {
         animationSetup(this);
         playerAnimation = player.anims;
         // keyobject for movement
-        keys = scene.input.keyboard.addKeys(constants.USERINPUT.WASD_MOVEMENT);
+        keys = scene.input.keyboard.addKeys(constants.USERINPUT);
         singlePress = constants.USERINPUT.SINGLEPRESS;
 
+        isInteracting = () => {
+            return singlePress(keys.interact) || singlePress(keys.alt_interact);
+        } 
+        console.log('Everything is running ok');
         // map collisions
         let borders = [ground, walls, decoration, decoration2, interact];
         scene.physics.add.collider(player, borders);
@@ -91,39 +96,22 @@ export class Base extends Phaser.Scene {
 
         // indstil tidsmaskine
         interact.setTileLocationCallback(10, 5, 6, 1, () => {
-            if (singlePress(keys.interact)) {
+            if (isInteracting()) {
                 console.log('Observér tidslinjen');
-                this.scene.start(constants.SCENES.TIMELINE, {playerPosition: {x: player.x, y: player.y}});
+                playerData.playerPosition.x = player.x;
+                playerData.playerPosition.y = player.y;
+                this.scene.start(constants.SCENES.TIMELINE, playerData);
                 // --- indstil tidsmaskine "scene" kode her ---
-            };
-        });
-
-        // træningssimulator
-        interact.setTileLocationCallback(23, 6, 3, 2, () => {
-            if (singlePress(keys.interact)) {
-                console.log('Start træningssimulator');
-                this.scene.start(constants.SCENES.TRAININGSIMULATORSCENE, 'from base scene');
-
-                //let newScene = this.scene.launch(constants.SCENES.TRANING, 'from base scene');
-               // isPlayerDisabled = true;
-                //this.scene.pause();
-                // this.scene.launch(constants.SCENES.TRANING);
-                
-                // this.scene.transition({target: constants.SCENES.TRANING, 
-                //     duration: 300, 
-                //     sleep: false, 
-                //     allowInput: false, 
-                //     moveAbove: true});
-                // --- Åbn træningssimulator kode her ---
             };
         });
 
         // Tidsmaskinen
         interact.setTileLocationCallback(22, 18, 1, 1, () => {
-            if (singlePress(keys.interact)) {
+            if (isInteracting()) {
                 console.log('Tidsmaskine aktiveret');
-                //this.scene.
-                this.scene.start(constants.SCENES.TIME_MACHINE, {playerPosition: {x: player.x, y: player.y}});
+                playerData.playerPosition.x = player.x;
+                playerData.playerPosition.y = player.y;
+                this.scene.start(constants.SCENES.TIME_MACHINE, playerData);
                 // --- skift scene til laboratorie kode her ---
             };
         });
@@ -144,32 +132,29 @@ function playerControl() {
         speed = 192;
     else if (keys.sprint.isUp) speed = 128;
 
-    if (keys.up.isDown) {
+    if (keys.up.isDown || keys.alt_up.isDown) {
         player.setVelocityY(-speed);
     }
-    if (keys.down.isDown) {
+    if (keys.down.isDown || keys.alt_down.isDown) {
         player.setVelocityY(speed);
     }
-    if (keys.left.isDown) {
+    if (keys.left.isDown || keys.alt_left.isDown) {
         player.setVelocityX(-speed);
     }
-    if (keys.right.isDown) {
+    if (keys.right.isDown || keys.alt_right.isDown) {
         player.setVelocityX(speed);
     }
     if (keys.up.isUp && keys.down.isUp) {
+        if(keys.alt_up.isUp && keys.alt_down.isUp)
         player.setVelocityY(0);
         //playerAnimation.play('turn', true);
     }
     if (keys.right.isUp && keys.left.isUp) {
+        if(keys.alt_right.isUp && keys.alt_left.isUp)
         player.setVelocityX(0);
         //playerAnimation.play('turn', true);
     }
-    // other inputs than movement 
-    if (singlePress(keys.interact)) {
-        console.log(player);
-        //console.log(keys.interact);
-        //checkColliders()
-    }
+  
     if (player.body.velocity.x > 0) playerAnimation.play('right', true);
     else if (player.body.velocity.x < 0) playerAnimation.playReverse('left', true);
     else if (player.body.velocity.y > 0) playerAnimation.play('down', true);
