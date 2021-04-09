@@ -73,13 +73,13 @@ export class Timeline extends Phaser.Scene {
 
         });
 
+        eventPic = this.add.image(150, 120, constants.IMAGES.EVENTPIC).setOrigin(0);
 
         // event billede til andet scenarie
         switch (storyProgression.length) {
 
             case 0:
                 // event billede til første scenarie
-                eventPic = this.add.image(150, 120, constants.IMAGES.EVENTPIC).setOrigin(0);
                 eventPic.setInteractive({ useHandCursor: true });
                 eventPic.on('pointerover', () => {
                     eventPic.setScale(1.01);
