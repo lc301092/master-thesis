@@ -54,7 +54,7 @@ export class TimeMachineScene extends Phaser.Scene {
         });
 
         backBtn.on('pointerdown', () => {
-            this.scene.start(constants.SCENES.PLAY, { playerPosition });
+            this.scene.start(constants.SCENES.PLAY, playerPosition);
         });
     }
     update() {
