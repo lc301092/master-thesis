@@ -1,7 +1,7 @@
 import { constants } from "../constants.js"
 
-let playerProgression;
-let playerPosition;
+let storyProgression;
+let playerData;
 let eventPic;
 let currentYearPic;
 let secondEventPic;
@@ -18,16 +18,15 @@ export class Timeline extends Phaser.Scene {
     }
 
     init(data) {
-        console.log(data)
-        if (data.playerPosition) playerPosition = data.playerPosition;
+        playerData = data;
+        storyProgression = playerData.playerProgression
         this.add.image(0, 0, constants.IMAGES.SCREEN).setOrigin(0);
         isWriting = false;
         textPlugin = this.plugins.get('rexbbcodetextplugin');
     }
     preload() {
         // get progression from localstorage
-        playerProgression = JSON.parse(localStorage.getItem("objectives"));
-        console.log("JSON parser: ", playerProgression);
+
     }
 
     create() {
@@ -52,23 +51,10 @@ export class Timeline extends Phaser.Scene {
         });
 
         btn.on('pointerdown', () => {
-            scene.scene.start(constants.SCENES.PLAY, { playerPosition });
+            scene.scene.start(constants.SCENES.PLAY, playerData);
         });
 
-        // event billede til første scenarie
-        eventPic = this.add.image(150, 120, constants.IMAGES.EVENTPIC).setOrigin(0);
-        eventPic.setInteractive({ useHandCursor: true });
-        eventPic.on('pointerover', () => {
-            eventPic.setScale(1.01);
-        });
-        eventPic.on('pointerout', () => {
-            eventPic.setScale(1);
-        });
-        eventPic.on('pointerdown', () => {
-            // Dynamisk tekst
-            this.typewriteText('ADVARSEL: \nDER ER GÅET ROD I MEDICINFREMSTILLINGEN! \nHJÆLP LABORANTEN MED AT VÆLGE DEN RETTE MEDICIN! \n\nÅRSTAL:[size=24][color=orange][b] 1930 [/b][/color][/size] \nMATEMATIK: STATISTIK');
 
-        });
 
 
         // Ikon der viser dit nuværende år
@@ -88,53 +74,69 @@ export class Timeline extends Phaser.Scene {
 
 
         // event billede til andet scenarie
-        if (playerProgression != null) {
-            let sceneRef = this;
-            let questGraphic = '/\\/\\/\\/\\';
-            let questText;
-            let questLabel = this.add.rexBBCodeText(eventPic.x, 225, '')
-                .setInteractive()
-                .on('areadown', function (key) {
-                    sceneRef.typewriteText(questText);
+        switch (storyProgression.length) {
+
+            case 0:
+                // event billede til første scenarie
+                eventPic = this.add.image(150, 120, constants.IMAGES.EVENTPIC).setOrigin(0);
+                eventPic.setInteractive({ useHandCursor: true });
+                eventPic.on('pointerover', () => {
+                    eventPic.setScale(1.01);
                 });
-            // resolveLastMission()
-            if (playerProgression.isCorrect) {
-                questLabel.setText(`[b][area=correct][color=lightgreen]${questGraphic}[/color][/stroke][/area][/b]`);
-                questText = 'Der ser ikke ud til at være forstyrrelser med tidslinjen i denne periode';
-            }
-            else {
-                questLabel.setText(`[b][stroke=black][area=incorrect][color=red]${questGraphic}[/color][/stroke][/area][/b]`);
-                questText = 'Der er ingen synlige ændringer';
-            }
+                eventPic.on('pointerout', () => {
+                    eventPic.setScale(1);
+                });
+                eventPic.on('pointerdown', () => {
+                    // Dynamisk tekst
+                    this.typewriteText('ADVARSEL: \nDER ER GÅET ROD I MEDICINFREMSTILLINGEN! \nHJÆLP LABORANTEN MED AT VÆLGE DEN RETTE MEDICIN! \n\nÅRSTAL:[size=24][color=orange][b] 1930 [/b][/color][/size] \nMATEMATIK: STATISTIK');
 
-            eventPic.visible = false;
+                });
+                if (!welcome) return;
+                welcome = false;
 
-            secondEventPic = this.add.image(400, 120, constants.IMAGES.EVENTPIC).setOrigin(0);
-            secondEventPic.setInteractive({ useHandCursor: true });
-            secondEventPic.on('pointerover', () => {
-                secondEventPic.setScale(1.01);
-            });
-            secondEventPic.on('pointerout', () => {
-                secondEventPic.setScale(1);
-            });
-            secondEventPic.on('pointerdown', () => {
-                // Dynamisk tekst   
-                this.typewriteText('ADVARSEL: \nDER ER SKET ET SPILD AF MEDIKAMENTER, SOM HAR FØRT TIL FORURENING AF GRUNDVANDET. \nHJÆLP BIOLOGERNE MED AT RENSE GRUNDVANDET. \n\nÅRSTAL: 2000 \nMATEMATIK: STATISTIK');
+                this.typewriteText('VELKOMMEN HJEM REKRUT! \n\nHER KAN DU SE DIN TIDSLINJE! \nTRYK PÅ IKONERNE, FOR AT FINDE UD AF HVAD DER SKABER PROBLEMER I TIDSLINJEN OG RET OP PÅ DEM, VED AT REJSE TILBAGE I TIDEN! \n\nHELD OG LYKKE!');
+                break;
+            case 1:
+                let sceneRef = this;
+                let questGraphic = '/\\/\\/\\/\\';
+                let questText;
+                let questLabel = this.add.rexBBCodeText(eventPic.x, 225, '')
+                    .setInteractive()
+                    .on('areadown', function (key) {
+                        sceneRef.typewriteText(questText);
+                    });
+                // resolveLastMission()
+                if (storyProgression.isCorrect) {
+                    questLabel.setText(`[b][area=correct][color=lightgreen]${questGraphic}[/color][/stroke][/area][/b]`);
+                    questText = 'Der ser ikke ud til at være forstyrrelser med tidslinjen i denne periode';
+                }
+                else {
+                    questLabel.setText(`[b][stroke=black][area=incorrect][color=red]${questGraphic}[/color][/stroke][/area][/b]`);
+                    questText = 'Der er ingen synlige ændringer';
+                }
 
-            });
+                eventPic.visible = false;
+
+                secondEventPic = this.add.image(400, 120, constants.IMAGES.EVENTPIC).setOrigin(0);
+                secondEventPic.setInteractive({ useHandCursor: true });
+                secondEventPic.on('pointerover', () => {
+                    secondEventPic.setScale(1.01);
+                });
+                secondEventPic.on('pointerout', () => {
+                    secondEventPic.setScale(1);
+                });
+                secondEventPic.on('pointerdown', () => {
+                    // Dynamisk tekst   
+                    this.typewriteText('ADVARSEL: \nDER ER SKET ET SPILD AF MEDIKAMENTER, SOM HAR FØRT TIL FORURENING AF GRUNDVANDET. \nHJÆLP BIOLOGERNE MED AT RENSE GRUNDVANDET. \n\nÅRSTAL: 2000 \nMATEMATIK: STATISTIK');
+
+                });
+                break;
         }
-
-        // skal stå som det sidste i create metoden
-        if (!welcome) return;
-        welcome = false;
-
-        this.typewriteText('VELKOMMEN HJEM REKRUT! \n\nHER KAN DU SE DIN TIDSLINJE! \nTRYK PÅ IKONERNE, FOR AT FINDE UD AF HVAD DER SKABER PROBLEMER I TIDSLINJEN OG RET OP PÅ DEM, VED AT REJSE TILBAGE I TIDEN! \n\nHELD OG LYKKE!');
-
 
     }
 
     typewriteText(text) {
-        if(isWriting) return;
+        if (isWriting) return;
         isWriting = true;
         this.typeWriter(text);
     }

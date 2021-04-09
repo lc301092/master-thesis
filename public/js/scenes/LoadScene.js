@@ -1,4 +1,23 @@
 import { constants } from "../constants.js"
+const localStorageKey = 'foobar';
+let playerData = {
+    name: '',
+    // array elements will keep track of player choices by using scene IDs
+    // use the array.length to determine the progression
+    // [string] 
+    playerProgression: [],
+    // answers matches the progression array so that any index matches the player progression
+    // [{}]
+    answers: [],
+    // contains info about current scenario - matches the player progression  
+    // [{}]
+    playerLog: [],
+    playerPosition: {
+        x: 150,
+        y: 150
+    }
+}
+
 export class LoadScene extends Phaser.Scene {
     constructor() {
         super({
@@ -6,6 +25,15 @@ export class LoadScene extends Phaser.Scene {
         })
     }
     init() {
+        let previousData = JSON.parse(localStorage.getItem(localStorageKey));
+        if (previousData) {
+            playerData = previousData;
+        }
+        else {
+            // newgame
+            playerData.name = prompt('hvad er dit navn?');
+            localStorage.setItem(localStorageKey, JSON.stringify(playerData));
+        }
 
     }
     loadResources(type, resources_config = null) {
@@ -24,7 +52,7 @@ export class LoadScene extends Phaser.Scene {
                         // normal image
                         this.load.image(imageString, imageString);
                     }
-                        // tileImage add .png at second param
+                    // tileImage add .png at second param
                     else {
                         this.load.image(imageString, imageString + '.png')
                     }
@@ -41,11 +69,12 @@ export class LoadScene extends Phaser.Scene {
                 //     this.load.image(constants.IMAGES[key], constants.IMAGES[key])
                 // } 
                 break;
-                case 'tilemap':
-                    for (const key in constants.TILEMAPS) {
-                        let tileMapString = constants.TILEMAPS[key];
-                        this.load.tilemapTiledJSON(tileMapString, tileMapString+'.json');
-                    }
+            case 'tilemap':
+                for (const key in constants.TILEMAPS) {
+                    let tileMapString = constants.TILEMAPS[key];
+                    this.load.tilemapTiledJSON(tileMapString, tileMapString + '.json');
+                }
+                break;
         };
         this.load.setPath();
     }
@@ -93,6 +122,6 @@ export class LoadScene extends Phaser.Scene {
         })
     }
     create() {
-        this.scene.start(constants.SCENES.MENU, 'From load scene');
+        this.scene.start(constants.SCENES.MENU, playerData);
     }
 }

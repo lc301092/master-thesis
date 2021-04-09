@@ -1,6 +1,7 @@
 import { constants } from "../constants.js"
 let playerPosition = { x: 150, y: 150 };
-let playerProgression;
+let storyProgression;
+let playerData;
 let btnX, btnXCircle, btnXValue;
 let redButtonCircle;
 let titleText;
@@ -18,10 +19,8 @@ export class TimeMachineScene extends Phaser.Scene {
         })
     }
     init(data) {
-        if (data.playerPosition) playerPosition = data.playerPosition;
-
-        console.log(playerPosition);
-        playerProgression = JSON.parse(localStorage.getItem('objectives'));
+        playerData = data;
+        storyProgression = playerData.playerProgression.length;  
         btnXValue = 0;
         textPlugin = this.plugins.get('rexbbcodetextplugin');
     }
@@ -63,10 +62,13 @@ export class TimeMachineScene extends Phaser.Scene {
     }
 }
 function checkTimeSettings() {
-    if (playerProgression) return;
+    if (storyProgression != 0){
+        alert('Du har spillet demoen færdig! Tak fordi du gad at spille');
+        return;
+    } 
     let answer = calculateYValue(btnXValue);
     if (answer == 1930) {
-        this.scene.start(constants.SCENES.CHEMIST, { playerPosition });
+        this.scene.start(constants.SCENES.CHEMIST, playerData);
     }
     else {
         alert('Der sker ikke noget, der må være noget galt med tidsindstillingen');

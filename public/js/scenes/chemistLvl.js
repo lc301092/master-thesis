@@ -1,6 +1,8 @@
 import { constants } from "../constants.js"
+const sceneID = constants.SCENES.CHEMIST;
 
-let player, keys, playerAnimation, singlePress, scene, playerPosition;
+let player, playerData, playerAnimation, scene, playerPosition;
+let keys, singlePress, isInteracting, isPlayerDisabled = false;
 let speed = 128;
 
 let npc;
@@ -42,7 +44,8 @@ export class ChemistLevel extends Phaser.Scene {
         })
     }
     init(data) {
-        if (data.playerPosition) playerPosition = data.playerPosition;
+        playerData = data;
+        if (playerData.playerProgression.indexOf(sceneID) == -1) playerData.playerProgression.push(sceneID);
     }
     preload() {
         this.load.scenePlugin({
@@ -123,9 +126,13 @@ export class ChemistLevel extends Phaser.Scene {
         npcState = 0;
 
         // keyobject for movement
-        keys = scene.input.keyboard.addKeys(constants.USERINPUT.WASD_MOVEMENT);
+        keys = scene.input.keyboard.addKeys(constants.USERINPUT);
         singlePress = constants.USERINPUT.SINGLEPRESS;
 
+        isInteracting = () => {
+            if (!isPlayerDisabled)
+                return singlePress(keys.interact) || singlePress(keys.alt_interact);
+        }
         // map collisions
         let borders = [walls, ground, deco, deco1, deco2];
         scene.physics.add.collider(player, borders);
@@ -168,7 +175,8 @@ export class ChemistLevel extends Phaser.Scene {
 
         // gul medicin
         interact.setTileLocationCallback(22, 27, 2, 2, () => {
-            if (singlePress(keys.interact)) {
+
+            if (isInteracting()) {
                 checkIfDone();
                 alert('Her kan du se dataene på den gule medicin');
                 toggleImage(dataY, function () {
@@ -191,7 +199,7 @@ export class ChemistLevel extends Phaser.Scene {
 
         // rød medicin
         interact.setTileLocationCallback(30, 27, 2, 2, () => {
-            if (singlePress(keys.interact)) {
+            if (isInteracting()) {
                 checkIfDone();
                 alert('Du interagerer med RØD medicin');
                 toggleImage(dataR, function () {
@@ -214,7 +222,7 @@ export class ChemistLevel extends Phaser.Scene {
 
         // blå medicin
         interact.setTileLocationCallback(26, 27, 2, 2, () => {
-            if (singlePress(keys.interact)) {
+            if (isInteracting()) {
                 checkIfDone();
 
                 alert('Du interagerer med BLÅ medicin');
@@ -238,13 +246,13 @@ export class ChemistLevel extends Phaser.Scene {
 
         interact2.setTileLocationCallback(15, 13, 3, 4, () => {
 
-            if (singlePress(keys.interact)) {
+            if (isInteracting()) {
                 if (!confirm('Vil du gerne rejse tilbage til år 2200?')) return;
-
                 // Save answers!
-                localStorage.setItem('objectives', JSON.stringify(objective));
+                playerData.answers[playerData.playerProgression.indexOf(sceneID)] = objective;
+                localStorage.setItem('foobar', JSON.stringify(playerData));
                 console.log('Rejser tilbage');
-                this.scene.start(constants.SCENES.PLAY, { playerPosition });
+                this.scene.start(constants.SCENES.PLAY, playerData);
                 //interact.setTileLocationCallback(7,25,1,4, null);
 
             };
@@ -267,46 +275,46 @@ export class ChemistLevel extends Phaser.Scene {
         this.playerControl();
     }
     // 8 directional  
+
     playerControl() {
+
+        if (isPlayerDisabled) return;
 
         if (singlePress(keys.sprint))
             speed = 192;
         else if (keys.sprint.isUp) speed = 128;
 
-        if (keys.up.isDown) {
+        if (keys.up.isDown || keys.alt_up.isDown) {
             player.setVelocityY(-speed);
             playerInteractionCollider.x = player.x;
             playerInteractionCollider.y = player.y - interactionRangeX;
         }
-        if (keys.down.isDown) {
+        if (keys.down.isDown || keys.alt_down.isDown) {
             player.setVelocityY(speed);
             playerInteractionCollider.x = player.x;
             playerInteractionCollider.y = player.y + interactionRangeY;
         }
-        if (keys.left.isDown) {
+        if (keys.left.isDown || keys.alt_left.isDown) {
             player.setVelocityX(-speed);
             playerInteractionCollider.x = player.x - interactionRangeX;
             playerInteractionCollider.y = player.y;
         }
-        if (keys.right.isDown) {
+        if (keys.right.isDown || keys.alt_right.isDown) {
             player.setVelocityX(speed);
             playerInteractionCollider.x = player.x + interactionRangeX;
             playerInteractionCollider.y = player.y;
         }
         if (keys.up.isUp && keys.down.isUp) {
-            player.setVelocityY(0);
+            if (keys.alt_up.isUp && keys.alt_down.isUp)
+                player.setVelocityY(0);
             //playerAnimation.play('turn', true);
         }
         if (keys.right.isUp && keys.left.isUp) {
-            player.setVelocityX(0);
+            if (keys.alt_right.isUp && keys.alt_left.isUp)
+                player.setVelocityX(0);
             //playerAnimation.play('turn', true);
         }
-        // other inputs than movement 
-        if (singlePress(keys.interact)) {
-            console.log(player);
-            //console.log(keys.interact);
-            //checkColliders()
-        }
+
         if (player.body.velocity.x > 0) playerAnimation.play('right', true);
         else if (player.body.velocity.x < 0) playerAnimation.playReverse('left', true);
         else if (player.body.velocity.y > 0) playerAnimation.play('down', true);
@@ -315,6 +323,8 @@ export class ChemistLevel extends Phaser.Scene {
             playerAnimation.stop();
         }
     }
+
+
     animationSetup(scene) {
         scene.anims.create({
             key: 'idle',
@@ -382,22 +392,24 @@ export class ChemistLevel extends Phaser.Scene {
 
 // needs to be rewrtitten once text is chained together  
 function npcInteraction() {
-    if (!singlePress(keys.interact)) return;
+    if (!isInteracting()) return;
     // disable exclamation mark after first time talking
     if (npcState == 0) toggleImage(newDialogue);
     // determins what npc will say 
+    isPlayerDisabled = true;
+
     if (!objective.isComplete) {
         uiTextBox.setVisible(true);
-        content = ['Det må være dig, der skal analysere vores medicin objektivt.','', 'Hvis en medicin skal kunne godkendes, skal det overholde følgende to regler:','', 'Regel #1: For bivirkninger gælder det, at medianen IKKE må overskride mere end 5 bivirkninger, dvs. 50% af de rapportede bivirkninger skal være under 5.','','Regel #2: Den midterste halvdel af spredning for medikamentets evne til febernedsættelse, skal være større end det ydre. Sig endelig til hvis du vil høre det igen'];
+        content = ['Det må være dig, der skal analysere vores medicin objektivt.', '', 'Hvis en medicin skal kunne godkendes, skal det overholde følgende to regler:', '', 'Regel #1: For bivirkninger gælder det, at medianen IKKE må overskride mere end 5 bivirkninger, dvs. 50% af de rapportede bivirkninger skal være under 5.', '', 'Regel #2: Den midterste halvdel af spredning for medikamentets evne til febernedsættelse, skal være større end det ydre. Sig endelig til hvis du vil høre det igen'];
         uiTextBox.start(content, 50);
-        if (npcState == 0) npcState ++; 
+        if (npcState == 0) npcState++;
     }
     else {
-        if(npcState == 1) toggleImage(newDialogue);
+        if (npcState == 1) toggleImage(newDialogue);
         uiTextBox.setVisible(true);
         content = 'Jeg kan se, at du har behandlet de tre mediciner. Det er kun de endelige resultater vi kommer til at bruge, så du kan stadigvæk nå at acceptere eller kassere endnu. Tak for hjælpen!'
         uiTextBox.start(content, 50);
-        if (npcState == 1) npcState ++; 
+        if (npcState == 1) npcState++;
     }
 }
 async function toggleImage(image, callback = null) {
@@ -412,7 +424,7 @@ async function toggleImage(image, callback = null) {
 }
 
 let bookshelfInteraction = () => {
-    if (singlePress(keys.interact))
+    if (isInteracting())
         alert('Du kigger i en bog. Du lægger mærke til følgende:\n "...Medianen i en sumkurve læses ud fra 50% markøren på Y aksen."');
 };
 
@@ -467,6 +479,7 @@ function createTextBox(scene, x, y, config) {
             this.resetChildVisibleState(icon);
             if (this.isLastPage && !this.isTyping) {
                 this.setVisible(false);
+                isPlayerDisabled = false;
             };
             if (this.isTyping) {
                 this.stop(true);
@@ -478,7 +491,6 @@ function createTextBox(scene, x, y, config) {
             if (this.isLastPage) {
                 return;
             }
-
             var icon = this.getElement('action').setVisible(true);
             this.resetChildVisibleState(icon);
             icon.y -= 30;
