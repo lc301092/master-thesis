@@ -38,13 +38,17 @@ const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
 
-const rule1 = 'Regel #1: For bivirkninger gælder det, at medianen IKKE må overskride mere end 5 bivirkninger, dvs. 50% af de rapportede bivirkninger skal være under 5.';
-const rule2 = 'Regel #2: Den midterste halvdel af spredning for medikamentets evne til febernedsættelse, skal være større end det ydre. Sig endelig til hvis du vil høre det igen.';
-
-let uiPlayerLog;
+const rule1 = 'Regl #1: Medianen af antal rapporterede bivirkninger må ikke overstige 5.';
+const rule2 = 'Regl #2: 50% af menneskerne der har indtaget medicinen, skal have oplevet et temperaturfald på minimum 2 grader celcius eller over.';
 let uiTextBox;
+let uiPlayerLog;
 let content;
 
+const tip1 = 'Bog#1 Sumkurver: \n\n...Medianen er det midterste tal af alle observationer, hvilket vil sige at 50% af observationer er mindre end medianen og 50% er større. \nFor at finde medianen, finder man 50% markøren på y-aksen og følger den vandret, indtil man møder sumkurven. \nDerefter går man lodret ned, hvor tallet man støder på på x-aksen, er medianen.';
+const tip2 = 'Bog#2 Boxplot: \n\n...Boxplot er en overskuelig måde sammenligne data med hinanden på. \nEt boxplot indeholder ALTID: Den mindste observation, en nedre kvartil, en median, en øvre kvartil, og den største observation.';
+
+const sinkString = 'Jeg er glad for at de har god håndhygiejne i den her tid...';
+const dropString = 'Gad vide om jeg har været koblet op til et drop, da de opererede mit ansigt...';
 
 export class ChemistLevel extends Phaser.Scene {
     constructor() {
@@ -122,15 +126,25 @@ export class ChemistLevel extends Phaser.Scene {
         let npcCollider = this.add.rectangle(npc.x, npc.y, npc.width / 2, npc.height,
             // 0xff0000,0.5 // debugging purposes
         );
-        let bookshelf = scene.add.rectangle(480, 90, 50, 50,
+        let bookshelf = scene.add.rectangle(465, 90, 25, 50,
             0xff0000, 0.5
         );
+        let bookshelf2 = scene.add.rectangle(495, 90, 25, 50,
+            0xff00ff, 0.5
+        );
         // TODO make them say stuff 
-        let sink;
-        let drop;
+        let drop = scene.add.rectangle(550, 150, 35, 75,
+            0xff00ff, 0.5
+        );;
+        let sink = scene.add.rectangle(130, 340, 25, 100,
+            0xff00ff, 0.5
+        );;
 
         collideables.add(npcCollider);
         collideables.add(bookshelf);
+        collideables.add(bookshelf2)
+        collideables.add(sink)
+        collideables.add(drop)
         //npcCollider.setCollideWorldBounds(true)
         //npcCollider.setImmovable(true);
         playerSprite.setSize(25, 50).setOffset(12, 10);
@@ -158,8 +172,13 @@ export class ChemistLevel extends Phaser.Scene {
         scene.physics.add.collider(playerSprite, interact);
         scene.physics.add.collider(playerSprite, interact2);
         scene.physics.add.overlap(playerInteractionCollider, npcCollider, npcInteraction, null, this);
-        scene.physics.add.collider(playerInteractionCollider, bookshelf, bookshelfInteraction, null, this);
         scene.physics.add.collider(playerSprite, npcCollider);
+
+        scene.physics.add.overlap(playerInteractionCollider, bookshelf, bookshelfInteraction1, null, this);
+        scene.physics.add.overlap(playerInteractionCollider, bookshelf2, bookshelfInteraction2, null, this);
+        scene.physics.add.overlap(playerInteractionCollider, sink, sinkInteraction, null, this);
+        scene.physics.add.overlap(playerInteractionCollider, drop, dropInteraction, null, this);
+
 
 
 
@@ -277,7 +296,7 @@ export class ChemistLevel extends Phaser.Scene {
         }).setVisible(false);
 
         uiPlayerLog = new PlayerLog(this);
-        uiPlayerLog.setText(sceneID);
+       // uiPlayerLog.setText(sceneID);
 
 
     }
@@ -363,8 +382,8 @@ function npcInteraction() {
 
     if (!objective.isComplete) {
         uiTextBox.setVisible(true);
-        content = ['Det må være dig, der skal analysere vores medicin objektivt.', '', 'Hvis en medicin skal kunne godkendes, skal det overholde følgende to regler:', '', rule1, '', rule2];
-
+        content = ['Hej! Du må være laboranten vi har ventet på. Jeg er glad for at møde dig…', '', 'På bordet finder du vores tre mediciner. Vi har brug for dit input, så vi sikrer os at vores resultater ikke er farvet… ', 'Du finder information om medicinerne, ved at gå ned og undersøge dem.', '', 'Når du godkender eller afviser en medicin, så er beslutningen ikke endelig.', '', 'For at godkende en medicin skal to regler være opfyldt…', '', rule1, '', rule2];
+        
         // in this case the rules are chained so only check for rule1.
         if (scenarioLog.rules.indexOf(rule1) == -1) {
             scenarioLog.rules.push(rule1, rule2);
@@ -379,7 +398,7 @@ function npcInteraction() {
     else {
         if (npcState == 1) toggleImage(newDialogue);
         uiTextBox.setVisible(true);
-        content = 'Jeg kan se, at du har behandlet de tre mediciner. Det er kun de endelige resultater vi kommer til at bruge, så du kan stadigvæk nå at acceptere eller kassere endnu. Tak for hjælpen!'
+        content = ['Jeg kan se, at du har behandlet de tre mediciner. Tusind tak for din hjælp!', '', 'Du har stadigvæk mulighed for at ændre din beslutning, hvis du er kommet i tvivl.'];
         uiTextBox.start(content, 50);
         if (npcState == 1) npcState++;
     }
@@ -395,17 +414,29 @@ async function toggleImage(image, callback = null) {
     }, 50);
 }
 
-function bookshelfInteraction() {
+// display books in bookshelf 
+function bookshelfInteraction1() {
     const player = this.player;
     if (!player.isInteracting()) return;
-    const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
-
-    alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip}"`);
-    if (scenarioLog.tips.indexOf(tip) == -1) {
-        scenarioLog.tips.push(tip);
+    // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
+    alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip1}"`);
+    if (scenarioLog.tips.indexOf(tip1) == -1) {
+        scenarioLog.tips.push(tip1);
 
         // remove when scenario log is implemented
-        uiPlayerLog.setText('Tip: ' + tip);
+      //  uiPlayerLog.setText('Tip: ' + tip1);
+    }
+};
+function bookshelfInteraction2() {
+    const player = this.player;
+    if (!player.isInteracting()) return;
+    // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
+    alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip2}"`);
+    if (scenarioLog.tips.indexOf(tip2) == -1) {
+        scenarioLog.tips.push(tip2);
+
+        // remove when scenario log is implemented
+       // uiPlayerLog.setText('Tip: ' + tip2);
     }
 };
 
@@ -520,6 +551,18 @@ var createLabel = function (scene, text) {
             bottom: 20
         }
     });
-
-
 }
+
+function sinkInteraction(){
+        const player = this.player;
+    if (!player.isInteracting()) return;
+    alert(sinkString);
+}
+
+function dropInteraction(){
+    const player = this.player;
+if (!player.isInteracting()) return;
+alert(dropString);
+}
+
+
