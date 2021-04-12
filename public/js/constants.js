@@ -42,13 +42,11 @@ export const constants = {
         EXTERIOR_B: 'CC_City_Exterior_B',
         EXTERIOR_C: 'CC_City_Exterior_C',
         SCIFI: 'scifi_space_rpg_tiles_lpcized',
-        TRAINING_COMPUTER: 'trainingComputer4-3.png',
         MEDLAB_INTERIOR_1: 'interior1',
         MEDLAB_INTERIOR_2: 'walls1',
         MED1: 'med1_32',
         MED2: 'med2_32',
         MED3: 'med3_32',
-        TRAINING_COMPUTER: 'trainingComputer.png',
         BG_TIME_MACHINE: 'bg_time_device.png',
         BTN_TIME_MACHINE: 'time_device_btnC.png',
         SCREEN_TIME_MACHINE: 'clear_screen.png',
@@ -88,5 +86,4 @@ export const constants = {
         NPC: {},
         COMPUTER: {}
     }
-
 }

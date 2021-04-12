@@ -1,9 +1,15 @@
 import { constants } from "../constants.js"
-const sceneID = constants.SCENES.CHEMIST;
+import Player from "../game/player.js"
 
-let player, playerData, playerAnimation, scene, playerPosition;
-let keys, singlePress, isInteracting, isPlayerDisabled = false;
-let speed = 128;
+const sceneID = constants.SCENES.CHEMIST;
+let sceneIndex;
+
+let playerSprite, playerData, scene;
+let scenarioLog = {
+    level: '',
+    rules: [],
+    tips: []
+};
 
 let npc;
 let npcText;
@@ -21,8 +27,6 @@ let dataR;
 let dataB;
 
 let playerInteractionCollider;
-let interactionRangeY = 30;
-let interactionRangeX = 15;
 let objective = {
     medY: { isApproved: null },
     medR: { isApproved: null },
@@ -33,6 +37,8 @@ const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
 
+const rule1 = 'Regel #1: For bivirkninger gælder det, at medianen IKKE må overskride mere end 5 bivirkninger, dvs. 50% af de rapportede bivirkninger skal være under 5.';
+const rule2 = 'Regel #2: Den midterste halvdel af spredning for medikamentets evne til febernedsættelse, skal være større end det ydre. Sig endelig til hvis du vil høre det igen.';
 let uiTextBox;
 let content;
 
@@ -42,10 +48,25 @@ export class ChemistLevel extends Phaser.Scene {
         super({
             key: constants.SCENES.CHEMIST,
         })
+        this.player = null;
     }
     init(data) {
         playerData = data;
         if (playerData.playerProgression.indexOf(sceneID) == -1) playerData.playerProgression.push(sceneID);
+
+        sceneIndex = playerData.playerProgression.indexOf(sceneID);
+        scenarioLog.level = sceneID;
+        //TODO
+        // updatePlayerlog()
+        // playerData.playerLog.push({level: ""})
+
+        playerSprite = this.physics.add.sprite(265, 250, 'player', 4).setCollideWorldBounds(true).setDepth(1); //.setScale(2);
+        let keys = this.input.keyboard.addKeys(constants.USERINPUT);
+        playerInteractionCollider = this.add.rectangle(playerSprite.x, playerSprite.y, playerSprite.width / 2, playerSprite.height / 2,
+            0xff0000, 0.5
+        );
+        // animationSetup(this);
+        this.player = new Player(keys, playerInteractionCollider, playerSprite);
     }
     preload() {
         this.load.scenePlugin({
@@ -89,12 +110,9 @@ export class ChemistLevel extends Phaser.Scene {
         let interact = chemist_lvl.createLayer('interact', [MED1, MED2, MED3, PORTAL], 0, 0).setDepth(1);
         let interact2 = chemist_lvl.createLayer('interact2', [PORTAL], 0, 0).setDepth(-1);
 
-        player = scene.physics.add.sprite(265, 250, 'player', 4).setCollideWorldBounds(true); //.setScale(2);
-        playerInteractionCollider = this.add.rectangle(player.x, player.y + interactionRangeY, player.width / 2, player.height / 2,
-            0xff0000, 0.5  // debugging purposes
-        );
+        // object colliders
         let dynmaicCollider = this.physics.add.group();
-        dynmaicCollider.add(playerInteractionCollider);
+        dynmaicCollider.add(this.player.collider);
         npc = scene.physics.add.sprite(550, 350, 'professor-npc', 9);
         newDialogue = scene.add.image(npc.x + 5, npc.y - 40, 'exclamation.png').setScale(0.1);
         let collideables = this.physics.add.staticGroup();
@@ -104,6 +122,7 @@ export class ChemistLevel extends Phaser.Scene {
         let bookshelf = scene.add.rectangle(480, 90, 50, 50,
             0xff0000, 0.5
         );
+        // TODO make them say stuff 
         let sink;
         let drop;
 
@@ -111,42 +130,33 @@ export class ChemistLevel extends Phaser.Scene {
         collideables.add(bookshelf);
         //npcCollider.setCollideWorldBounds(true)
         //npcCollider.setImmovable(true);
-        player.setSize(25, 50).setOffset(12, 10);
+        playerSprite.setSize(25, 50).setOffset(12, 10);
 
         //scene.cameras.main.setZoom(1.5);
         scene.cameras.main.setBounds(0, 0, 600, 600);
         scene.physics.world.setBounds(0, 0, 600, 600);
         let mainCamera = scene.cameras.main;
-        mainCamera.startFollow(player, true, 0.05, 0.05);
+        mainCamera.startFollow(playerSprite, true, 0.05, 0.05);
         scene.animationSetup(this);
-        playerAnimation = player.anims;
 
         npcText = this.add.text(110, 485, '', { color: 'black' });
         npcText.visible = false;
         npcState = 0;
 
-        // keyobject for movement
-        keys = scene.input.keyboard.addKeys(constants.USERINPUT);
-        singlePress = constants.USERINPUT.SINGLEPRESS;
-
-        isInteracting = () => {
-            if (!isPlayerDisabled)
-                return singlePress(keys.interact) || singlePress(keys.alt_interact);
-        }
         // map collisions
         let borders = [walls, ground, deco, deco1, deco2];
-        scene.physics.add.collider(player, borders);
+        scene.physics.add.collider(playerSprite, borders);
 
         for (let i = 0; i < borders.length; i++) {
             borders[i].setCollisionByProperty({ border: true });
         }
 
         // map collision interactives
-        scene.physics.add.collider(player, interact);
-        scene.physics.add.collider(player, interact2);
+        scene.physics.add.collider(playerSprite, interact);
+        scene.physics.add.collider(playerSprite, interact2);
         scene.physics.add.overlap(playerInteractionCollider, npcCollider, npcInteraction, null, this);
         scene.physics.add.collider(playerInteractionCollider, bookshelf, bookshelfInteraction, null, this);
-        scene.physics.add.collider(player, npcCollider);
+        scene.physics.add.collider(playerSprite, npcCollider);
 
 
 
@@ -176,7 +186,7 @@ export class ChemistLevel extends Phaser.Scene {
         // gul medicin
         interact.setTileLocationCallback(22, 27, 2, 2, () => {
 
-            if (isInteracting()) {
+            if (this.player.isInteracting()) {
                 checkIfDone();
                 alert('Her kan du se dataene på den gule medicin');
                 toggleImage(dataY, function () {
@@ -199,7 +209,7 @@ export class ChemistLevel extends Phaser.Scene {
 
         // rød medicin
         interact.setTileLocationCallback(30, 27, 2, 2, () => {
-            if (isInteracting()) {
+            if (this.player.isInteracting()) {
                 checkIfDone();
                 alert('Du interagerer med RØD medicin');
                 toggleImage(dataR, function () {
@@ -222,7 +232,7 @@ export class ChemistLevel extends Phaser.Scene {
 
         // blå medicin
         interact.setTileLocationCallback(26, 27, 2, 2, () => {
-            if (isInteracting()) {
+            if (this.player.isInteracting()) {
                 checkIfDone();
 
                 alert('Du interagerer med BLÅ medicin');
@@ -246,22 +256,16 @@ export class ChemistLevel extends Phaser.Scene {
 
         interact2.setTileLocationCallback(15, 13, 3, 4, () => {
 
-            if (isInteracting()) {
+            if (this.player.isInteracting()) {
                 if (!confirm('Vil du gerne rejse tilbage til år 2200?')) return;
                 // Save answers!
-                playerData.answers[playerData.playerProgression.indexOf(sceneID)] = objective;
+                playerData.answers[sceneIndex] = objective;
                 localStorage.setItem('foobar', JSON.stringify(playerData));
                 console.log('Rejser tilbage');
                 this.scene.start(constants.SCENES.PLAY, playerData);
-                //interact.setTileLocationCallback(7,25,1,4, null);
 
             };
         });
-
-        // createTextBox(this, 100, 100, {
-        //     wrapWidth: 500,
-        // })
-        //     .start(content, 50);
 
         uiTextBox = createTextBox(this, 65, 480, {
             wrapWidth: 500,
@@ -272,58 +276,9 @@ export class ChemistLevel extends Phaser.Scene {
     }
     update() {
         // player movement
-        this.playerControl();
+        this.player.update();
     }
     // 8 directional  
-
-    playerControl() {
-
-        if (isPlayerDisabled) return;
-
-        if (singlePress(keys.sprint))
-            speed = 192;
-        else if (keys.sprint.isUp) speed = 128;
-
-        if (keys.up.isDown || keys.alt_up.isDown) {
-            player.setVelocityY(-speed);
-            playerInteractionCollider.x = player.x;
-            playerInteractionCollider.y = player.y - interactionRangeX;
-        }
-        if (keys.down.isDown || keys.alt_down.isDown) {
-            player.setVelocityY(speed);
-            playerInteractionCollider.x = player.x;
-            playerInteractionCollider.y = player.y + interactionRangeY;
-        }
-        if (keys.left.isDown || keys.alt_left.isDown) {
-            player.setVelocityX(-speed);
-            playerInteractionCollider.x = player.x - interactionRangeX;
-            playerInteractionCollider.y = player.y;
-        }
-        if (keys.right.isDown || keys.alt_right.isDown) {
-            player.setVelocityX(speed);
-            playerInteractionCollider.x = player.x + interactionRangeX;
-            playerInteractionCollider.y = player.y;
-        }
-        if (keys.up.isUp && keys.down.isUp) {
-            if (keys.alt_up.isUp && keys.alt_down.isUp)
-                player.setVelocityY(0);
-            //playerAnimation.play('turn', true);
-        }
-        if (keys.right.isUp && keys.left.isUp) {
-            if (keys.alt_right.isUp && keys.alt_left.isUp)
-                player.setVelocityX(0);
-            //playerAnimation.play('turn', true);
-        }
-
-        if (player.body.velocity.x > 0) playerAnimation.play('right', true);
-        else if (player.body.velocity.x < 0) playerAnimation.playReverse('left', true);
-        else if (player.body.velocity.y > 0) playerAnimation.play('down', true);
-        else if (player.body.velocity.y < 0) playerAnimation.play('up', true);
-        else {
-            playerAnimation.stop();
-        }
-    }
-
 
     animationSetup(scene) {
         scene.anims.create({
@@ -392,17 +347,26 @@ export class ChemistLevel extends Phaser.Scene {
 
 // needs to be rewrtitten once text is chained together  
 function npcInteraction() {
-    if (!isInteracting()) return;
+    const player = this.player;
+    if (!player.isInteracting()) return;
     // disable exclamation mark after first time talking
+    console.log('@!#$!#%%#%$@%@$%@$%@$', player);
     if (npcState == 0) toggleImage(newDialogue);
     // determins what npc will say 
-    isPlayerDisabled = true;
+    player.setDisabled(true);
 
     if (!objective.isComplete) {
         uiTextBox.setVisible(true);
-        content = ['Det må være dig, der skal analysere vores medicin objektivt.', '', 'Hvis en medicin skal kunne godkendes, skal det overholde følgende to regler:', '', 'Regel #1: For bivirkninger gælder det, at medianen IKKE må overskride mere end 5 bivirkninger, dvs. 50% af de rapportede bivirkninger skal være under 5.', '', 'Regel #2: Den midterste halvdel af spredning for medikamentets evne til febernedsættelse, skal være større end det ydre. Sig endelig til hvis du vil høre det igen'];
+        content = ['Det må være dig, der skal analysere vores medicin objektivt.', '', 'Hvis en medicin skal kunne godkendes, skal det overholde følgende to regler:', '', rule1, '', rule2];
+        
+        // in this case the rules are chained so only check for rule1.
+        if(scenarioLog.rules.indexOf(rule1) == -1){
+            scenarioLog.rules.push(rule1,rule2);
+        };
+        
         uiTextBox.start(content, 50);
         if (npcState == 0) npcState++;
+
     }
     else {
         if (npcState == 1) toggleImage(newDialogue);
@@ -423,9 +387,13 @@ async function toggleImage(image, callback = null) {
     }, 50);
 }
 
-let bookshelfInteraction = () => {
-    if (isInteracting())
-        alert('Du kigger i en bog. Du lægger mærke til følgende:\n "...Medianen i en sumkurve læses ud fra 50% markøren på Y aksen."');
+function bookshelfInteraction() {
+    const player = this.player;
+    const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
+    if (!player.isInteracting()) return;
+
+    alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip}"`);
+    if(scenarioLog.tips.indexOf(tip) == -1 ) scenarioLog.tips.push(tip);
 };
 
 function checkIfDone() {
@@ -443,6 +411,8 @@ function checkIfDone() {
 const GetValue = Phaser.Utils.Objects.GetValue;
 
 function createTextBox(scene, x, y, config) {
+    const player = scene.player;
+
     var wrapWidth = GetValue(config, 'wrapWidth', 0);
     var fixedWidth = GetValue(config, 'fixedWidth', 0);
     var fixedHeight = GetValue(config, 'fixedHeight', 0);
@@ -479,7 +449,7 @@ function createTextBox(scene, x, y, config) {
             this.resetChildVisibleState(icon);
             if (this.isLastPage && !this.isTyping) {
                 this.setVisible(false);
-                isPlayerDisabled = false;
+                player.setDisabled(false);
             };
             if (this.isTyping) {
                 this.stop(true);
