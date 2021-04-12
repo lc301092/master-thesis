@@ -38,7 +38,7 @@ export class LoadScene extends Phaser.Scene {
     }
     loadResources(type, resources_config = null) {
 
-        let pathString = '/assets/' + type
+        let pathString = '/assets/' + type;
         console.log(pathString);
         this.load.setPath(pathString);
 

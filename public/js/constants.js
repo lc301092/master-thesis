@@ -84,5 +84,4 @@ export const constants = {
         NPC: {},
         COMPUTER: {}
     }
-
 }

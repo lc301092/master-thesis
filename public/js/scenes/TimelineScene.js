@@ -19,7 +19,7 @@ export class Timeline extends Phaser.Scene {
 
     init(data) {
         playerData = data;
-        storyProgression = playerData.playerProgression
+        storyProgression = playerData.playerProgression;
         this.add.image(0, 0, constants.IMAGES.SCREEN).setOrigin(0);
         isWriting = false;
         textPlugin = this.plugins.get('rexbbcodetextplugin');
