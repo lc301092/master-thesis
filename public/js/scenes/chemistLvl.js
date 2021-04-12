@@ -1,5 +1,6 @@
 import { constants } from "../constants.js"
 import Player from "../game/player.js"
+import PlayerLog from "../game/ui.js"
 
 const sceneID = constants.SCENES.CHEMIST;
 let sceneIndex;
@@ -39,6 +40,8 @@ const COLOR_DARK = 0x260e04;
 
 const rule1 = 'Regel #1: For bivirkninger gælder det, at medianen IKKE må overskride mere end 5 bivirkninger, dvs. 50% af de rapportede bivirkninger skal være under 5.';
 const rule2 = 'Regel #2: Den midterste halvdel af spredning for medikamentets evne til febernedsættelse, skal være større end det ydre. Sig endelig til hvis du vil høre det igen.';
+
+let uiPlayerLog;
 let uiTextBox;
 let content;
 
@@ -273,6 +276,10 @@ export class ChemistLevel extends Phaser.Scene {
             fixedHeight: 65,
         }).setVisible(false);
 
+        uiPlayerLog = new PlayerLog(this);
+        uiPlayerLog.setText(sceneID);
+
+
     }
     update() {
         // player movement
@@ -350,7 +357,6 @@ function npcInteraction() {
     const player = this.player;
     if (!player.isInteracting()) return;
     // disable exclamation mark after first time talking
-    console.log('@!#$!#%%#%$@%@$%@$%@$', player);
     if (npcState == 0) toggleImage(newDialogue);
     // determins what npc will say 
     player.setDisabled(true);
@@ -358,12 +364,14 @@ function npcInteraction() {
     if (!objective.isComplete) {
         uiTextBox.setVisible(true);
         content = ['Det må være dig, der skal analysere vores medicin objektivt.', '', 'Hvis en medicin skal kunne godkendes, skal det overholde følgende to regler:', '', rule1, '', rule2];
-        
+
         // in this case the rules are chained so only check for rule1.
-        if(scenarioLog.rules.indexOf(rule1) == -1){
-            scenarioLog.rules.push(rule1,rule2);
+        if (scenarioLog.rules.indexOf(rule1) == -1) {
+            scenarioLog.rules.push(rule1, rule2);
+            // uiPlayerLog.setText(rule1);
+            // uiPlayerLog.setText(rule2);
         };
-        
+
         uiTextBox.start(content, 50);
         if (npcState == 0) npcState++;
 
@@ -389,11 +397,16 @@ async function toggleImage(image, callback = null) {
 
 function bookshelfInteraction() {
     const player = this.player;
-    const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
     if (!player.isInteracting()) return;
+    const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
 
     alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip}"`);
-    if(scenarioLog.tips.indexOf(tip) == -1 ) scenarioLog.tips.push(tip);
+    if (scenarioLog.tips.indexOf(tip) == -1) {
+        scenarioLog.tips.push(tip);
+
+        // remove when scenario log is implemented
+        uiPlayerLog.setText('Tip: ' + tip);
+    }
 };
 
 function checkIfDone() {
@@ -450,6 +463,8 @@ function createTextBox(scene, x, y, config) {
             if (this.isLastPage && !this.isTyping) {
                 this.setVisible(false);
                 player.setDisabled(false);
+                uiPlayerLog.setText(rule1);
+                uiPlayerLog.setText(rule2);
             };
             if (this.isTyping) {
                 this.stop(true);
@@ -491,4 +506,20 @@ var getBBcodeText = function (scene, wrapWidth, fixedWidth, fixedHeight) {
         },
         maxLines: 3
     })
+}
+
+var createLabel = function (scene, text) {
+    return scene.rexUI.add.label({
+        background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY),
+        text: scene.add.text(0, 0, text),
+        align: 'center',
+        space: {
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: 20
+        }
+    });
+
+
 }
