@@ -1,9 +1,11 @@
 import { constants } from "../constants.js"
+import Player from "../game/player.js"
 
-let player, keys, playerAnimation, singlePress, scene, map;
-let speed = 128;
-let isPlayerDisabled;
+// 
+let playerSprite, playerData, scene;
 let playerProgression;
+const ADJUST_RANGE_Y = 30;
+const ADJUST_RANGE_X = 15
 
 
 export class Base extends Phaser.Scene {
@@ -11,16 +13,24 @@ export class Base extends Phaser.Scene {
         super({
             key: constants.SCENES.PLAY,
         })
+        this.player = null;
     }
+
     init(data) {
         // tell progress from 
-        player = this.physics.add.sprite(150, 150, 'player',4).setCollideWorldBounds(true).setDepth(1); //.setScale(2);
+        playerSprite = this.physics.add.sprite(150, 150, 'player', 4).setCollideWorldBounds(true).setDepth(1); //.setScale(2);
+        console.log('Base Scene', data);
+        playerData = data;
+        playerSprite.x = data.playerPosition.x;
+        playerSprite.y = data.playerPosition.y;
 
-        console.log(data)
-        if(data.playerPosition) {
-            player.x = data.playerPosition.x;
-            player.y = data.playerPosition.y;
-        } 
+        let keys = this.input.keyboard.addKeys(constants.USERINPUT);
+        let collider = this.add.rectangle(playerSprite.x, playerSprite.y, playerSprite.width / 2, playerSprite.height / 2,
+            0xff0000, 0.5
+        );
+        animationSetup(this);
+        this.player = new Player(keys, collider, playerSprite);
+
     }
     preload() {
         playerProgression = JSON.parse(localStorage.getItem("objectives"));
@@ -29,14 +39,12 @@ export class Base extends Phaser.Scene {
 
     create() {
         scene = this;
-        isPlayerDisabled = false;
         // tilemap configurations
 
         let baseSceneTest = this.add.tilemap('baseSceneTest');
         //baseSceneTest.set
 
         // add tileset image
-        //#region tilsets and layers
         let tileImages = constants.TILEIMAGES.BASE_LVL;
         let images = constants.IMAGES;
         let tileObj = {};
@@ -62,102 +70,57 @@ export class Base extends Phaser.Scene {
         let interact = baseSceneTest.createLayer('Interact', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B], 0, 0);
         let layers = baseSceneTest.createLayer('Layercontrol', EXTERIOR_C, 0, 0).setDepth(1);
 
-        //#endregion tilsets and layers
-      
-        //player = scene.physics.add.sprite(150, 150, 'player').setCollideWorldBounds(true); //.setScale(2);
-        player.setSize(25, 50).setOffset(12, 10);
-        scene.cameras.main.setBounds(0, 0, 1600, 1200);
+
+        playerSprite.setSize(25, 50).setOffset(12, 10);
+
+        // scene.cameras.main.setZoom(1.5);
+        scene.cameras.main.setBounds(-200, -200);
         scene.physics.world.setBounds(0, 0, 1600, 1200);
         let mainCamera = scene.cameras.main;
-        mainCamera.startFollow(player, true, 0.05, 0.05);
+        mainCamera.startFollow(playerSprite, true, 0.05, 0.05);
 
-        animationSetup(this);
-        playerAnimation = player.anims;
-        // keyobject for movement
-        keys = scene.input.keyboard.addKeys(constants.USERINPUT.WASD_MOVEMENT);
-        singlePress = constants.USERINPUT.SINGLEPRESS;
-
+        console.log('Everything is running ok');
         // map collisions
         let borders = [ground, walls, decoration, decoration2, interact];
-        scene.physics.add.collider(player, borders);
+        scene.physics.add.collider(playerSprite, borders);
 
         for (let i = 0; i < borders.length; i++) {
             borders[i].setCollisionByProperty({ border: true });
         }
 
         // map collision interactives
-        scene.physics.add.collider(player, interact);
-       // interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1665, 1666, 1713, 1714]);
+        scene.physics.add.collider(playerSprite, interact);
+        interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1665, 1666, 1713, 1714]);
 
         // indstil tidsmaskine
         interact.setTileLocationCallback(10, 5, 6, 1, () => {
-            if (singlePress(keys.interact)) {
+            if (this.player.isInteracting()) {
                 console.log('Observér tidslinjen');
-                this.scene.start(constants.SCENES.TIMELINE, {playerPosition: {x: player.x, y: player.y}});
+                playerData.playerPosition.x = playerSprite.x;
+                playerData.playerPosition.y = playerSprite.y;
+                this.scene.start(constants.SCENES.TIMELINE, playerData);
                 // --- indstil tidsmaskine "scene" kode her ---
             };
         });
 
         // Tidsmaskinen
         interact.setTileLocationCallback(22, 18, 1, 1, () => {
-            if (singlePress(keys.interact)) {
+            if (this.player.isInteracting()) {
                 console.log('Tidsmaskine aktiveret');
-                //this.scene.
-                this.scene.start(constants.SCENES.TIME_MACHINE, {playerPosition: {x: player.x, y: player.y}});
+                playerData.playerPosition.x = playerSprite.x;
+                playerData.playerPosition.y = playerSprite.y;
+                this.scene.start(constants.SCENES.TIME_MACHINE, playerData);
                 // --- skift scene til laboratorie kode her ---
             };
         });
 
     }
     update() {
-        // player movement
-        playerControl();
+        this.player.update();
     }
-    // 8 directional  
-    
-}
-function playerControl() {
-        
-    if(isPlayerDisabled) return;
 
-    if (singlePress(keys.sprint))
-        speed = 192;
-    else if (keys.sprint.isUp) speed = 128;
-
-    if (keys.up.isDown) {
-        player.setVelocityY(-speed);
-    }
-    if (keys.down.isDown) {
-        player.setVelocityY(speed);
-    }
-    if (keys.left.isDown) {
-        player.setVelocityX(-speed);
-    }
-    if (keys.right.isDown) {
-        player.setVelocityX(speed);
-    }
-    if (keys.up.isUp && keys.down.isUp) {
-        player.setVelocityY(0);
-        //playerAnimation.play('turn', true);
-    }
-    if (keys.right.isUp && keys.left.isUp) {
-        player.setVelocityX(0);
-        //playerAnimation.play('turn', true);
-    }
-    // other inputs than movement 
-    if (singlePress(keys.interact)) {
-        console.log(player);
-        //console.log(keys.interact);
-        //checkColliders()
-    }
-    if (player.body.velocity.x > 0) playerAnimation.play('right', true);
-    else if (player.body.velocity.x < 0) playerAnimation.playReverse('left', true);
-    else if (player.body.velocity.y > 0) playerAnimation.play('down', true);
-    else if (player.body.velocity.y < 0) playerAnimation.play('up', true);
-    else {
-        playerAnimation.stop();
-    }
 }
+
 function animationSetup(scene) {
     scene.anims.create({
         key: 'idle',

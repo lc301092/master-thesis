@@ -1,10 +1,21 @@
 import { constants } from "../constants.js"
+import Player from "../game/player.js"
 
-let player, keys, playerAnimation, singlePress, scene, playerPosition;
-let speed = 128;
+const sceneID = constants.SCENES.CHEMIST;
+let sceneIndex;
+
+let playerSprite, playerData, scene;
+let scenarioLog = {
+    level: '',
+    rules: [],
+    tips: []
+};
+
 let npc;
 let npcText;
 let npcState;
+let newDialogue;
+
 let tickY;
 let tickB;
 let tickR;
@@ -14,15 +25,22 @@ let xR;
 let dataY;
 let dataR;
 let dataB;
+
 let playerInteractionCollider;
-let interactionRangeY = 30;
-let interactionRangeX = 15;
 let objective = {
-    medY: {isApproved: null},
-    medR: {isApproved: null},
-    medB: {isApproved: null}
+    medY: { isApproved: null },
+    medR: { isApproved: null },
+    medB: { isApproved: null }
 }
 
+const COLOR_PRIMARY = 0x4e342e;
+const COLOR_LIGHT = 0x7b5e57;
+const COLOR_DARK = 0x260e04;
+
+const rule1 = 'Regel #1: For bivirkninger gælder det, at medianen IKKE må overskride mere end 5 bivirkninger, dvs. 50% af de rapportede bivirkninger skal være under 5.';
+const rule2 = 'Regel #2: Den midterste halvdel af spredning for medikamentets evne til febernedsættelse, skal være større end det ydre. Sig endelig til hvis du vil høre det igen.';
+let uiTextBox;
+let content;
 
 
 export class ChemistLevel extends Phaser.Scene {
@@ -30,11 +48,32 @@ export class ChemistLevel extends Phaser.Scene {
         super({
             key: constants.SCENES.CHEMIST,
         })
+        this.player = null;
     }
     init(data) {
-        if (data.playerPosition) playerPosition = data.playerPosition;
+        playerData = data;
+        if (playerData.playerProgression.indexOf(sceneID) == -1) playerData.playerProgression.push(sceneID);
+
+        sceneIndex = playerData.playerProgression.indexOf(sceneID);
+        scenarioLog.level = sceneID;
+        //TODO
+        // updatePlayerlog()
+        // playerData.playerLog.push({level: ""})
+
+        playerSprite = this.physics.add.sprite(265, 250, 'player', 4).setCollideWorldBounds(true).setDepth(1); //.setScale(2);
+        let keys = this.input.keyboard.addKeys(constants.USERINPUT);
+        playerInteractionCollider = this.add.rectangle(playerSprite.x, playerSprite.y, playerSprite.width / 2, playerSprite.height / 2,
+            0xff0000, 0.5
+        );
+        // animationSetup(this);
+        this.player = new Player(keys, playerInteractionCollider, playerSprite);
     }
     preload() {
+        this.load.scenePlugin({
+            key: 'rexuiplugin',
+            url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js',
+            sceneKey: 'rexUI'
+        });
     }
     create() {
         scene = this;
@@ -71,20 +110,19 @@ export class ChemistLevel extends Phaser.Scene {
         let interact = chemist_lvl.createLayer('interact', [MED1, MED2, MED3, PORTAL], 0, 0).setDepth(1);
         let interact2 = chemist_lvl.createLayer('interact2', [PORTAL], 0, 0).setDepth(-1);
 
-        player = scene.physics.add.sprite(265, 250, 'player', 4).setCollideWorldBounds(true); //.setScale(2);
-        playerInteractionCollider = this.add.rectangle(player.x, player.y + interactionRangeY, player.width / 2, player.height / 2,
-             0xff0000,0.5  // debugging purposes
-        );
+        // object colliders
         let dynmaicCollider = this.physics.add.group();
-        dynmaicCollider.add(playerInteractionCollider);
+        dynmaicCollider.add(this.player.collider);
         npc = scene.physics.add.sprite(550, 350, 'professor-npc', 9);
+        newDialogue = scene.add.image(npc.x + 5, npc.y - 40, 'exclamation.png').setScale(0.1);
         let collideables = this.physics.add.staticGroup();
         let npcCollider = this.add.rectangle(npc.x, npc.y, npc.width / 2, npc.height,
             // 0xff0000,0.5 // debugging purposes
         );
-        let bookshelf = scene.add.rectangle(480,90,50,50,
-             0xff0000,0.5
+        let bookshelf = scene.add.rectangle(480, 90, 50, 50,
+            0xff0000, 0.5
         );
+        // TODO make them say stuff 
         let sink;
         let drop;
 
@@ -92,36 +130,33 @@ export class ChemistLevel extends Phaser.Scene {
         collideables.add(bookshelf);
         //npcCollider.setCollideWorldBounds(true)
         //npcCollider.setImmovable(true);
-        player.setSize(25, 50).setOffset(12, 10);
+        playerSprite.setSize(25, 50).setOffset(12, 10);
+
+        //scene.cameras.main.setZoom(1.5);
         scene.cameras.main.setBounds(0, 0, 600, 600);
         scene.physics.world.setBounds(0, 0, 600, 600);
         let mainCamera = scene.cameras.main;
-        mainCamera.startFollow(player, true, 0.05, 0.05);
+        mainCamera.startFollow(playerSprite, true, 0.05, 0.05);
         scene.animationSetup(this);
-        playerAnimation = player.anims;
 
         npcText = this.add.text(110, 485, '', { color: 'black' });
         npcText.visible = false;
         npcState = 0;
 
-        // keyobject for movement
-        keys = scene.input.keyboard.addKeys(constants.USERINPUT.WASD_MOVEMENT);
-        singlePress = constants.USERINPUT.SINGLEPRESS;
-
         // map collisions
         let borders = [walls, ground, deco, deco1, deco2];
-        scene.physics.add.collider(player, borders);
+        scene.physics.add.collider(playerSprite, borders);
 
         for (let i = 0; i < borders.length; i++) {
             borders[i].setCollisionByProperty({ border: true });
         }
 
         // map collision interactives
-        scene.physics.add.collider(player, interact);
-        scene.physics.add.collider(player, interact2);
+        scene.physics.add.collider(playerSprite, interact);
+        scene.physics.add.collider(playerSprite, interact2);
         scene.physics.add.overlap(playerInteractionCollider, npcCollider, npcInteraction, null, this);
         scene.physics.add.collider(playerInteractionCollider, bookshelf, bookshelfInteraction, null, this);
-        scene.physics.add.collider(player, npcCollider);
+        scene.physics.add.collider(playerSprite, npcCollider);
 
 
 
@@ -150,7 +185,9 @@ export class ChemistLevel extends Phaser.Scene {
 
         // gul medicin
         interact.setTileLocationCallback(22, 27, 2, 2, () => {
-            if (singlePress(keys.interact)) {
+
+            if (this.player.isInteracting()) {
+                checkIfDone();
                 alert('Her kan du se dataene på den gule medicin');
                 toggleImage(dataY, function () {
                     // --- dataset til gul medicin kode her ---
@@ -172,7 +209,8 @@ export class ChemistLevel extends Phaser.Scene {
 
         // rød medicin
         interact.setTileLocationCallback(30, 27, 2, 2, () => {
-            if (singlePress(keys.interact)) {
+            if (this.player.isInteracting()) {
+                checkIfDone();
                 alert('Du interagerer med RØD medicin');
                 toggleImage(dataR, function () {
                     // --- dataset til rød medicin kode her---
@@ -194,7 +232,8 @@ export class ChemistLevel extends Phaser.Scene {
 
         // blå medicin
         interact.setTileLocationCallback(26, 27, 2, 2, () => {
-            if (singlePress(keys.interact)) {
+            if (this.player.isInteracting()) {
+                checkIfDone();
 
                 alert('Du interagerer med BLÅ medicin');
                 toggleImage(dataB, function () {
@@ -217,72 +256,30 @@ export class ChemistLevel extends Phaser.Scene {
 
         interact2.setTileLocationCallback(15, 13, 3, 4, () => {
 
-            if (singlePress(keys.interact)) {
+            if (this.player.isInteracting()) {
                 if (!confirm('Vil du gerne rejse tilbage til år 2200?')) return;
-
                 // Save answers!
-                localStorage.setItem('objectives', JSON.stringify(objective));
+                playerData.answers[sceneIndex] = objective;
+                localStorage.setItem('foobar', JSON.stringify(playerData));
                 console.log('Rejser tilbage');
-                this.scene.start(constants.SCENES.PLAY, { playerPosition });
-                //interact.setTileLocationCallback(7,25,1,4, null);
+                this.scene.start(constants.SCENES.PLAY, playerData);
 
             };
         });
 
+        uiTextBox = createTextBox(this, 65, 480, {
+            wrapWidth: 500,
+            fixedWidth: 500,
+            fixedHeight: 65,
+        }).setVisible(false);
+
     }
     update() {
         // player movement
-        this.playerControl();
+        this.player.update();
     }
     // 8 directional  
-    playerControl() {
 
-        if (singlePress(keys.sprint))
-            speed = 192;
-        else if (keys.sprint.isUp) speed = 128;
-
-        if (keys.up.isDown) {
-            player.setVelocityY(-speed);
-            playerInteractionCollider.x = player.x;
-            playerInteractionCollider.y = player.y - interactionRangeX;
-        }
-        if (keys.down.isDown) {
-            player.setVelocityY(speed);
-            playerInteractionCollider.x = player.x;
-            playerInteractionCollider.y = player.y + interactionRangeY;
-        }
-        if (keys.left.isDown) {
-            player.setVelocityX(-speed);
-            playerInteractionCollider.x = player.x - interactionRangeX;
-            playerInteractionCollider.y = player.y;
-        }
-        if (keys.right.isDown) {
-            player.setVelocityX(speed);
-            playerInteractionCollider.x = player.x + interactionRangeX;
-            playerInteractionCollider.y = player.y;
-        }
-        if (keys.up.isUp && keys.down.isUp) {
-            player.setVelocityY(0);
-            //playerAnimation.play('turn', true);
-        }
-        if (keys.right.isUp && keys.left.isUp) {
-            player.setVelocityX(0);
-            //playerAnimation.play('turn', true);
-        }
-        // other inputs than movement 
-        if (singlePress(keys.interact)) {
-            console.log(player);
-            //console.log(keys.interact);
-            //checkColliders()
-        }
-        if (player.body.velocity.x > 0) playerAnimation.play('right', true);
-        else if (player.body.velocity.x < 0) playerAnimation.playReverse('left', true);
-        else if (player.body.velocity.y > 0) playerAnimation.play('down', true);
-        else if (player.body.velocity.y < 0) playerAnimation.play('up', true);
-        else {
-            playerAnimation.stop();
-        }
-    }
     animationSetup(scene) {
         scene.anims.create({
             key: 'idle',
@@ -347,52 +344,151 @@ export class ChemistLevel extends Phaser.Scene {
         });
     }
 }
-/*function npcInteraction2() {
-    console.log('touching');
-}*/
 
+// needs to be rewrtitten once text is chained together  
 function npcInteraction() {
-    if (singlePress(keys.interact)) {
-        if (npcText.visible) return;
-        npcText.text = getNpcText(npcState);
-        let medicines = 0; 
-        for (const key in objective) {
-            if(objective[key].isApproved != undefined) medicines++; 
-        }
-        console.log(medicines); 
-        if(medicines == 3) npcText.text = 'Jeg kan se, at du har behandlet de tre mediciner.\nTusind tak for din hjælp! \nDu har stadigvæk mulighed for at ændre din beslutning, \nhvis du er kommet i tvivl.'
-        // determine what npc will say 
+    const player = this.player;
+    if (!player.isInteracting()) return;
+    // disable exclamation mark after first time talking
+    console.log('@!#$!#%%#%$@%@$%@$%@$', player);
+    if (npcState == 0) toggleImage(newDialogue);
+    // determins what npc will say 
+    player.setDisabled(true);
 
-        // set text to visible for a period of time
-        npcText.visible = true;
-        setTimeout(() => { npcText.visible = false; npcState++; }, npcText.text.length * 70);
+    if (!objective.isComplete) {
+        uiTextBox.setVisible(true);
+        content = ['Det må være dig, der skal analysere vores medicin objektivt.', '', 'Hvis en medicin skal kunne godkendes, skal det overholde følgende to regler:', '', rule1, '', rule2];
+        
+        // in this case the rules are chained so only check for rule1.
+        if(scenarioLog.rules.indexOf(rule1) == -1){
+            scenarioLog.rules.push(rule1,rule2);
+        };
+        
+        uiTextBox.start(content, 50);
+        if (npcState == 0) npcState++;
+
     }
-
+    else {
+        if (npcState == 1) toggleImage(newDialogue);
+        uiTextBox.setVisible(true);
+        content = 'Jeg kan se, at du har behandlet de tre mediciner. Det er kun de endelige resultater vi kommer til at bruge, så du kan stadigvæk nå at acceptere eller kassere endnu. Tak for hjælpen!'
+        uiTextBox.start(content, 50);
+        if (npcState == 1) npcState++;
+    }
 }
-async function toggleImage(image, callback) {
+async function toggleImage(image, callback = null) {
     if (image.visible) image.visible = false;
     else image.visible = true;
+
+    if (!callback) return;
 
     setTimeout(() => {
         return callback();
     }, 50);
 }
 
-function getNpcText(state) {
-   
-    switch (state) {
-        case 0: return 'Hej! Du må være laboranten vi har ventet på. \nJeg er glad for at møde dig...';
-        case 1: return 'På bordet finder du vores tre mediciner. \nVi har brug for dit input, så vi sikrer os at vores \nresultater ikke er farvet...';
-        case 2: return 'Du finder information om medicinerne, ved \nat gå ned og undersøge dem. \nNår du godkender eller afviser en medicin, \nså er beslutningen ikke endelig.';
-        case 3: return 'For at godkende en medicin skal to regler være opfyldt...';
-        case 4: return 'Regl #1: Medianen af antal rapporterede bivirkninger \nmå ikke overstige 5 bivirkninger. ';
-        case 5: npcState = 0; return 'Regl #2: 50% af menneskerne der har \nindtaget medicinen, skal have oplevet et temperaturfald \npå minimum 2 grader celcius eller over.';
+function bookshelfInteraction() {
+    const player = this.player;
+    const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
+    if (!player.isInteracting()) return;
+
+    alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip}"`);
+    if(scenarioLog.tips.indexOf(tip) == -1 ) scenarioLog.tips.push(tip);
+};
+
+function checkIfDone() {
+    let medicines = 0;
+
+    for (const key in objective) {
+        if (objective[key].isApproved != undefined) medicines++;
     }
+    console.log(medicines);
+    if (medicines != 2) return;
+    objective.isComplete = true;
+    toggleImage(newDialogue);
 }
 
-let bookshelfInteraction = () => {
-    if (singlePress(keys.interact)) 
-    alert('Bog#1 Sumkurver: \n\n...Medianen er det midterste tal af alle observationer, hvilket vil sige at 50% af observationer er mindre end medianen og 50% er større. For at finde medianen, finder man 50% markøren på y-aksen og følger den vandret, indtil man møder sumkurven. Derefter går man lodret ned, hvor tallet man støder på på x-aksen, er medianen.');
-    //bog 2 tekst 
-    //alert('Bog#2 Boxplot: \n\n...Boxplot er en overskuelig måde sammenligne data med hinanden på. Et boxplot indeholder ALTID: Den mindste observation, en nedre kvartil, en median, en øvre kvartil, og den største observation.');
-}; 
+const GetValue = Phaser.Utils.Objects.GetValue;
+
+function createTextBox(scene, x, y, config) {
+    const player = scene.player;
+
+    var wrapWidth = GetValue(config, 'wrapWidth', 0);
+    var fixedWidth = GetValue(config, 'fixedWidth', 0);
+    var fixedHeight = GetValue(config, 'fixedHeight', 0);
+    var textBox = scene.rexUI.add.textBox({
+        x: x,
+        y: y,
+
+        background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY)
+            .setStrokeStyle(2, COLOR_LIGHT),
+
+        icon: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_DARK),
+
+        // text: getBuiltInText(scene, wrapWidth, fixedWidth, fixedHeight),
+        text: getBBcodeText(scene, wrapWidth, fixedWidth, fixedHeight),
+
+        action: scene.add.image(0, 0, 'flueben.png').setScale(0.2).setTint(COLOR_LIGHT).setVisible(false),
+
+        space: {
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: 20,
+            icon: 10,
+            text: 10,
+        }
+    })
+        .setOrigin(0)
+        .layout();
+
+    textBox
+        .setInteractive()
+        .on('pointerdown', function () {
+            var icon = this.getElement('action').setVisible(false);
+            this.resetChildVisibleState(icon);
+            if (this.isLastPage && !this.isTyping) {
+                this.setVisible(false);
+                player.setDisabled(false);
+            };
+            if (this.isTyping) {
+                this.stop(true);
+            } else {
+                this.typeNextPage();
+            }
+        }, textBox)
+        .on('pageend', function () {
+            if (this.isLastPage) {
+                return;
+            }
+            var icon = this.getElement('action').setVisible(true);
+            this.resetChildVisibleState(icon);
+            icon.y -= 30;
+            var tween = scene.tweens.add({
+                targets: icon,
+                y: '+=30', // '+=100'
+                ease: 'Bounce', // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                duration: 500,
+                repeat: 0, // -1: infinity
+                yoyo: false
+            });
+        }, textBox)
+    //.on('type', function () {
+    //})
+
+    return textBox;
+}
+
+var getBBcodeText = function (scene, wrapWidth, fixedWidth, fixedHeight) {
+    return scene.rexUI.add.BBCodeText(0, 0, '', {
+        fixedWidth: fixedWidth,
+        fixedHeight: fixedHeight,
+
+        fontSize: '20px',
+        wrap: {
+            mode: 'word',
+            width: wrapWidth
+        },
+        maxLines: 3
+    })
+}

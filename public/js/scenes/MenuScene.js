@@ -1,4 +1,7 @@
 import { constants } from "../constants.js"
+
+let playerData;
+
 export class MenuScene extends Phaser.Scene {
     constructor() {
         super({
@@ -6,7 +9,7 @@ export class MenuScene extends Phaser.Scene {
         })
     }
     init(data) {
-        console.log(data)
+       playerData = data;
     }
     preload() {
     }
@@ -28,7 +31,7 @@ export class MenuScene extends Phaser.Scene {
 
         this.input.on('pointerdown', (pointer) => {
             console.log('clicked');
-            this.scene.start(constants.SCENES.CHEMIST, 'Start');
+            this.scene.start(constants.SCENES.CHEMIST, playerData);
         });
     }
         

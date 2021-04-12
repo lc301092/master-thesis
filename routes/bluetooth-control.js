@@ -1,11 +1,12 @@
-const BTSP = require('bluetooth-serial-port');
-const btSerial = new BTSP.BluetoothSerialPort();
+//const BTSP = require('bluetooth-serial-port');
+//const btSerial = new BTSP.BluetoothSerialPort();
 
 const express = require('express');
 const router = express.Router();
 
 /* GET users listing. */
 /// ### >>> DEL 1 <<< ###
+/*
 btSerial.on('found', function (address, name) {
 
 
@@ -49,5 +50,5 @@ router.post('/led', function (req, res, next) {
 	res.send(JSON.stringify(message));
 });
 
-
+*/
 module.exports = router;
