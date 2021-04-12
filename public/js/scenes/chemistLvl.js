@@ -360,7 +360,7 @@ function npcInteraction() {
             if(objective[key].isApproved != undefined) medicines++; 
         }
         console.log(medicines); 
-        if(medicines == 3) npcText.text = 'Jeg kan se, at du har behandlet de tre mediciner.\nDet er kun de endelige resultater vi kommer til at bruge,\nså du kan stadigvæk nå at acceptere eller kassere endnu.\nTak for hjælpen!'
+        if(medicines == 3) npcText.text = 'Jeg kan se, at du har behandlet de tre mediciner.\nTusind tak for din hjælp! \nDu har stadigvæk mulighed for at ændre din beslutning, \nhvis du er kommet i tvivl.'
         // determine what npc will say 
 
         // set text to visible for a period of time
@@ -381,14 +381,18 @@ async function toggleImage(image, callback) {
 function getNpcText(state) {
    
     switch (state) {
-        case 0: return 'Det må være dig, der skal analysere vores medicin\nobjektivt';
-        case 1: return 'Hvis en medicin skal kunne godkendes,skal det\noverholde følgende to regler:';
-        case 2: return 'Regel #1: For bivirkninger gælder det, at medianen\nIKKE må overskride mere end 5 bivirkninger, dvs. 50%\naf de rapportede bivirkninger skal være under 5';
-        case 3: npcState = 0; return 'Regel #2: Den midterste halvdel af spredning for\nmedikamentets evne til febernedsættelse,\nskal være større end det ydre';
+        case 0: return 'Hej! Du må være laboranten vi har ventet på. \nJeg er glad for at møde dig...';
+        case 1: return 'På bordet finder du vores tre mediciner. \nVi har brug for dit input, så vi sikrer os at vores \nresultater ikke er farvet...';
+        case 2: return 'Du finder information om medicinerne, ved \nat gå ned og undersøge dem. \nNår du godkender eller afviser en medicin, \nså er beslutningen ikke endelig.';
+        case 3: return 'For at godkende en medicin skal to regler være opfyldt...';
+        case 4: return 'Regl #1: Medianen af antal rapporterede bivirkninger \nmå ikke overstige 5 bivirkninger. ';
+        case 5: npcState = 0; return 'Regl #2: 50% af menneskerne der har \nindtaget medicinen, skal have oplevet et temperaturfald \npå minimum 2 grader celcius eller over.';
     }
 }
 
 let bookshelfInteraction = () => {
     if (singlePress(keys.interact)) 
-    alert('Du kigger i en bog. Du lægger mærke til følgende:\n "...Medianen i en sumkurve læses ud fra 50% markøren på Y aksen."');
+    alert('Bog#1 Sumkurver: \n\n...Medianen er det midterste tal af alle observationer, hvilket vil sige at 50% af observationer er mindre end medianen og 50% er større. For at finde medianen, finder man 50% markøren på y-aksen og følger den vandret, indtil man møder sumkurven. Derefter går man lodret ned, hvor tallet man støder på på x-aksen, er medianen.');
+    //bog 2 tekst 
+    //alert('Bog#2 Boxplot: \n\n...Boxplot er en overskuelig måde sammenligne data med hinanden på. Et boxplot indeholder ALTID: Den mindste observation, en nedre kvartil, en median, en øvre kvartil, og den største observation.');
 }; 
