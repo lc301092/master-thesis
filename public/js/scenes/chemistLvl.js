@@ -37,11 +37,13 @@ const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
 
-const rule1 = 'Regel #1: For bivirkninger gælder det, at medianen IKKE må overskride mere end 5 bivirkninger, dvs. 50% af de rapportede bivirkninger skal være under 5.';
-const rule2 = 'Regel #2: Den midterste halvdel af spredning for medikamentets evne til febernedsættelse, skal være større end det ydre. Sig endelig til hvis du vil høre det igen.';
+const rule1 = 'Regl #1: Medianen af antal rapporterede bivirkninger må ikke overstige 5.';
+const rule2 = 'Regl #2: 50% af menneskerne der har indtaget medicinen, skal have oplevet et temperaturfald på minimum 2 grader celcius eller over.';
 let uiTextBox;
 let content;
 
+const tip1 = 'Bog#1 Sumkurver: \n\n...Medianen er det midterste tal af alle observationer, hvilket vil sige at 50% af observationer er mindre end medianen og 50% er større. \nFor at finde medianen, finder man 50% markøren på y-aksen og følger den vandret, indtil man møder sumkurven. \nDerefter går man lodret ned, hvor tallet man støder på på x-aksen, er medianen.';
+    const tip2 = 'Bog#2 Boxplot: \n\n...Boxplot er en overskuelig måde sammenligne data med hinanden på. \nEt boxplot indeholder ALTID: Den mindste observation, en nedre kvartil, en median, en øvre kvartil, og den største observation.';
 
 export class ChemistLevel extends Phaser.Scene {
     constructor() {
@@ -357,7 +359,7 @@ function npcInteraction() {
 
     if (!objective.isComplete) {
         uiTextBox.setVisible(true);
-        content = ['Det må være dig, der skal analysere vores medicin objektivt.', '', 'Hvis en medicin skal kunne godkendes, skal det overholde følgende to regler:', '', rule1, '', rule2];
+        content = ['Hej! Du må være laboranten vi har ventet på. Jeg er glad for at møde dig…', '', 'På bordet finder du vores tre mediciner. Vi har brug for dit input, så vi sikrer os at vores resultater ikke er farvet… ', 'Du finder information om medicinerne, ved at gå ned og undersøge dem.', '', 'Når du godkender eller afviser en medicin, så er beslutningen ikke endelig.', '', 'For at godkende en medicin skal to regler være opfyldt…', '', rule1, '', rule2];
         
         // in this case the rules are chained so only check for rule1.
         if(scenarioLog.rules.indexOf(rule1) == -1){
@@ -371,7 +373,7 @@ function npcInteraction() {
     else {
         if (npcState == 1) toggleImage(newDialogue);
         uiTextBox.setVisible(true);
-        content = 'Jeg kan se, at du har behandlet de tre mediciner. Det er kun de endelige resultater vi kommer til at bruge, så du kan stadigvæk nå at acceptere eller kassere endnu. Tak for hjælpen!'
+        content = ['Jeg kan se, at du har behandlet de tre mediciner. Tusind tak for din hjælp!', '', 'Du har stadigvæk mulighed for at ændre din beslutning, hvis du er kommet i tvivl.'];
         uiTextBox.start(content, 50);
         if (npcState == 1) npcState++;
     }
@@ -387,13 +389,13 @@ async function toggleImage(image, callback = null) {
     }, 50);
 }
 
+// display books in bookshelf 
 function bookshelfInteraction() {
     const player = this.player;
-    const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
     if (!player.isInteracting()) return;
 
-    alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip}"`);
-    if(scenarioLog.tips.indexOf(tip) == -1 ) scenarioLog.tips.push(tip);
+    alert(`${tip2}`);
+    if(scenarioLog.tips.indexOf(tip2) == -1 ) scenarioLog.tips.push(tip2);
 };
 
 function checkIfDone() {
