@@ -7,6 +7,7 @@ export const constants = {
         CHEMIST: "CHEMIST",
         TIMELINE: "TIMELINE",
         TIME_MACHINE: 'TIME_MACHINE',
+        INTRO: 'INTRO',
     },
     USERINPUT: {
         SINGLEPRESS: Phaser.Input.Keyboard.JustDown,
@@ -51,12 +52,17 @@ export const constants = {
         MED_DATA_YELLOW: 'yellow.png',
         MED_DATA_BLUE: 'blue.png',
         MED_DATA_RED: 'red.png',
-        NEW_DIALOGUE: 'exclamation.png'
+        NEW_DIALOGUE: 'exclamation.png',
+        INTRO1: 'intro1.png',
+        INTRO2: 'intro2.png',
+        INTRO3: 'intro3.png',
+        INTRO4: 'intro4.png',
+        INTRO5: 'intro5.png'
     },
     SPRITES: {
         PC: 'playable_charaters.png',
         PORTAL: 'portal_u.png',
-        CHEMIST_NPC: 'professor-npc.png'
+        CHEMIST_NPC: 'professor-npc.png',
     },
     TILEIMAGES: {
         BASE_LVL: {
