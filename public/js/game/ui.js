@@ -6,7 +6,7 @@ export default class PlayerLog {
 
     constructor(scene, title) {
         this.scene = scene
-        this.background = scene.add.rectangle(595,10, 200,550, COLOR_PRIMARY).setOrigin(0).setDepth(5);
+        this.background = scene.add.rectangle(595,10, 200,300, COLOR_PRIMARY).setOrigin(0).setDepth(5);
         this.container = scene.add.container;
         this.visible;
         this.baseYValue = this.background.y + 20;

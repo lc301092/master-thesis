@@ -43,6 +43,7 @@ const rule2 = 'Regl #2: 50% af menneskerne der har indtaget medicinen, skal have
 let uiTextBox;
 let uiPlayerLog;
 let content;
+let isLogUpdated;
 
 const tip1 = 'Bog#1 Sumkurver: \n\n...Medianen er det midterste tal af alle observationer, hvilket vil sige at 50% af observationer er mindre end medianen og 50% er større. \nFor at finde medianen, finder man 50% markøren på y-aksen og følger den vandret, indtil man møder sumkurven. \nDerefter går man lodret ned, hvor tallet man støder på på x-aksen, er medianen.';
 const tip2 = 'Bog#2 Boxplot: \n\n...Boxplot er en overskuelig måde sammenligne data med hinanden på. \nEt boxplot indeholder ALTID: Den mindste observation, en nedre kvartil, en median, en øvre kvartil, og den største observation.';
@@ -70,7 +71,7 @@ export class ChemistLevel extends Phaser.Scene {
         playerSprite = this.physics.add.sprite(265, 250, 'player', 4).setCollideWorldBounds(true).setDepth(1); //.setScale(2);
         let keys = this.input.keyboard.addKeys(constants.USERINPUT);
         playerInteractionCollider = this.add.rectangle(playerSprite.x, playerSprite.y, playerSprite.width / 2, playerSprite.height / 2,
-            0xff0000, 0.5
+           // 0xff0000, 0.5
         );
         // animationSetup(this);
         this.player = new Player(keys, playerInteractionCollider, playerSprite);
@@ -127,17 +128,17 @@ export class ChemistLevel extends Phaser.Scene {
             // 0xff0000,0.5 // debugging purposes
         );
         let bookshelf = scene.add.rectangle(465, 90, 25, 50,
-            0xff0000, 0.5
+           // 0xff0000, 0.5
         );
         let bookshelf2 = scene.add.rectangle(495, 90, 25, 50,
-            0xff00ff, 0.5
+            //0xff00ff, 0.5
         );
         // TODO make them say stuff 
         let drop = scene.add.rectangle(550, 150, 35, 75,
-            0xff00ff, 0.5
+            //0xff00ff, 0.5
         );;
         let sink = scene.add.rectangle(130, 340, 25, 100,
-            0xff00ff, 0.5
+            //0xff00ff, 0.5
         );;
 
         collideables.add(npcCollider);
@@ -494,8 +495,10 @@ function createTextBox(scene, x, y, config) {
             if (this.isLastPage && !this.isTyping) {
                 this.setVisible(false);
                 player.setDisabled(false);
+                if(isLogUpdated) return;
                 uiPlayerLog.setText(rule1);
                 uiPlayerLog.setText(rule2);
+                isLogUpdated = true;
             };
             if (this.isTyping) {
                 this.stop(true);
