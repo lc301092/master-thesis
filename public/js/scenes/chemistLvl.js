@@ -1,5 +1,6 @@
 import { constants } from "../constants.js"
 import Player from "../game/player.js"
+import PlayerLog from "../game/ui.js"
 
 const sceneID = constants.SCENES.CHEMIST;
 let sceneIndex;
@@ -40,13 +41,14 @@ const COLOR_DARK = 0x260e04;
 const rule1 = 'Regl #1: Medianen af antal rapporterede bivirkninger må ikke overstige 5.';
 const rule2 = 'Regl #2: 50% af menneskerne der har indtaget medicinen, skal have oplevet et temperaturfald på minimum 2 grader celcius eller over.';
 let uiTextBox;
+let uiPlayerLog;
 let content;
 
 const tip1 = 'Bog#1 Sumkurver: \n\n...Medianen er det midterste tal af alle observationer, hvilket vil sige at 50% af observationer er mindre end medianen og 50% er større. \nFor at finde medianen, finder man 50% markøren på y-aksen og følger den vandret, indtil man møder sumkurven. \nDerefter går man lodret ned, hvor tallet man støder på på x-aksen, er medianen.';
 const tip2 = 'Bog#2 Boxplot: \n\n...Boxplot er en overskuelig måde sammenligne data med hinanden på. \nEt boxplot indeholder ALTID: Den mindste observation, en nedre kvartil, en median, en øvre kvartil, og den største observation.';
 
-const vask = 'Jeg er glad for at de har god håndhygiejne i den her tid...';
-const drop = 'Gad vide om jeg har været koblet op til et drop, da de opererede mit ansigt...';
+const sinkString = 'Jeg er glad for at de har god håndhygiejne i den her tid...';
+const dropString = 'Gad vide om jeg har været koblet op til et drop, da de opererede mit ansigt...';
 
 export class ChemistLevel extends Phaser.Scene {
     constructor() {
@@ -124,15 +126,25 @@ export class ChemistLevel extends Phaser.Scene {
         let npcCollider = this.add.rectangle(npc.x, npc.y, npc.width / 2, npc.height,
             // 0xff0000,0.5 // debugging purposes
         );
-        let bookshelf = scene.add.rectangle(480, 90, 50, 50,
+        let bookshelf = scene.add.rectangle(465, 90, 25, 50,
             0xff0000, 0.5
         );
+        let bookshelf2 = scene.add.rectangle(495, 90, 25, 50,
+            0xff00ff, 0.5
+        );
         // TODO make them say stuff 
-        let sink;
-        let drop;
+        let drop = scene.add.rectangle(550, 150, 35, 75,
+            0xff00ff, 0.5
+        );;
+        let sink = scene.add.rectangle(130, 340, 25, 100,
+            0xff00ff, 0.5
+        );;
 
         collideables.add(npcCollider);
         collideables.add(bookshelf);
+        collideables.add(bookshelf2)
+        collideables.add(sink)
+        collideables.add(drop)
         //npcCollider.setCollideWorldBounds(true)
         //npcCollider.setImmovable(true);
         playerSprite.setSize(25, 50).setOffset(12, 10);
@@ -160,8 +172,13 @@ export class ChemistLevel extends Phaser.Scene {
         scene.physics.add.collider(playerSprite, interact);
         scene.physics.add.collider(playerSprite, interact2);
         scene.physics.add.overlap(playerInteractionCollider, npcCollider, npcInteraction, null, this);
-        scene.physics.add.collider(playerInteractionCollider, bookshelf, bookshelfInteraction, null, this);
         scene.physics.add.collider(playerSprite, npcCollider);
+
+        scene.physics.add.overlap(playerInteractionCollider, bookshelf, bookshelfInteraction1, null, this);
+        scene.physics.add.overlap(playerInteractionCollider, bookshelf2, bookshelfInteraction2, null, this);
+        scene.physics.add.overlap(playerInteractionCollider, sink, sinkInteraction, null, this);
+        scene.physics.add.overlap(playerInteractionCollider, drop, dropInteraction, null, this);
+
 
 
 
@@ -278,6 +295,10 @@ export class ChemistLevel extends Phaser.Scene {
             fixedHeight: 65,
         }).setVisible(false);
 
+        uiPlayerLog = new PlayerLog(this);
+       // uiPlayerLog.setText(sceneID);
+
+
     }
     update() {
         // player movement
@@ -355,7 +376,6 @@ function npcInteraction() {
     const player = this.player;
     if (!player.isInteracting()) return;
     // disable exclamation mark after first time talking
-    console.log('@!#$!#%%#%$@%@$%@$%@$', player);
     if (npcState == 0) toggleImage(newDialogue);
     // determins what npc will say 
     player.setDisabled(true);
@@ -365,10 +385,12 @@ function npcInteraction() {
         content = ['Hej! Du må være laboranten vi har ventet på. Jeg er glad for at møde dig…', '', 'På bordet finder du vores tre mediciner. Vi har brug for dit input, så vi sikrer os at vores resultater ikke er farvet… ', 'Du finder information om medicinerne, ved at gå ned og undersøge dem.', '', 'Når du godkender eller afviser en medicin, så er beslutningen ikke endelig.', '', 'For at godkende en medicin skal to regler være opfyldt…', '', rule1, '', rule2];
         
         // in this case the rules are chained so only check for rule1.
-        if(scenarioLog.rules.indexOf(rule1) == -1){
-            scenarioLog.rules.push(rule1,rule2);
+        if (scenarioLog.rules.indexOf(rule1) == -1) {
+            scenarioLog.rules.push(rule1, rule2);
+            // uiPlayerLog.setText(rule1);
+            // uiPlayerLog.setText(rule2);
         };
-        
+
         uiTextBox.start(content, 50);
         if (npcState == 0) npcState++;
 
@@ -393,12 +415,29 @@ async function toggleImage(image, callback = null) {
 }
 
 // display books in bookshelf 
-function bookshelfInteraction() {
+function bookshelfInteraction1() {
     const player = this.player;
     if (!player.isInteracting()) return;
+    // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
+    alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip1}"`);
+    if (scenarioLog.tips.indexOf(tip1) == -1) {
+        scenarioLog.tips.push(tip1);
 
-    alert(`${tip2}`);
-    if(scenarioLog.tips.indexOf(tip2) == -1 ) scenarioLog.tips.push(tip2);
+        // remove when scenario log is implemented
+      //  uiPlayerLog.setText('Tip: ' + tip1);
+    }
+};
+function bookshelfInteraction2() {
+    const player = this.player;
+    if (!player.isInteracting()) return;
+    // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
+    alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip2}"`);
+    if (scenarioLog.tips.indexOf(tip2) == -1) {
+        scenarioLog.tips.push(tip2);
+
+        // remove when scenario log is implemented
+       // uiPlayerLog.setText('Tip: ' + tip2);
+    }
 };
 
 function checkIfDone() {
@@ -455,6 +494,8 @@ function createTextBox(scene, x, y, config) {
             if (this.isLastPage && !this.isTyping) {
                 this.setVisible(false);
                 player.setDisabled(false);
+                uiPlayerLog.setText(rule1);
+                uiPlayerLog.setText(rule2);
             };
             if (this.isTyping) {
                 this.stop(true);
@@ -497,3 +538,31 @@ var getBBcodeText = function (scene, wrapWidth, fixedWidth, fixedHeight) {
         maxLines: 3
     })
 }
+
+var createLabel = function (scene, text) {
+    return scene.rexUI.add.label({
+        background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY),
+        text: scene.add.text(0, 0, text),
+        align: 'center',
+        space: {
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: 20
+        }
+    });
+}
+
+function sinkInteraction(){
+        const player = this.player;
+    if (!player.isInteracting()) return;
+    alert(sinkString);
+}
+
+function dropInteraction(){
+    const player = this.player;
+if (!player.isInteracting()) return;
+alert(dropString);
+}
+
+
