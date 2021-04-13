@@ -31,7 +31,12 @@ export class IntroScene extends Phaser.Scene {
         intro4 = this.add.image(0, 0, constants.IMAGES.INTRO4).setScale(0.45).setOrigin(0).setVisible(false);
         intro5 = this.add.image(0, 0, constants.IMAGES.INTRO5).setScale(0.45).setOrigin(0).setVisible(false);
     
-        text = this.add.text(0,0, textContent[0], { font: '18px Courier', fill: '#ff0000', stroke: '#8B0000', strokeThickness: 1 });
+        text = this.add.text(0,0, textContent[0], { 
+            font: '18px Courier', 
+            fill: '#ff0000', 
+            stroke: '#8B0000', 
+            strokeThickness: 1,
+            backgroundColor: 'black'});
         state = 0;
       
         this.input.on('pointerdown', function () {
