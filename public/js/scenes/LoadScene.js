@@ -31,7 +31,7 @@ export class LoadScene extends Phaser.Scene {
         }
         else {
             // newgame
-            playerData.name = prompt('hvad er dit navn?');
+            //playerData.name = prompt('hvad er dit navn?');
             localStorage.setItem(localStorageKey, JSON.stringify(playerData));
         }
 
