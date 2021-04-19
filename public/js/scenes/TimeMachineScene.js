@@ -82,8 +82,11 @@ function promptXValue() {
     if (isNaN(promptVal)) {
         alert('du kan kun skrive et tal, prøv igen');
         promptXValue();
+        return;
     }
     btnXValue += parseInt(promptVal);
+    if (btnXValue > 9999) btnXValue = 9999;
+    
     rotateBtnX(btnXValue);
     // update 
     updateScreen();

@@ -14,8 +14,8 @@ let scenarioLog = {
 
 let npc;
 let npcText;
-let npcState;
 let newDialogue;
+let hasNewDialogue = true;
 
 let tickY;
 let tickB;
@@ -73,7 +73,6 @@ export class ChemistLevel extends Phaser.Scene {
         playerInteractionCollider = this.add.rectangle(playerSprite.x, playerSprite.y, playerSprite.width / 2, playerSprite.height / 2,
            // 0xff0000, 0.5
         );
-        // animationSetup(this);
         this.player = new Player(keys, playerInteractionCollider, playerSprite);
     }
     preload() {
@@ -155,11 +154,9 @@ export class ChemistLevel extends Phaser.Scene {
         scene.physics.world.setBounds(0, 0, 600, 600);
         let mainCamera = scene.cameras.main;
         mainCamera.startFollow(playerSprite, true, 0.05, 0.05);
-        scene.animationSetup(this);
 
         npcText = this.add.text(110, 485, '', { color: 'black' });
         npcText.visible = false;
-        npcState = 0;
 
         // map collisions
         let borders = [walls, ground, deco, deco1, deco2];
@@ -304,72 +301,7 @@ export class ChemistLevel extends Phaser.Scene {
     update() {
         // player movement
         this.player.update();
-    }
-    // 8 directional  
-
-    animationSetup(scene) {
-        scene.anims.create({
-            key: 'idle',
-            frames: scene.anims.generateFrameNumbers('portal', {
-                start: 0,
-                end: 3
-            }),
-            frameRate: 6,
-            repeat: -1
-        });
-
-        scene.anims.create({
-            key: 'left',
-            frames: scene.anims.generateFrameNumbers('player', {
-                start: 15,
-                end: 17
-            }),
-            frameRate: 6,
-        });
-
-        scene.anims.create({
-            key: 'right',
-            frames: scene.anims.generateFrameNumbers('player', {
-                start: 27,
-                end: 29
-            }),
-            frameRate: 6,
-        });
-        scene.anims.create({
-            key: 'down',
-            frames: scene.anims.generateFrameNumbers('player', {
-                start: 3,
-                end: 5
-            }),
-            frameRate: 6,
-        });
-        scene.anims.create({
-            key: 'up',
-            frames: scene.anims.generateFrameNumbers('player', {
-                start: 39,
-                end: 41
-            }),
-            frameRate: 4,
-        });
-        scene.anims.create({
-            key: 'turn',
-            frames: [{
-                key: 'player',
-                frame: 4
-            }],
-            frameRate: 10,
-            repeat: -1
-        });
-        scene.anims.create({
-            key: 'idle',
-            frames: [{
-                key: constants.SPRITES.CHEMIST_NPC,
-                frame: 10
-            }],
-            frameRate: 10,
-            repeat: -1
-        });
-    }
+    } 
 }
 
 // needs to be rewrtitten once text is chained together  
@@ -377,7 +309,9 @@ function npcInteraction() {
     const player = this.player;
     if (!player.isInteracting()) return;
     // disable exclamation mark after first time talking
-    if (npcState == 0) toggleImage(newDialogue);
+    if (hasNewDialogue) toggleImage(newDialogue);
+    
+    hasNewDialogue = false;
     // determins what npc will say 
     player.setDisabled(true);
 
@@ -388,20 +322,18 @@ function npcInteraction() {
         // in this case the rules are chained so only check for rule1.
         if (scenarioLog.rules.indexOf(rule1) == -1) {
             scenarioLog.rules.push(rule1, rule2);
-            // uiPlayerLog.setText(rule1);
-            // uiPlayerLog.setText(rule2);
         };
 
         uiTextBox.start(content, 50);
-        if (npcState == 0) npcState++;
+
 
     }
     else {
-        if (npcState == 1) toggleImage(newDialogue);
+        if (hasNewDialogue) toggleImage(newDialogue);
+        hasNewDialogue = false;
         uiTextBox.setVisible(true);
         content = ['Jeg kan se, at du har behandlet de tre mediciner. Tusind tak for din hjælp!', '', 'Du har stadigvæk mulighed for at ændre din beslutning, hvis du er kommet i tvivl.'];
         uiTextBox.start(content, 50);
-        if (npcState == 1) npcState++;
     }
 }
 async function toggleImage(image, callback = null) {
@@ -448,9 +380,13 @@ function checkIfDone() {
         if (objective[key].isApproved != undefined) medicines++;
     }
     console.log(medicines);
+    // not done
     if (medicines != 2) return;
+    
+    // is done
     objective.isComplete = true;
     toggleImage(newDialogue);
+    hasNewDialogue = true;
 }
 
 const GetValue = Phaser.Utils.Objects.GetValue;
