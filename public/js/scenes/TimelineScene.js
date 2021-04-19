@@ -99,15 +99,17 @@ export class Timeline extends Phaser.Scene {
                 break;
             case 1:
                 let sceneRef = this;
+                let isCorrect = playerData.answers[0].medY.isApproved && !playerData.answers[0].medR.isApproved && !playerData.answers[0].medB.isApproved;
                 let questGraphic = '/\\/\\/\\/\\';
                 let questText;
+                console.log('ANSWER IS: ' + isCorrect);
                 let questLabel = this.add.rexBBCodeText(eventPic.x, 225, '')
                     .setInteractive()
                     .on('areadown', function (key) {
                         sceneRef.typewriteText(questText);
                     });
                 // resolveLastMission()
-                if (storyProgression.isCorrect) {
+                if (isCorrect) {
                     questLabel.setText(`[b][area=correct][color=lightgreen]${questGraphic}[/color][/stroke][/area][/b]`);
                     questText = 'Der ser ikke ud til at være forstyrrelser med tidslinjen i denne periode';
                 }
