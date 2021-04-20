@@ -7,12 +7,13 @@ import {ChemistLevel} from './scenes/chemistLvl.js';
 import {Timeline} from './scenes/TimelineScene.js';
 import {TimeMachineScene } from './scenes/TimeMachineScene.js';
 import {IntroScene} from './scenes/IntroScene.js';
+import {Farm} from './scenes/Farm.js';
 
 
 let game = new Phaser.Game({
     width: 800,
     height: 600,
-    scene: [LoadScene, MenuScene, Base, ChemistLevel, Timeline, TimeMachineScene, IntroScene], 
+    scene: [LoadScene, MenuScene, Base, ChemistLevel, Timeline, TimeMachineScene, IntroScene, Farm], 
     physics: {
         default: 'arcade',
         arcade: {
