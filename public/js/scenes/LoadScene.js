@@ -46,7 +46,7 @@ export class LoadScene extends Phaser.Scene {
             case 'image':
                 for (const key in constants.IMAGES) {
                     let imageString = constants.IMAGES[key];
-                    console.log(imageString);
+                    //console.log(imageString);
                     // check if normal image or tileImage
                     if (imageString.split('.png').length > 1) {
                         // normal image
@@ -116,7 +116,7 @@ export class LoadScene extends Phaser.Scene {
                 color: 0xffffff //white
             }
         });
-        console.log(this);
+        //console.log(this);
         this.load.on('progress', (percent) => {
             loadingBar.fillRect(200, this.game.renderer.height / 2, this.game.renderer.width * percent / 2, 20);
         })

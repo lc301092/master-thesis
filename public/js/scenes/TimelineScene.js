@@ -19,7 +19,7 @@ export class Timeline extends Phaser.Scene {
 
     init(data) {
         playerData = data;
-        storyProgression = playerData.playerProgression;
+        storyProgression = playerData.playerProgression.length;
         this.add.image(0, 0, constants.IMAGES.SCREEN).setOrigin(0);
         isWriting = false;
         textPlugin = this.plugins.get('rexbbcodetextplugin');
@@ -76,7 +76,7 @@ export class Timeline extends Phaser.Scene {
         eventPic = this.add.image(150, 120, constants.IMAGES.EVENTPIC).setOrigin(0);
 
         // event billede til andet scenarie
-        switch (storyProgression.length) {
+        switch (storyProgression) {
 
             case 0:
                 // event billede til første scenarie
@@ -99,7 +99,8 @@ export class Timeline extends Phaser.Scene {
                 break;
             case 1:
                 let sceneRef = this;
-                let isCorrect = playerData.answers[0].medY.isApproved && !playerData.answers[0].medR.isApproved && !playerData.answers[0].medB.isApproved;
+                
+                let isCorrect = playerData.answers[storyProgression-1].isCorrect;
                 let questGraphic = '/\\/\\/\\/\\';
                 let questText;
                 console.log('ANSWER IS: ' + isCorrect);

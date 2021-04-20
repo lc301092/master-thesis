@@ -1,6 +1,7 @@
 import { constants } from "../constants.js"
 import Player from "../game/player.js"
 import PlayerLog from "../game/ui.js"
+import { textBox } from "../game/ui.js"
 
 const sceneID = constants.SCENES.CHEMIST;
 let sceneIndex;
@@ -34,9 +35,6 @@ let objective = {
     medB: { isApproved: null }
 }
 
-const COLOR_PRIMARY = 0x4e342e;
-const COLOR_LIGHT = 0x7b5e57;
-const COLOR_DARK = 0x260e04;
 
 const rule1 = 'Regl #1: Medianen af antal rapporterede bivirkninger må ikke overstige 5.';
 const rule2 = 'Regl #2: 50% af menneskerne der har indtaget medicinen, skal have oplevet et temperaturfald på minimum 2 grader celcius eller over.';
@@ -71,7 +69,7 @@ export class ChemistLevel extends Phaser.Scene {
         playerSprite = this.physics.add.sprite(265, 250, 'player', 4).setCollideWorldBounds(true).setDepth(1); //.setScale(2);
         let keys = this.input.keyboard.addKeys(constants.USERINPUT);
         playerInteractionCollider = this.add.rectangle(playerSprite.x, playerSprite.y, playerSprite.width / 2, playerSprite.height / 2,
-           // 0xff0000, 0.5
+            // 0xff0000, 0.5
         );
         this.player = new Player(keys, playerInteractionCollider, playerSprite);
     }
@@ -127,7 +125,7 @@ export class ChemistLevel extends Phaser.Scene {
             // 0xff0000,0.5 // debugging purposes
         );
         let bookshelf = scene.add.rectangle(465, 90, 25, 50,
-           // 0xff0000, 0.5
+            // 0xff0000, 0.5
         );
         let bookshelf2 = scene.add.rectangle(495, 90, 25, 50,
             //0xff00ff, 0.5
@@ -278,6 +276,9 @@ export class ChemistLevel extends Phaser.Scene {
 
             if (this.player.isInteracting()) {
                 if (!confirm('Vil du gerne rejse tilbage til år 2200?')) return;
+                let isCorrect = objective.medY.isApproved && !objective.medR.isApproved && !objective.medB.isApproved;
+                objective.isCorrect = isCorrect;
+
                 // Save answers!
                 playerData.answers[sceneIndex] = objective;
                 localStorage.setItem('foobar', JSON.stringify(playerData));
@@ -287,21 +288,21 @@ export class ChemistLevel extends Phaser.Scene {
             };
         });
 
-        uiTextBox = createTextBox(this, 65, 480, {
+        uiTextBox = textBox.createTextBox(this, 65, 480, {
             wrapWidth: 500,
             fixedWidth: 500,
             fixedHeight: 65,
         }).setVisible(false);
 
         uiPlayerLog = new PlayerLog(this);
-       // uiPlayerLog.setText(sceneID);
+        // uiPlayerLog.setText(sceneID);
 
 
     }
     update() {
         // player movement
         this.player.update();
-    } 
+    }
 }
 
 // needs to be rewrtitten once text is chained together  
@@ -310,7 +311,7 @@ function npcInteraction() {
     if (!player.isInteracting()) return;
     // disable exclamation mark after first time talking
     if (hasNewDialogue) toggleImage(newDialogue);
-    
+
     hasNewDialogue = false;
     // determins what npc will say 
     player.setDisabled(true);
@@ -318,14 +319,19 @@ function npcInteraction() {
     if (!objective.isComplete) {
         uiTextBox.setVisible(true);
         content = ['Hej! Du må være laboranten vi har ventet på. Jeg er glad for at møde dig…', '', 'På bordet finder du vores tre mediciner. Vi har brug for dit input, så vi sikrer os at vores resultater ikke er farvet… ', 'Du finder information om medicinerne, ved at gå ned og undersøge dem.', '', 'Når du godkender eller afviser en medicin, så er beslutningen ikke endelig.', '', 'For at godkende en medicin skal to regler være opfyldt…', '', rule1, '', rule2];
-        
+
         // in this case the rules are chained so only check for rule1.
         if (scenarioLog.rules.indexOf(rule1) == -1) {
             scenarioLog.rules.push(rule1, rule2);
+
+            //isLogUpdated = true;
         };
 
-        uiTextBox.start(content, 50);
-
+        uiTextBox.once('complete', function () {
+            uiPlayerLog.setText(rule1);
+            uiPlayerLog.setText(rule2);
+            console.log('done');
+        }).start(content, 50);
 
     }
     else {
@@ -357,7 +363,7 @@ function bookshelfInteraction1() {
         scenarioLog.tips.push(tip1);
 
         // remove when scenario log is implemented
-      //  uiPlayerLog.setText('Tip: ' + tip1);
+        //  uiPlayerLog.setText('Tip: ' + tip1);
     }
 };
 function bookshelfInteraction2() {
@@ -369,7 +375,7 @@ function bookshelfInteraction2() {
         scenarioLog.tips.push(tip2);
 
         // remove when scenario log is implemented
-       // uiPlayerLog.setText('Tip: ' + tip2);
+        // uiPlayerLog.setText('Tip: ' + tip2);
     }
 };
 
@@ -382,126 +388,26 @@ function checkIfDone() {
     console.log(medicines);
     // not done
     if (medicines != 2) return;
-    
+
     // is done
     objective.isComplete = true;
+    if (hasNewDialogue) return;
     toggleImage(newDialogue);
     hasNewDialogue = true;
 }
 
-const GetValue = Phaser.Utils.Objects.GetValue;
 
-function createTextBox(scene, x, y, config) {
-    const player = scene.player;
-
-    var wrapWidth = GetValue(config, 'wrapWidth', 0);
-    var fixedWidth = GetValue(config, 'fixedWidth', 0);
-    var fixedHeight = GetValue(config, 'fixedHeight', 0);
-    var textBox = scene.rexUI.add.textBox({
-        x: x,
-        y: y,
-
-        background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY)
-            .setStrokeStyle(2, COLOR_LIGHT),
-
-        icon: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_DARK),
-
-        // text: getBuiltInText(scene, wrapWidth, fixedWidth, fixedHeight),
-        text: getBBcodeText(scene, wrapWidth, fixedWidth, fixedHeight),
-
-        action: scene.add.image(0, 0, 'flueben.png').setScale(0.2).setTint(COLOR_LIGHT).setVisible(false),
-
-        space: {
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: 20,
-            icon: 10,
-            text: 10,
-        }
-    })
-        .setOrigin(0)
-        .layout();
-
-    textBox
-        .setInteractive()
-        .on('pointerdown', function () {
-            var icon = this.getElement('action').setVisible(false);
-            this.resetChildVisibleState(icon);
-            if (this.isLastPage && !this.isTyping) {
-                this.setVisible(false);
-                player.setDisabled(false);
-                if(isLogUpdated) return;
-                uiPlayerLog.setText(rule1);
-                uiPlayerLog.setText(rule2);
-                isLogUpdated = true;
-            };
-            if (this.isTyping) {
-                this.stop(true);
-            } else {
-                this.typeNextPage();
-            }
-        }, textBox)
-        .on('pageend', function () {
-            if (this.isLastPage) {
-                return;
-            }
-            var icon = this.getElement('action').setVisible(true);
-            this.resetChildVisibleState(icon);
-            icon.y -= 30;
-            var tween = scene.tweens.add({
-                targets: icon,
-                y: '+=30', // '+=100'
-                ease: 'Bounce', // 'Cubic', 'Elastic', 'Bounce', 'Back'
-                duration: 500,
-                repeat: 0, // -1: infinity
-                yoyo: false
-            });
-        }, textBox)
-    //.on('type', function () {
-    //})
-
-    return textBox;
-}
-
-var getBBcodeText = function (scene, wrapWidth, fixedWidth, fixedHeight) {
-    return scene.rexUI.add.BBCodeText(0, 0, '', {
-        fixedWidth: fixedWidth,
-        fixedHeight: fixedHeight,
-
-        fontSize: '20px',
-        wrap: {
-            mode: 'word',
-            width: wrapWidth
-        },
-        maxLines: 3
-    })
-}
-
-var createLabel = function (scene, text) {
-    return scene.rexUI.add.label({
-        background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY),
-        text: scene.add.text(0, 0, text),
-        align: 'center',
-        space: {
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: 20
-        }
-    });
-}
-
-function sinkInteraction(){
-        const player = this.player;
-    if (!player.isInteracting()) return;
-    alert(sinkString);
-}
-
-function dropInteraction(){
+function sinkInteraction() {
     const player = this.player;
-if (!player.isInteracting()) return;
-alert(dropString);
+    if (!player.isInteracting()) return;
+    //uiTextBox.setVisible(true);
+    textBox.writeUiText(uiTextBox, sinkString, 50);//alert(sinkString);
+}
+
+function dropInteraction() {
+    const player = this.player;
+    if (!player.isInteracting()) return;
+    alert(dropString);
 }
 
 

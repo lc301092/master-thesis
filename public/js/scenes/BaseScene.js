@@ -33,43 +33,17 @@ export class Base extends Phaser.Scene {
 
     }
     preload() {
-        playerProgression = JSON.parse(localStorage.getItem("objectives"));
-        console.log("JSON parser: ", playerProgression);
+
     }
 
     create() {
         scene = this;
         // tilemap configurations
 
-        let baseSceneTest = this.add.tilemap('baseSceneTest');
+        let tilemap = this.add.tilemap('baseSceneTest');
         //baseSceneTest.set
-
+        setupTilemap(scene, tilemap);
         // add tileset image
-        let tileImages = constants.TILEIMAGES.BASE_LVL;
-        let images = constants.IMAGES;
-        let tileObj = {};
-        for (const key in tileImages) {
-            let tileImageString = images[key];
-            let tilesetImage = baseSceneTest.addTilesetImage(tileImageString);
-            tileObj[key] = tilesetImage;
-        }
-        console.log(tileObj);
-
-        let DOORS1 = tileObj.DOORS1;
-        let EXTERIOR_A2 = tileObj.EXTERIOR_A2;
-        let INTERIOR_B = tileObj.INTERIOR_B;
-        let EXTERIOR_B = tileObj.EXTERIOR_B;
-        let EXTERIOR_C = tileObj.EXTERIOR_C;
-        let SCIFI = tileObj.SCIFI;
-
-        //layers 
-        let ground = baseSceneTest.createLayer('Ground', [SCIFI, DOORS1], 0, 0);
-        let walls = baseSceneTest.createLayer('Wall', [SCIFI], 0, 0);
-        let decoration = baseSceneTest.createLayer('Decoration', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B, SCIFI], 0, 0);
-        let decoration2 = baseSceneTest.createLayer('Decoration2', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B], 0, 0);
-        let interact = baseSceneTest.createLayer('Interact', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B], 0, 0);
-        let layers = baseSceneTest.createLayer('Layercontrol', EXTERIOR_C, 0, 0).setDepth(1);
-
 
         playerSprite.setSize(25, 50).setOffset(12, 10);
 
@@ -79,40 +53,17 @@ export class Base extends Phaser.Scene {
         let mainCamera = scene.cameras.main;
         mainCamera.startFollow(playerSprite, true, 0.05, 0.05);
 
-        console.log('Everything is running ok');
         // map collisions
-        let borders = [ground, walls, decoration, decoration2, interact];
-        scene.physics.add.collider(playerSprite, borders);
+        
+        let playerProgression = playerData.playerProgression.length - 1;
+        let playerAnswers = playerData.answers[playerProgression];
 
-        for (let i = 0; i < borders.length; i++) {
-            borders[i].setCollisionByProperty({ border: true });
+        if(playerProgression >= 0 && playerAnswers){
+            console.log(playerAnswers.isCorrect);
+            if (playerAnswers.isCorrect) 
+            scene.add.image(100,350, 'med3_32');
+
         }
-
-        // map collision interactives
-        scene.physics.add.collider(playerSprite, interact);
-        interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1665, 1666, 1713, 1714]);
-
-        // indstil tidsmaskine
-        interact.setTileLocationCallback(10, 5, 6, 1, () => {
-            if (this.player.isInteracting()) {
-                console.log('Observér tidslinjen');
-                playerData.playerPosition.x = playerSprite.x;
-                playerData.playerPosition.y = playerSprite.y;
-                this.scene.start(constants.SCENES.TIMELINE, playerData);
-                // --- indstil tidsmaskine "scene" kode her ---
-            };
-        });
-
-        // Tidsmaskinen
-        interact.setTileLocationCallback(22, 18, 1, 1, () => {
-            if (this.player.isInteracting()) {
-                console.log('Tidsmaskine aktiveret');
-                playerData.playerPosition.x = playerSprite.x;
-                playerData.playerPosition.y = playerSprite.y;
-                this.scene.start(constants.SCENES.TIME_MACHINE, playerData);
-                // --- skift scene til laboratorie kode her ---
-            };
-        });
 
     }
     update() {
@@ -174,4 +125,62 @@ function animationSetup(scene) {
         frameRate: 10,
         repeat: -1
     });
+}
+function setupTilemap(scene,baseSceneTest){
+    let tileImages = constants.TILEIMAGES.BASE_LVL;
+    let images = constants.IMAGES;
+    let tileObj = {};
+    for (const key in tileImages) {
+        let tileImageString = images[key];
+        let tilesetImage = baseSceneTest.addTilesetImage(tileImageString);
+        tileObj[key] = tilesetImage;
+    }
+
+    let DOORS1 = tileObj.DOORS1;
+    let EXTERIOR_A2 = tileObj.EXTERIOR_A2;
+    let INTERIOR_B = tileObj.INTERIOR_B;
+    let EXTERIOR_B = tileObj.EXTERIOR_B;
+    let EXTERIOR_C = tileObj.EXTERIOR_C;
+    let SCIFI = tileObj.SCIFI;
+
+    //layers 
+    let ground = baseSceneTest.createLayer('Ground', [SCIFI, DOORS1], 0, 0);
+    let walls = baseSceneTest.createLayer('Wall', [SCIFI], 0, 0);
+    let decoration = baseSceneTest.createLayer('Decoration', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B, SCIFI], 0, 0);
+    let decoration2 = baseSceneTest.createLayer('Decoration2', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B], 0, 0);
+    let interact = baseSceneTest.createLayer('Interact', [EXTERIOR_A2, EXTERIOR_B, EXTERIOR_C, INTERIOR_B], 0, 0);
+    let layers = baseSceneTest.createLayer('Layercontrol', EXTERIOR_C, 0, 0).setDepth(1);
+
+    let borders = [ground, walls, decoration, decoration2, interact];
+        scene.physics.add.collider(playerSprite, borders);
+
+        for (let i = 0; i < borders.length; i++) {
+            borders[i].setCollisionByProperty({ border: true });
+        }
+
+        // map collision interactives
+        scene.physics.add.collider(playerSprite, interact);
+        interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1665, 1666, 1713, 1714]);
+
+        // indstil tidsmaskine
+        interact.setTileLocationCallback(10, 5, 6, 1, () => {
+            if (scene.player.isInteracting()) {
+                console.log('Observér tidslinjen');
+                playerData.playerPosition.x = playerSprite.x;
+                playerData.playerPosition.y = playerSprite.y;
+                scene.scene.start(constants.SCENES.TIMELINE, playerData);
+                // --- indstil tidsmaskine "scene" kode her ---
+            };
+        });
+
+        // Tidsmaskinen
+        interact.setTileLocationCallback(22, 18, 1, 1, () => {
+            if (scene.player.isInteracting()) {
+                console.log('Tidsmaskine aktiveret');
+                playerData.playerPosition.x = playerSprite.x;
+                playerData.playerPosition.y = playerSprite.y;
+                scene.scene.start(constants.SCENES.TIME_MACHINE, playerData);
+                // --- skift scene til laboratorie kode her ---
+            };
+        });
 }
