@@ -105,18 +105,18 @@ export class Timeline extends Phaser.Scene {
                 let questText;
                 console.log('ANSWER IS: ' + isCorrect);
                 let questLabel = this.add.rexBBCodeText(eventPic.x, 225, '')
-                    .setInteractive()
+                    .setInteractive({ useHandCursor: true })
                     .on('areadown', function (key) {
                         sceneRef.typewriteText(questText);
                     });
                 // resolveLastMission()
                 if (isCorrect) {
                     questLabel.setText(`[b][area=correct][color=lightgreen]${questGraphic}[/color][/stroke][/area][/b]`);
-                    questText = 'Der ser ikke ud til at være forstyrrelser med tidslinjen i denne periode';
+                    questText = 'Der er ikke forstyrrelser med tidslinjen i denne periode';
                 }
                 else {
                     questLabel.setText(`[b][stroke=black][area=incorrect][color=red]${questGraphic}[/color][/stroke][/area][/b]`);
-                    questText = 'Der er ingen synlige ændringer';
+                    questText = 'Der er stadig problemer i denne periode';
                 }
 
                 eventPic.visible = false;
@@ -131,7 +131,7 @@ export class Timeline extends Phaser.Scene {
                 });
                 secondEventPic.on('pointerdown', () => {
                     // Dynamisk tekst   
-                    this.typewriteText('ADVARSEL: \nDER ER SKET ET SPILD AF MEDIKAMENTER, SOM HAR FØRT TIL FORURENING AF GRUNDVANDET. \nHJÆLP BIOLOGERNE MED AT RENSE GRUNDVANDET. \n\nÅRSTAL: 2000 \nMATEMATIK: STATISTIK');
+                    this.typewriteText('ADVARSEL: \nDER ER SKET ET SPILD AF MEDICIN, SOM HAR FØRT TIL FORURENING AF GRUNDVANDET. \nHJÆLP BIOLOGERNE MED AT RENSE GRUNDVANDET. \n\nÅRSTAL: 2000 \nMATEMATIK: STATISTIK');
 
                 });
                 break;

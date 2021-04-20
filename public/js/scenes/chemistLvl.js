@@ -193,10 +193,10 @@ export class ChemistLevel extends Phaser.Scene {
         xR.visible = false;
         xB.visible = false;
 
-        // medikament datasæt billede 
-        dataY = scene.add.image(0, 100, 'yellow.png').setScale(0.8).setOrigin(0).setDepth(10);
-        dataR = scene.add.image(0, 100, 'red.png').setScale(0.8).setOrigin(0).setDepth(10);
-        dataB = scene.add.image(0, 100, 'blue.png').setScale(0.8).setOrigin(0).setDepth(10);
+        // medicinf datasæt billede 
+        dataY = scene.add.image(0, 100, 'diagram_chemist_yellow.png').setScale(0.8).setOrigin(0).setDepth(10);
+        dataR = scene.add.image(0, 100, 'diagram_chemist_red.png').setScale(0.8).setOrigin(0).setDepth(10);
+        dataB = scene.add.image(0, 100, 'diagram_chemist_blue.png').setScale(0.8).setOrigin(0).setDepth(10);
         dataY.visible = false;
         dataR.visible = false;
         dataB.visible = false;
@@ -209,7 +209,7 @@ export class ChemistLevel extends Phaser.Scene {
                 alert('Her kan du se dataene på den gule medicin');
                 toggleImage(dataY, function () {
                     // --- dataset til gul medicin kode her ---
-                    if (confirm('Vil du acceptere dette medikament? \nTryk [ok] for ja \nTryk på [annuller] for nej')) {
+                    if (confirm('Vil du acceptere denne medicin? \nTryk [ok] for ja \nTryk på [annuller] for nej')) {
                         objective.medY.isApproved = true;
                         if (xY.visible) xY.visible = false;
                         tickY.visible = true;
@@ -232,7 +232,7 @@ export class ChemistLevel extends Phaser.Scene {
                 alert('Du interagerer med RØD medicin');
                 toggleImage(dataR, function () {
                     // --- dataset til rød medicin kode her---
-                    if (confirm('Vil du acceptere dette medikament? \nTryk [ok] for ja \nTryk på [annuller] for nej')) {
+                    if (confirm('Vil du acceptere denne medicin? \nTryk [ok] for ja \nTryk på [annuller] for nej')) {
                         objective.medR.isApproved = true;
                         if (xR.visible) xR.visible = false;
                         tickR.visible = true;
@@ -256,7 +256,7 @@ export class ChemistLevel extends Phaser.Scene {
                 alert('Du interagerer med BLÅ medicin');
                 toggleImage(dataB, function () {
                     // --- dataset til blå medicin kode her ---
-                    if (confirm('Vil du acceptere dette medikament? \nTryk [ok] for ja \nTryk på [annuller] for nej')) {
+                    if (confirm('Vil du acceptere denne medicin? \nTryk [ok] for ja \nTryk på [annuller] for nej')) {
                         objective.medB.isApproved = true;
                         if (xB.visible) xB.visible = false;
                         tickB.visible = true;
@@ -353,42 +353,17 @@ async function toggleImage(image, callback = null) {
     }, 50);
 }
 
-// display books in bookshelf 
-function bookshelfInteraction1() {
-    const player = this.player;
-    if (!player.isInteracting()) return;
-    // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
-    alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip1}"`);
-    if (scenarioLog.tips.indexOf(tip1) == -1) {
-        scenarioLog.tips.push(tip1);
-
-        // remove when scenario log is implemented
-        //  uiPlayerLog.setText('Tip: ' + tip1);
-    }
-};
-function bookshelfInteraction2() {
-    const player = this.player;
-    if (!player.isInteracting()) return;
-    // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
-    alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip2}"`);
-    if (scenarioLog.tips.indexOf(tip2) == -1) {
-        scenarioLog.tips.push(tip2);
-
-        // remove when scenario log is implemented
-        // uiPlayerLog.setText('Tip: ' + tip2);
-    }
-};
 
 function checkIfDone() {
     let medicines = 0;
-
+    
     for (const key in objective) {
         if (objective[key].isApproved != undefined) medicines++;
     }
     console.log(medicines);
     // not done
     if (medicines != 2) return;
-
+    
     // is done
     objective.isComplete = true;
     if (hasNewDialogue) return;
@@ -407,7 +382,40 @@ function sinkInteraction() {
 function dropInteraction() {
     const player = this.player;
     if (!player.isInteracting()) return;
-    alert(dropString);
+    textBox.writeUiText(uiTextBox, dropString, 50);//alert(sinkString);
+    
 }
+// display books in bookshelf 
+function bookshelfInteraction1() {
+    const player = this.player;
+    if (!player.isInteracting()) return;
+
+    textBox.writeUiText(uiTextBox, tip1, 50);//alert(sinkString);
+
+    // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
+   /* alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip1}"`);
+    if (scenarioLog.tips.indexOf(tip1) == -1) {
+        scenarioLog.tips.push(tip1);
+
+        // remove when scenario log is implemented
+        //  uiPlayerLog.setText('Tip: ' + tip1);
+    }*/
+};
+
+function bookshelfInteraction2() {
+    const player = this.player;
+    if (!player.isInteracting()) return;
+    // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
+    textBox.writeUiText(uiTextBox, tip2, 50);//alert(sinkString);
+    /*
+    alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip2}"`);
+    if (scenarioLog.tips.indexOf(tip2) == -1) {
+        scenarioLog.tips.push(tip2);
+        
+        // remove when scenario log is implemented
+        // uiPlayerLog.setText('Tip: ' + tip2);
+    }
+    */
+};
 
 
