@@ -79,7 +79,7 @@ export class IntroScene extends Phaser.Scene {
             }
             else if (state === 4)
             {
-                this.scene.start(constants.SCENES.PLAY, playerData);
+                this.scene.start(constants.SCENES.FARM, playerData);
             }
     
         }, this);

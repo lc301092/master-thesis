@@ -8,6 +8,7 @@ export const constants = {
         TIMELINE: "TIMELINE",
         TIME_MACHINE: 'TIME_MACHINE',
         INTRO: 'INTRO',
+        FARM: "FARM",
     },
     USERINPUT: {
         SINGLEPRESS: Phaser.Input.Keyboard.JustDown,
@@ -57,12 +58,21 @@ export const constants = {
         INTRO2: 'intro2.png',
         INTRO3: 'intro3.png',
         INTRO4: 'intro4.png',
-        INTRO5: 'intro5.png'
+        INTRO5: 'intro5.png', 
+        FARM_BOOK: 'book',
+        FARM_BUILDING: 'building', 
+        FARM_DECO: 'exterior2',
+        FARM_GROUND: 'ground3',
+        FARM_DECO2: 'interior',
+        FARM_DECO3: 'trees',
+        FARM_DECO4: 'treesAndPlants',
+
     },
     SPRITES: {
         PC: 'playable_charaters.png',
         PORTAL: 'portal_u.png',
         CHEMIST_NPC: 'professor-npc.png',
+        FARM_NPC: 'npc.png'
     },
     TILEIMAGES: {
         BASE_LVL: {
@@ -80,11 +90,21 @@ export const constants = {
             MED2: 'med2_32',
             MED3: 'med3_32',
             PORTAL: 'portal_u'
-        }
+        },
+        FARM_LVL:{
+            FARM_BOOK: 'book',
+            FARM_BUILDING: 'building', 
+            FARM_DECO: 'exterior2',
+            FARM_GROUND: 'ground3',
+            FARM_DECO2: 'interior',
+            FARM_DECO3: 'trees',
+            FARM_DECO4: 'treesAndPlants',
+        },
     },
     TILEMAPS: {
         BASE_LVL: 'baseSceneTest',
-        CHEMIST_LVL: 'scenarie1'
+        CHEMIST_LVL: 'scenarie1',
+        FARM_LVL: 'farm',
     },
     TEXT_STYLE: {
         NPC: {},
