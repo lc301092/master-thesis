@@ -91,6 +91,11 @@ export class LoadScene extends Phaser.Scene {
             frameHeight: 64
         });
 
+        this.load.spritesheet('npc1', '/assets/sprite/npc1.png', {
+            frameWidth: 72,
+            frameHeight: 72
+        });
+
         this.load.spritesheet('portal', 'assets/sprite/portal.png', {
             frameWidth: 250,
             frameHeight: 592

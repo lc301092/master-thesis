@@ -72,7 +72,7 @@ export const constants = {
         PC: 'playable_charaters.png',
         PORTAL: 'portal_u.png',
         CHEMIST_NPC: 'professor-npc.png',
-        FARM_NPC: 'npc.png'
+        FARM_NPC: 'npc1.png'
     },
     TILEIMAGES: {
         BASE_LVL: {

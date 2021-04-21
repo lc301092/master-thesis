@@ -168,7 +168,7 @@ function setupTilemap(scene,baseSceneTest){
                 console.log('Observér tidslinjen');
                 playerData.playerPosition.x = playerSprite.x;
                 playerData.playerPosition.y = playerSprite.y;
-                scene.scene.start(constants.SCENES.TIMELINE, playerData);
+                scene.scene.start(constants.SCENES.FARM, playerData);
                 // --- indstil tidsmaskine "scene" kode her ---
             };
         });
