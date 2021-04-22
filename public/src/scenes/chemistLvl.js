@@ -307,7 +307,6 @@ function npcInteraction() {
 
     hasNewDialogue = false;
     // determins what npc will say 
-    player.setDisabled(true);
 
     if (!objective.isComplete) {
         uiTextBox.setVisible(true);
@@ -369,13 +368,13 @@ function sinkInteraction() {
     const player = this.player;
     if (!player.isInteracting()) return;
     //uiTextBox.setVisible(true);
-    textBox.writeUiText(uiTextBox, sinkString, 50);//alert(sinkString);
+    textBox.writeUiText(scene, uiTextBox, sinkString, 50);//alert(sinkString);
 }
 
 function dropInteraction() {
     const player = this.player;
     if (!player.isInteracting()) return;
-    textBox.writeUiText(uiTextBox, dropString, 50);//alert(sinkString);
+    textBox.writeUiText(scene, uiTextBox, dropString, 50);//alert(sinkString);
     
 }
 // display books in bookshelf 
@@ -383,7 +382,7 @@ function bookshelfInteraction1() {
     const player = this.player;
     if (!player.isInteracting()) return;
 
-    textBox.writeUiText(uiTextBox, tip1, 50);//alert(sinkString);
+    textBox.writeUiText(scene, uiTextBox, tip1, 50);//alert(sinkString);
 
     // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
    /* alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip1}"`);
@@ -399,7 +398,7 @@ function bookshelfInteraction2() {
     const player = this.player;
     if (!player.isInteracting()) return;
     // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
-    textBox.writeUiText(uiTextBox, tip2, 50);//alert(sinkString);
+    textBox.writeUiText(scene, uiTextBox, tip2, 50);//alert(sinkString);
     /*
     alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip2}"`);
     if (scenarioLog.tips.indexOf(tip2) == -1) {

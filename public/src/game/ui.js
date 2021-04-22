@@ -54,7 +54,8 @@ export default class PlayerLog {
 }
 
 export const textBox = {
-    writeUiText: function(uiElement, text, speed){
+    writeUiText: function(scene,uiElement, text, speed){
+        scene.player.setDisabled(true);
         uiElement.setVisible(true);
         uiElement.start(text,speed);
     },

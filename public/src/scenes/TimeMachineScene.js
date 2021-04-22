@@ -13,7 +13,8 @@ let textPlugin;
 
 let DragRotate;
 // const rotationIntervals = [0,45,90,135,180,225,270,315,360];
-const rotationIntervals = [0,45,90,135,180,-45,-90,-135,-180];
+const rotationInterval = 45;
+const rotationIntervals = [0, 45, 90, 135, 180, -45, -90, -135, -180];
 const ColorGray = 0x8e8e8e;
 const ColorDarkBlue = 0x0000A0;
 const ColorRed = 0x5eb8ff;
@@ -40,9 +41,9 @@ export class TimeMachineScene extends Phaser.Scene {
         // btnXCircle = this.add.circle(btnX.x - 2, btnX.y + 5, 50
         //      , 0xff0000, 0.5
         // ).setInteractive({ useHandCursor: true });
-        //btnXCircle.on('pointerdown', promptXValue, this);
-        let btnXDrag = createButton(this,btnX.x,btnX.y,70, btnX).setInteractive({useHandCursor: true});
-        
+        // btnXCircle.on('pointerdown', promptXValue, this);
+        let btnXDrag = createButton(this, btnX.x, btnX.y, 70, btnX).setInteractive({ useHandCursor: true });
+
         // rexDragRotate.add(this, {
         //         x: btnX.x - 2,
         //         y: btnX.y + 5,
@@ -51,14 +52,14 @@ export class TimeMachineScene extends Phaser.Scene {
         // });
         let screen = this.add.image(100, 200, 'clear_screen.png').setOrigin(0).setScale(0.4, 0.2);
         titleText = this.add.text(255, 85, 'Tidsindstilling', { fontSize: 30, color: 'black' });
-        
+
         redButtonCircle = this.add.circle(458, 180, 117).setOrigin(0).setInteractive({ useHandCursor: true });
         redButtonCircle.on('pointerdown', checkTimeSettings, this);
-        
+
         displayFunction = this.add.rexBBCodeText(120, 235, '', compupterStyle);
-        updateScreen();
-        
-        
+        updateScreen(0);
+
+
         const backBtn = this.add.text(50, 550, 'Tilbage', { fill: '#0f0' });
         backBtn.setInteractive({ useHandCursor: true });
         backBtn.on('pointerover', () => {
@@ -77,11 +78,7 @@ export class TimeMachineScene extends Phaser.Scene {
     }
 }
 function checkTimeSettings() {
-    if (storyProgression != 0) {
-        alert('Du har spillet demoen færdig! Tak fordi du gad at spille');
-        return;
-    }
-    let answer = calculateYValue(btnXValue);
+    let answer = calculateYValue(intervalCounter);
     if (answer == 1930) {
         this.scene.start(constants.SCENES.CHEMIST, playerData);
     }
@@ -113,12 +110,12 @@ function calculateYValue(xValue) {
 };
 
 function rotateBtnX(btnValue) {
-    let rotationInterval = 45;
+    //let rotationInterval = 45;
     let newRotation = (rotationInterval * btnValue);
     btnX.angle = newRotation;
 }
-function updateScreen() {
-    let charOrNum = (btnXValue == 0) ? 'x' : btnXValue;
+function updateScreen(displayUnit) {
+    let charOrNum = (displayUnit == 0) ? 'x' : displayUnit;
     let xValue = '[color=#009900]' + charOrNum + '[/color]';
     let aValue = -15;
     let bValue = 2200;
@@ -145,7 +142,7 @@ function createButton(scene, x, y, radius, imageToRotate) {
         .lineStyle(lineWidth, 0xffffff, 1)
         .strokeCircle(btnX, Btny, config.minRadius + lineWidth)
         .strokeCircle(btnX, Btny, config.maxRadius)
-        //.lineBetween(btnX + config.minRadius, Btny, btnX + config.maxRadius, Btny);
+    //.lineBetween(btnX + config.minRadius, Btny, btnX + config.maxRadius, Btny);
 
     let button = scene.add.renderTexture(config.x, config.y, width, height)
         .draw(buttonGraphics)
@@ -155,25 +152,32 @@ function createButton(scene, x, y, radius, imageToRotate) {
 
     DragRotate.add(scene, config)
         .on('drag', function (dragRotate) {
-            imageToRotate.rotation += dragRotate.deltaRotation;
-            
-            button.rotation += dragRotate.deltaRotation;
+            let dragValueDelta = dragRotate.deltaRotation;
+            imageToRotate.rotation += dragValueDelta;
+
+            btnXValue = Math.round(imageToRotate.angle / rotationInterval);
+            let displayX = getBtnxValue(btnXValue, dragRotate.cw);
+            button.rotation += dragValueDelta;
+            updateScreen(displayX);
             //console.log(dragRotate.deltaRotation);
-           let color = (dragRotate.cw) ? ColorDarkBlue : ColorRed;
-           button.setTint(color);
+            let color = (dragRotate.cw) ? ColorDarkBlue : ColorRed;
+            button.setTint(color);
         })
-        .on('dragend', function () {
+        .on('dragend', function (dragRotate) {
             button.setTint(ColorGray);
             let angle = imageToRotate.angle;
             // let angle = Math.abs(imageToRotate.angle);
             console.log('current angle: ' + angle);
             // let snapToAngle = closest(angle, rotationIntervals);
             let snapToAngle = getClosest(angle, rotationIntervals);
-
             console.log('snap to angle: ' + snapToAngle);
             imageToRotate.angle = snapToAngle;
+
+            btnXValue = Math.floor(snapToAngle / rotationInterval);
+            let displayX = getBtnxValue(btnXValue, dragRotate.cw);
+            updateScreen(displayX);
         })
-        button.angle = -90;
+    button.angle = -90;
     return button;
 }
 const getClosest = (index, array) => {
@@ -182,5 +186,31 @@ const getClosest = (index, array) => {
         if (Math.abs(index - i) < Math.abs(index - closest))
             closest = i;
     return closest;
+
+};
+
+let previousPos = 0;
+let intervalCounter = 0;
+
+const getBtnxValue = (currentPos, isMovingWithClock) => {
+    if (currentPos === previousPos) return intervalCounter;
+
+    if (currentPos === -4 && previousPos === 4){
+       // previousPos = currentPos;
+        return intervalCounter;
+    }
+    if (currentPos === 4 && previousPos === -4){
+        //previousPos = currentPos;
+        return intervalCounter;
+    }
+    
+    
+    if(isMovingWithClock) intervalCounter++;
+    else intervalCounter --;
+    
+    previousPos = currentPos;
+
+    console.log('display position: ' +intervalCounter);
+    return intervalCounter;
     
 };
