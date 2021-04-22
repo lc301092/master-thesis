@@ -7,19 +7,17 @@ let redButtonCircle;
 let titleText;
 let displayFunction;
 let displayUnits;
-let textPlugin;
 let compupterStyle = { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', color: 'black', fontSize: 24 };
 
-// from http://phaser.io/sandbox/gHNNubSp/play
-var circle;
-var spriteGroup;
-var sprite;
-var hitZone;
-var radius = 150;
-var cX;
-var cY;
-var theta;
-// end 
+let textPlugin;
+
+let DragRotate;
+// const rotationIntervals = [0,45,90,135,180,225,270,315,360];
+const rotationIntervals = [0,45,90,135,180,-45,-90,-135,-180];
+const ColorGray = 0x8e8e8e;
+const ColorDarkBlue = 0x0000A0;
+const ColorRed = 0x5eb8ff;
+
 
 export class TimeMachineScene extends Phaser.Scene {
     constructor() {
@@ -31,27 +29,36 @@ export class TimeMachineScene extends Phaser.Scene {
         playerData = data;
         storyProgression = playerData.playerProgression.length;
         btnXValue = 0;
-        textPlugin = this.plugins.get('rexbbcodetextplugin');
     }
     preload() {
+        textPlugin = this.plugins.get('rexbbcodetextplugin');
+        DragRotate = this.plugins.get('rexDragRotate');
     }
     create() {
         this.add.image(50, 50, 'bg_time_device.png').setOrigin(0);
         btnX = this.add.image(259, 416, constants.IMAGES.BTN_TIME_MACHINE);
-        btnXCircle = this.add.circle(btnX.x - 2, btnX.y + 5, 50
-            // , 0xff0000, 0.5
-        ).setInteractive({ useHandCursor: true });
-        btnXCircle.on('pointerdown', promptXValue, this);
+        // btnXCircle = this.add.circle(btnX.x - 2, btnX.y + 5, 50
+        //      , 0xff0000, 0.5
+        // ).setInteractive({ useHandCursor: true });
+        //btnXCircle.on('pointerdown', promptXValue, this);
+        let btnXDrag = createButton(this,btnX.x,btnX.y,70, btnX).setInteractive({useHandCursor: true});
+        
+        // rexDragRotate.add(this, {
+        //         x: btnX.x - 2,
+        //         y: btnX.y + 5,
+        //         maxRadius: 50,
+        //         minRadius: 0
+        // });
         let screen = this.add.image(100, 200, 'clear_screen.png').setOrigin(0).setScale(0.4, 0.2);
         titleText = this.add.text(255, 85, 'Tidsindstilling', { fontSize: 30, color: 'black' });
-
+        
         redButtonCircle = this.add.circle(458, 180, 117).setOrigin(0).setInteractive({ useHandCursor: true });
         redButtonCircle.on('pointerdown', checkTimeSettings, this);
-
+        
         displayFunction = this.add.rexBBCodeText(120, 235, '', compupterStyle);
         updateScreen();
-
-
+        
+        
         const backBtn = this.add.text(50, 550, 'Tilbage', { fill: '#0f0' });
         backBtn.setInteractive({ useHandCursor: true });
         backBtn.on('pointerover', () => {
@@ -120,3 +127,60 @@ function updateScreen() {
 }
 
 
+function createButton(scene, x, y, radius, imageToRotate) {
+    let config = {
+        x: x,
+        y: y,
+        maxRadius: radius,
+        minRadius: 0
+    };
+
+    let lineWidth = 3;
+    let btnX = config.maxRadius + lineWidth,
+        Btny = btnX,
+        width = btnX * 2,
+        height = width;
+
+    let buttonGraphics = scene.add.graphics()
+        .lineStyle(lineWidth, 0xffffff, 1)
+        .strokeCircle(btnX, Btny, config.minRadius + lineWidth)
+        .strokeCircle(btnX, Btny, config.maxRadius)
+        //.lineBetween(btnX + config.minRadius, Btny, btnX + config.maxRadius, Btny);
+
+    let button = scene.add.renderTexture(config.x, config.y, width, height)
+        .draw(buttonGraphics)
+        .setOrigin(0.5)
+        .setTint(ColorGray);
+    buttonGraphics.destroy();
+
+    DragRotate.add(scene, config)
+        .on('drag', function (dragRotate) {
+            imageToRotate.rotation += dragRotate.deltaRotation;
+            
+            button.rotation += dragRotate.deltaRotation;
+            //console.log(dragRotate.deltaRotation);
+           let color = (dragRotate.cw) ? ColorDarkBlue : ColorRed;
+           button.setTint(color);
+        })
+        .on('dragend', function () {
+            button.setTint(ColorGray);
+            let angle = imageToRotate.angle;
+            // let angle = Math.abs(imageToRotate.angle);
+            console.log('current angle: ' + angle);
+            // let snapToAngle = closest(angle, rotationIntervals);
+            let snapToAngle = getClosest(angle, rotationIntervals);
+
+            console.log('snap to angle: ' + snapToAngle);
+            imageToRotate.angle = snapToAngle;
+        })
+        button.angle = -90;
+    return button;
+}
+const getClosest = (index, array) => {
+    let closest = 0;
+    for (const i of array)
+        if (Math.abs(index - i) < Math.abs(index - closest))
+            closest = i;
+    return closest;
+    
+};

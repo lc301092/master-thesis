@@ -1,11 +1,20 @@
 import { constants } from "../constants.js"
 import Player from "../game/player.js"
+import { textBox } from "../game/ui.js";
 
 // 
 let playerSprite, playerData, scene;
 let playerProgression;
 const ADJUST_RANGE_Y = 30;
-const ADJUST_RANGE_X = 15
+const ADJUST_RANGE_X = 15;
+
+let uiTextBox;
+const correctItems = [{
+    name: constants.IMAGES.MED3,
+    x: 100,
+    y: 350,
+    message: 'Tiden før medicin må have været hård' 
+}]
 
 
 export class Base extends Phaser.Scene {
@@ -60,10 +69,19 @@ export class Base extends Phaser.Scene {
 
         if(playerProgression >= 0 && playerAnswers){
             console.log(playerAnswers.isCorrect);
-            if (playerAnswers.isCorrect) 
-            scene.add.image(100,350, 'med3_32');
+            for (let i = 0; i <= playerProgression; i++) {
+                if (playerAnswers.isCorrect) continue;
+
+                let x = correctItems[i].x;
+                let y = correctItems[i].y;
+                let name = correctItems[i].name;
+                let correctItem = scene.add.image(x,y,name);
+                
+         }
 
         }
+
+        uiTextBox = textBox.createTextBox(this);
 
     }
     update() {
