@@ -15,6 +15,9 @@ let DragRotate;
 // const rotationIntervals = [0,45,90,135,180,225,270,315,360];
 const rotationInterval = 45;
 const rotationIntervals = [0, 45, 90, 135, 180, -45, -90, -135, -180];
+let previousPos;
+let intervalCounter;
+
 const ColorGray = 0x8e8e8e;
 const ColorDarkBlue = 0x0000A0;
 const ColorRed = 0x5eb8ff;
@@ -38,25 +41,21 @@ export class TimeMachineScene extends Phaser.Scene {
     create() {
         this.add.image(50, 50, 'bg_time_device.png').setOrigin(0);
         btnX = this.add.image(259, 416, constants.IMAGES.BTN_TIME_MACHINE);
-        // btnXCircle = this.add.circle(btnX.x - 2, btnX.y + 5, 50
-        //      , 0xff0000, 0.5
-        // ).setInteractive({ useHandCursor: true });
-        // btnXCircle.on('pointerdown', promptXValue, this);
-        let btnXDrag = createButton(this, btnX.x, btnX.y, 70, btnX).setInteractive({ useHandCursor: true });
 
-        // rexDragRotate.add(this, {
-        //         x: btnX.x - 2,
-        //         y: btnX.y + 5,
-        //         maxRadius: 50,
-        //         minRadius: 0
-        // });
-        let screen = this.add.image(100, 200, 'clear_screen.png').setOrigin(0).setScale(0.4, 0.2);
+        createButton(this, btnX.x, btnX.y, 70, btnX).setInteractive({ useHandCursor: true });
+
+        this.add.image(100, 200, 'clear_screen.png').setOrigin(0).setScale(0.4, 0.2);
+        
         titleText = this.add.text(255, 85, 'Tidsindstilling', { fontSize: 30, color: 'black' });
 
         redButtonCircle = this.add.circle(458, 180, 117).setOrigin(0).setInteractive({ useHandCursor: true });
         redButtonCircle.on('pointerdown', checkTimeSettings, this);
 
         displayFunction = this.add.rexBBCodeText(120, 235, '', compupterStyle);
+
+        // necessary variables for the 
+        previousPos = 0;
+        intervalCounter = 0;
         updateScreen(0);
 
 
@@ -78,13 +77,25 @@ export class TimeMachineScene extends Phaser.Scene {
     }
 }
 function checkTimeSettings() {
-    let answer = calculateYValue(intervalCounter);
-    if (answer == 1930) {
-        this.scene.start(constants.SCENES.CHEMIST, playerData);
+    switch (storyProgression) {
+        case 0:
+           
+            if (calculateYValue(intervalCounter) == 1930) {
+                this.scene.start(constants.SCENES.CHEMIST, playerData);
+            }
+            return;
+        case 1:
+
+            // TODO hvis der er flere options at rejse til skal de være her 
+            if (calculateYValue(intervalCounter) == 1990) {
+                this.scene.start(constants.SCENES.FARM, playerData);
+            }
+            return;
+
+        default:
+            alert('Du har nu spillet demoen færdig. Tusind tak!');
     }
-    else {
-        alert('Der sker ikke noget, der må være noget galt med tidsindstillingen');
-    }
+    alert('Der sker ikke noget, der må være noget galt med tidsindstillingen');
 }
 function promptXValue() {
 
@@ -189,28 +200,27 @@ const getClosest = (index, array) => {
 
 };
 
-let previousPos = 0;
-let intervalCounter = 0;
+
 
 const getBtnxValue = (currentPos, isMovingWithClock) => {
     if (currentPos === previousPos) return intervalCounter;
 
-    if (currentPos === -4 && previousPos === 4){
-       // previousPos = currentPos;
+    if (currentPos === -4 && previousPos === 4) {
+        // previousPos = currentPos;
         return intervalCounter;
     }
-    if (currentPos === 4 && previousPos === -4){
+    if (currentPos === 4 && previousPos === -4) {
         //previousPos = currentPos;
         return intervalCounter;
     }
-    
-    
-    if(isMovingWithClock) intervalCounter++;
-    else intervalCounter --;
-    
+
+
+    if (isMovingWithClock) intervalCounter++;
+    else intervalCounter--;
+
     previousPos = currentPos;
 
-    console.log('display position: ' +intervalCounter);
+    console.log('display position: ' + intervalCounter);
     return intervalCounter;
-    
+
 };

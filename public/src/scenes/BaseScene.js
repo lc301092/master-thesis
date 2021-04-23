@@ -67,10 +67,12 @@ export class Base extends Phaser.Scene {
         let playerProgression = playerData.playerProgression.length - 1;
         let playerAnswers = playerData.answers[playerProgression];
 
+
+        // add base rewards if correct
         if(playerProgression >= 0 && playerAnswers){
             console.log(playerAnswers.isCorrect);
             for (let i = 0; i <= playerProgression; i++) {
-                if (playerAnswers.isCorrect) continue;
+                if (!playerAnswers.isCorrect) continue;
 
                 let x = correctItems[i].x;
                 let y = correctItems[i].y;
@@ -186,7 +188,7 @@ function setupTilemap(scene,baseSceneTest){
                 console.log('Observér tidslinjen');
                 playerData.playerPosition.x = playerSprite.x;
                 playerData.playerPosition.y = playerSprite.y;
-                scene.scene.start(constants.SCENES.FARM, playerData);
+                scene.scene.start(constants.SCENES.TIMELINE, playerData);
                 // --- indstil tidsmaskine "scene" kode her ---
             };
         });

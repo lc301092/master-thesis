@@ -95,7 +95,7 @@ export const textBox = {
                 icon: 10,
                 text: 10,
             }
-        }).setOrigin(0).layout().setDepth(20);//.setVisible(false);
+        }).setOrigin(0).layout().setDepth(20).setVisible(false);
         
         textBox.setInteractive({ useHandCursor: true })
         .on('pointerdown', function () {
