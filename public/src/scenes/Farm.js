@@ -1,7 +1,7 @@
 import { constants } from "../constants.js"
 import Player from "../game/player.js"
 import PlayerLog from "../game/ui.js"
-import {textBox} from "../game/ui.js"
+import { textBox } from "../game/ui.js"
 
 let playerData;
 let playerSprite;
@@ -19,7 +19,7 @@ let hasNewDialogue = true;
 let dynmaicCollider;
 let collideables;
 let npcCollider;
-let portal; 
+let portal;
 
 // UI
 let uiTextBox;
@@ -36,9 +36,9 @@ export class Farm extends Phaser.Scene {
     }
 
     init(data) {
-       playerData = data;
+        playerData = data;
 
-       // set player
+        // set player
         playerSprite = this.physics.add.sprite(200, 400, 'player', 4).setCollideWorldBounds(true).setDepth(1);
         let keys = this.input.keyboard.addKeys(constants.USERINPUT);
         playerInteractionCollider = this.add.rectangle(playerSprite.x, playerSprite.y, playerSprite.width / 2, playerSprite.height / 2,
@@ -78,15 +78,15 @@ export class Farm extends Phaser.Scene {
         let FARM_DECO4 = tileObj.FARM_DECO4;
 
         //layers 
-        let borders = farm_lvl.createLayer('InvisibleBorders', [FARM_DECO2],0,0).setDepth(-3);
+        let borders = farm_lvl.createLayer('InvisibleBorders', [FARM_DECO2], 0, 0).setDepth(-3);
         let ground = farm_lvl.createLayer('Ground', [FARM_GROUND, FARM_DECO3], 0, 0).setDepth(-2);
         let wallTop = farm_lvl.createLayer('BorderTop', [FARM_DECO2], 0, 0).setDepth(-1);
         let wallBot = farm_lvl.createLayer('BorderBot', [FARM_DECO2], 0, 0).setDepth(1);
         let exterior = farm_lvl.createLayer('Exterior', [FARM_BUILDING, FARM_DECO4, FARM_DECO2, FARM_DECO3], 0, 0);
         let exterior2 = farm_lvl.createLayer('Exterior2', [FARM_DECO], 0, 0);
         let flavor = farm_lvl.createLayer('GroundFlavor', [FARM_DECO3], 0, 0).setDepth(1);
-        let interact = farm_lvl.createLayer('interactables', [FARM_BOOK, FARM_DECO2], 0, 0); 
-        
+        let interact = farm_lvl.createLayer('interactables', [FARM_BOOK, FARM_DECO2], 0, 0);
+
         // resize player
         playerSprite.setSize(25, 50).setOffset(12, 10);
 
@@ -99,32 +99,32 @@ export class Farm extends Phaser.Scene {
 
         // border collision 
         scene.physics.add.collider(playerSprite, borders);
-        borders.setCollisionByProperty({border:true});
+        borders.setCollisionByProperty({ border: true });
 
-         // object colliders
-         dynmaicCollider = this.physics.add.group();
-         dynmaicCollider.add(this.player.collider);
-         collideables = this.physics.add.staticGroup();
+        // object colliders
+        dynmaicCollider = this.physics.add.group();
+        dynmaicCollider.add(this.player.collider);
+        collideables = this.physics.add.staticGroup();
 
         // object instantiation
-            // npc
-        npc = scene.physics.add.sprite(550, 550, 'npc1',52).setScale(0.88);
-            // dialog
+        // npc
+        npc = scene.physics.add.sprite(550, 550, 'npc1', 52).setScale(0.88);
+        // dialog
         dialogue = scene.add.image(npc.x + 5, npc.y - 40, 'exclamation.png').setScale(0.1);
-            // portal 
-       // portal = scene.a
-        
+        // portal 
+        // portal = scene.a
+
         // object colliders
-            // npc collider
+        // npc collider
         npcCollider = this.add.rectangle(npc.x, npc.y, npc.width / 2, npc.height);
-            //
+        //
 
         collideables.add(npcCollider);
 
         // set colliders and overlap on objects
         scene.physics.add.collider(playerSprite, npcCollider);
         scene.physics.add.overlap(playerInteractionCollider, npcCollider, npcInteraction, null, this);
-    
+
         // create textbox
         uiTextBox = textBox.createTextBox(this, 65, 480, {
             wrapWidth: 500,
@@ -134,7 +134,7 @@ export class Farm extends Phaser.Scene {
 
         uiPlayerLog = new PlayerLog(this);
     }
-    update(){
+    update() {
         // player movement
         this.player.update();
     }
@@ -143,8 +143,8 @@ export class Farm extends Phaser.Scene {
 function npcInteraction() {
     const player = this.player;
     if (!player.isInteracting()) return;
-        
-     // disable exclamation mark after first time talking
+
+    // disable exclamation mark after first time talking
     if (hasNewDialogue) toggleImage(dialogue);
 
     hasNewDialogue = false;
@@ -153,10 +153,10 @@ function npcInteraction() {
 
     uiTextBox.setVisible(true);
     content = ['Hej!', '', 'Du må være jordbrugsteknologen!'];
-    
+
     uiTextBox.once('complete', function () {
         console.log('done');
-    }).start(content, 50); 
+    }).start(content, 50);
 
 }
 

@@ -4,7 +4,7 @@ import { textBox } from "../game/ui.js";
 
 // 
 let playerSprite, playerData, scene;
-let playerProgression;
+let playerInteractionCollider;
 const ADJUST_RANGE_Y = 30;
 const ADJUST_RANGE_X = 15;
 
@@ -13,8 +13,15 @@ const correctItems = [{
     name: constants.IMAGES.MED3,
     x: 100,
     y: 350,
-    message: 'Tiden før medicin må have været hård' 
-}]
+    message: () => {
+        const player = scene.player;
+        if (!player.isInteracting()) return;
+        textBox.writeUiText(scene,uiTextBox,'Tiden før medicin må have været hård', 50);
+    }
+}
+// ny reward
+//,{}
+];
 
 
 export class Base extends Phaser.Scene {
@@ -34,11 +41,11 @@ export class Base extends Phaser.Scene {
         playerSprite.y = data.playerPosition.y;
 
         let keys = this.input.keyboard.addKeys(constants.USERINPUT);
-        let collider = this.add.rectangle(playerSprite.x, playerSprite.y, playerSprite.width / 2, playerSprite.height / 2,
-            0xff0000, 0.5
+        playerInteractionCollider = this.add.rectangle(playerSprite.x, playerSprite.y, playerSprite.width / 2, playerSprite.height / 2,
+            //0xff0000, 0.5
         );
         animationSetup(this);
-        this.player = new Player(keys, collider, playerSprite);
+        this.player = new Player(keys, playerInteractionCollider, playerSprite);
 
     }
     preload() {
@@ -63,13 +70,16 @@ export class Base extends Phaser.Scene {
         mainCamera.startFollow(playerSprite, true, 0.05, 0.05);
 
         // map collisions
-        
+
+        let dynmaicCollider = this.physics.add.group();
+        let collideables = this.physics.add.staticGroup();
+        dynmaicCollider.add(this.player.collider);
+
         let playerProgression = playerData.playerProgression.length - 1;
         let playerAnswers = playerData.answers[playerProgression];
 
-
         // add base rewards if correct
-        if(playerProgression >= 0 && playerAnswers){
+        if (playerProgression >= 0 && playerAnswers) {
             console.log(playerAnswers.isCorrect);
             for (let i = 0; i <= playerProgression; i++) {
                 if (!playerAnswers.isCorrect) continue;
@@ -77,14 +87,23 @@ export class Base extends Phaser.Scene {
                 let x = correctItems[i].x;
                 let y = correctItems[i].y;
                 let name = correctItems[i].name;
-                let correctItem = scene.add.image(x,y,name);
-                
-         }
+                const action = correctItems[i].message;
+                let correctItem = scene.add.image(x, y, name);
+                let itemCollider = this.add.rectangle(x, y, correctItem.width/2, correctItem.height,
+                    0xff0000, 0.5 // debugging purposes
+                );
+                correctItems[i].collider = itemCollider;
+                collideables.add(itemCollider);
+                scene.physics.add.overlap(playerInteractionCollider, itemCollider, action, null, this);
+            }
 
         }
 
+        scene.physics.add.collider(playerSprite, collideables);
         uiTextBox = textBox.createTextBox(this);
 
+        //        scene.physics.add.overlap(playerInteractionCollider, itemCollider, , null, this);
+   
     }
     update() {
         this.player.update();
@@ -146,7 +165,7 @@ function animationSetup(scene) {
         repeat: -1
     });
 }
-function setupTilemap(scene,baseSceneTest){
+function setupTilemap(scene, baseSceneTest) {
     let tileImages = constants.TILEIMAGES.BASE_LVL;
     let images = constants.IMAGES;
     let tileObj = {};
@@ -172,35 +191,35 @@ function setupTilemap(scene,baseSceneTest){
     let layers = baseSceneTest.createLayer('Layercontrol', EXTERIOR_C, 0, 0).setDepth(1);
 
     let borders = [ground, walls, decoration, decoration2, interact];
-        scene.physics.add.collider(playerSprite, borders);
+    scene.physics.add.collider(playerSprite, borders);
 
-        for (let i = 0; i < borders.length; i++) {
-            borders[i].setCollisionByProperty({ border: true });
-        }
+    for (let i = 0; i < borders.length; i++) {
+        borders[i].setCollisionByProperty({ border: true });
+    }
 
-        // map collision interactives
-        scene.physics.add.collider(playerSprite, interact);
-        interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1665, 1666, 1713, 1714]);
+    // map collision interactives
+    scene.physics.add.collider(playerSprite, interact);
+    interact.setCollision([678, 679, 680, 681, 682, 683, 2214, 2215, 2216, 1665, 1666, 1713, 1714]);
 
-        // indstil tidsmaskine
-        interact.setTileLocationCallback(10, 5, 6, 1, () => {
-            if (scene.player.isInteracting()) {
-                console.log('Observér tidslinjen');
-                playerData.playerPosition.x = playerSprite.x;
-                playerData.playerPosition.y = playerSprite.y;
-                scene.scene.start(constants.SCENES.TIMELINE, playerData);
-                // --- indstil tidsmaskine "scene" kode her ---
-            };
-        });
+    // indstil tidsmaskine
+    interact.setTileLocationCallback(10, 5, 6, 1, () => {
+        if (scene.player.isInteracting()) {
+            console.log('Observér tidslinjen');
+            playerData.playerPosition.x = playerSprite.x;
+            playerData.playerPosition.y = playerSprite.y;
+            scene.scene.start(constants.SCENES.TIMELINE, playerData);
+            // --- indstil tidsmaskine "scene" kode her ---
+        };
+    });
 
-        // Tidsmaskinen
-        interact.setTileLocationCallback(22, 18, 1, 1, () => {
-            if (scene.player.isInteracting()) {
-                console.log('Tidsmaskine aktiveret');
-                playerData.playerPosition.x = playerSprite.x;
-                playerData.playerPosition.y = playerSprite.y;
-                scene.scene.start(constants.SCENES.TIME_MACHINE, playerData);
-                // --- skift scene til laboratorie kode her ---
-            };
-        });
+    // Tidsmaskinen
+    interact.setTileLocationCallback(22, 18, 1, 1, () => {
+        if (scene.player.isInteracting()) {
+            console.log('Tidsmaskine aktiveret');
+            playerData.playerPosition.x = playerSprite.x;
+            playerData.playerPosition.y = playerSprite.y;
+            scene.scene.start(constants.SCENES.TIME_MACHINE, playerData);
+            // --- skift scene til laboratorie kode her ---
+        };
+    });
 }

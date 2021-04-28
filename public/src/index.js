@@ -6,6 +6,7 @@ import DragRotatePlugin from '../node_modules/phaser3-rex-plugins/plugins/dragro
 import BBCodeTextPlugin from '../node_modules/phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
 
 
+
 import { LoadScene } from './scenes/LoadScene.js';
 import { MenuScene } from './scenes/MenuScene.js';
 import { Base } from './scenes/BaseScene.js';

@@ -1,12 +1,10 @@
 import { constants } from "../constants.js"
-let playerPosition = { x: 150, y: 150 };
 let storyProgression;
 let playerData;
-let btnX, btnXCircle, btnXValue;
+let btnX, btnXValue;
 let redButtonCircle;
 let titleText;
 let displayFunction;
-let displayUnits;
 let compupterStyle = { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', color: 'black', fontSize: 24 };
 
 let textPlugin;
@@ -199,8 +197,6 @@ const getClosest = (index, array) => {
     return closest;
 
 };
-
-
 
 const getBtnxValue = (currentPos, isMovingWithClock) => {
     if (currentPos === previousPos) return intervalCounter;

@@ -66,6 +66,9 @@ export const constants = {
         FARM_DECO2: 'interior',
         FARM_DECO3: 'trees',
         FARM_DECO4: 'treesAndPlants',
+        UI_LOG:'Log_icon.png',
+        UI_LOG_OPEN: 'Log_icon_open.png',
+        UI_LOG_NEW: 'Log_icon_new.png'
 
     },
     SPRITES: {
