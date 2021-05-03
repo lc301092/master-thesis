@@ -30,7 +30,7 @@ let objective = {
 let playerInteractionCollider;
 
 const rule1 = 'Regl #1: Medianen af antal rapporterede bivirkninger må ikke overstige 5.';
-const rule2 = 'Regl #2: 50% af menneskerne der har indtaget medicinen, skal have oplevet et temperaturfald på minimum 2 grader celcius eller over.';
+const rule2 = 'Regl #2: 50% af menneskerne der har indtaget medicinen, skal have oplevet et temperaturfald på minimum 2 grader.';
 
 const tip1 = 'Bog#1 Sumkurver: \n\n...Medianen er det midterste tal af alle observationer, hvilket vil sige at 50% af observationer er mindre end medianen og 50% er større. \nFor at finde medianen, finder man 50% markøren på y-aksen og følger den vandret, indtil man møder sumkurven. \nDerefter går man lodret ned, hvor tallet man støder på på x-aksen, er medianen.';
 const tip2 = 'Bog#2 Boxplot: \n\n...Boxplot er en overskuelig måde sammenligne data med hinanden på. \nEt boxplot indeholder ALTID: Den mindste observation, en nedre kvartil, en median, en øvre kvartil, og den største observation.';
@@ -281,7 +281,7 @@ function npcInteraction() {
 
     if (!objective.isComplete) {
         uiTextBox.setVisible(true);
-        let ruleText = ['Hej! Du må være laboranten vi har ventet på. Jeg er glad for at møde dig…', '', 'På bordet finder du vores tre mediciner. Vi har brug for dit input, så vi sikrer os at vores resultater ikke er farvet… ', 'Du finder information om medicinerne, ved at gå ned og undersøge dem.', '', 'Når du godkender eller afviser en medicin, så er beslutningen ikke endelig.', '', 'For at godkende en medicin skal to regler være opfyldt…', '', rule1, '', rule2];
+        let ruleText = ['Hej! Du må være laboranten vi har ventet på. Jeg er glad for at møde dig…', '', 'På bordet finder du vores tre typer medicin. Vi har brug for dit input, så vi sikrer os at vores resultater ikke er farvet… ', 'Du finder information om hver medicin, ved at gå ned og undersøge dem.', 'Når du godkender eller afviser en medicin, så er beslutningen ikke endelig.', '', 'For at godkende en medicin skal to regler være opfyldt…', '', rule1, '', rule2];
 
         console.log(scenarioLog.rules.indexOf(rule1) == -1);
         // in this case the rules are chained so only check for rule1.
@@ -301,7 +301,7 @@ function npcInteraction() {
     else {
         if (hasNewDialogue) newDialogue.setVisible(true);
         hasNewDialogue = false;
-        let text = ['Jeg kan se, at du har behandlet de tre mediciner. Tusind tak for din hjælp!', '', 'Du har stadigvæk mulighed for at ændre din beslutning, hvis du er kommet i tvivl.'];
+        let text = ['Jeg kan se, at du har behandlet hver  medicin. Tusind tak for din hjælp!', '', 'Du har stadigvæk mulighed for at ændre din beslutning, hvis du er kommet i tvivl.'];
         textBox.writeUiText(scene,uiTextBox,text,50);
     }
 }

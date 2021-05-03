@@ -28,7 +28,7 @@ export const timeMachine =
             {
                 sceneID: constants.SCENES.FARM,
                 year: 1990,
-                text: 'ADVARSEL: \nDER ER SKET ET SPILD AF MEDICIN, SOM HAR FØRT TIL FORURENING AF GRUNDVANDET. \nHJÆLP BIOLOGERNE MED AT RENSE GRUNDVANDET. \n\nÅRSTAL: 1990 \nMATEMATIK: STATISTIK'
+                text: 'ADVARSEL: \n OPSKALERINGEN AF MEDICINUDVIKLING HAR FØRT TIL, AT DER SKAL DYRKES FLERE PLANTER TIL MEDICINBRUG. DU SKAL UD TIL LANDMÆND OG RÅDGIVE DEM I DYRKNING AF PLANTER. \n\nÅRSRTAL: [size=24][color=orange][b] 1990 [/b][/color][/size]\nMATEMATIK: STATISTIK OG LINEÆR REGRESSION '
             },
             // {
             //     sceneID: 'Placeholder scene',
