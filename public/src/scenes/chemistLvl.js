@@ -6,7 +6,7 @@ import { textBox } from "../game/ui.js"
 const sceneID = constants.SCENES.CHEMIST;
 let anchor;
 
-let sceneIndex;
+const sceneIndex = 0;
 
 let playerSprite, playerData, scene;
 let scenarioLog = {
@@ -53,9 +53,8 @@ export class ChemistLevel extends Phaser.Scene {
     }
     init(data) {
         playerData = data;
-        if (playerData.playerProgression.indexOf(sceneID) == -1) playerData.playerProgression.push(sceneID);
-
-        sceneIndex = playerData.playerProgression.indexOf(sceneID);
+       // if (playerData.playerProgression.indexOf(sceneID) == -1) playerData.playerProgression.push(sceneID);
+        //sceneIndex = playerData.playerProgression.indexOf(sceneID);
         scenarioLog.level = sceneID;
         //TODO
         // updatePlayerlog()
@@ -198,12 +197,14 @@ export class ChemistLevel extends Phaser.Scene {
         anchor.add(objective.medB.data, anchorConfig);
 
         let dialogueConfig = {
+            numberOfChoices: 2,
             button0: {
                 text: 'Godkend',
                 action: acceptMedicin
             },
             button1: {
-                text: 'Afvis'
+                text: 'Afvis',
+                action: acceptMedicin
             }
         };
 
@@ -294,15 +295,14 @@ function npcInteraction() {
                 console.log('done');
             });
         }
-        else textBox.writeUiText(this, uiTextBox, ruleText, 50);
+        else textBox.writeUiText(scene, uiTextBox, ruleText, 50);
 
     }
     else {
         if (hasNewDialogue) newDialogue.setVisible(true);
         hasNewDialogue = false;
-        uiTextBox.setVisible(true);
-        content = ['Jeg kan se, at du har behandlet de tre mediciner. Tusind tak for din hjælp!', '', 'Du har stadigvæk mulighed for at ændre din beslutning, hvis du er kommet i tvivl.'];
-        uiTextBox.start(content, 50);
+        let text = ['Jeg kan se, at du har behandlet de tre mediciner. Tusind tak for din hjælp!', '', 'Du har stadigvæk mulighed for at ændre din beslutning, hvis du er kommet i tvivl.'];
+        textBox.writeUiText(scene,uiTextBox,text,50);
     }
 }
 
@@ -407,6 +407,7 @@ function portalInteraction() {
     if (!this.player.isInteracting()) return;
     //if (!confirm('Vil du gerne rejse tilbage til år 2200?')) return;
     let dialogueConfig = {
+        numberOfChoices: 2,
         button0: {
             text: 'ja',
             action: function (index) {
@@ -428,11 +429,7 @@ function portalInteraction() {
         title: 'Vil du gerne rejse tilbage til år 2200?'
     }
 
-
     textBox.createDialog(scene, dialogueConfig);
-
-
-
 
 }
 

@@ -16,11 +16,23 @@ const correctItems = [{
     message: () => {
         const player = scene.player;
         if (!player.isInteracting()) return;
-        textBox.writeUiText(scene,uiTextBox,'Tiden før medicin må have været hård', 50);
-    }
+        textBox.writeUiText(scene, uiTextBox, 'Tiden før medicin må have været hård', 50);
+    },
+    scale: 1
+
+}, {
+    name: constants.IMAGES.PLANT,
+    x: 60,
+    y: 250,
+    message: () => {
+        const player = scene.player;
+        if (!player.isInteracting()) return;
+        textBox.writeUiText(scene, uiTextBox, 'Kamilleurten er igang med at spirre', 50);
+    },
+    scale: 0.12
 }
-// ny reward
-//,{}
+    // ny reward
+    //,{}
 ];
 
 
@@ -87,10 +99,11 @@ export class Base extends Phaser.Scene {
                 let x = correctItems[i].x;
                 let y = correctItems[i].y;
                 let name = correctItems[i].name;
+                let scale = correctItems[i].scale;
                 const action = correctItems[i].message;
-                let correctItem = scene.add.image(x, y, name);
-                let itemCollider = this.add.rectangle(x, y, correctItem.width/2, correctItem.height,
-                    0xff0000, 0.5 // debugging purposes
+                let correctItem = scene.add.image(x, y, name).setScale(scale);
+                let itemCollider = this.add.rectangle(x, y, correctItem.displayWidth / 2, correctItem.displayHeight,
+                 //   0xff0000, 0.5 // debugging purposes
                 );
                 correctItems[i].collider = itemCollider;
                 collideables.add(itemCollider);
@@ -103,7 +116,7 @@ export class Base extends Phaser.Scene {
         uiTextBox = textBox.createTextBox(this);
 
         //        scene.physics.add.overlap(playerInteractionCollider, itemCollider, , null, this);
-   
+
     }
     update() {
         this.player.update();

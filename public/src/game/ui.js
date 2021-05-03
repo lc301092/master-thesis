@@ -95,11 +95,13 @@ export const textBox = {
     },
     writeUiText: function (scene, uiElement, text, speed) {
         scene.player.setDisabled(true);
-        uiElement.setVisible(true);
         uiElement.start(text, speed);
+        setTimeout(() => {
+            uiElement.setVisible(true);
+        }, 5);
     },
 
-    createTextBox: function (scene) {
+    createTextBox: function (scene, hasPointerEvents = true) {
         const player = scene.player;
         const anchor = scene.plugins.get('rexAnchor');
         const x = 65;
@@ -110,6 +112,7 @@ export const textBox = {
             fixedHeight: 65,
         };
 
+        const iconImage = (hasPointerEvents) ? 'flueben_v2.png': 'enter_keyboard.png';
 
         var wrapWidth = GetValue(config, 'wrapWidth', 0);
         var fixedWidth = GetValue(config, 'fixedWidth', 0);
@@ -124,7 +127,7 @@ export const textBox = {
 
             // text: getBuiltInText(scene, wrapWidth, fixedWidth, fixedHeight),
             text: getBBcodeText(scene, wrapWidth, fixedWidth, fixedHeight),
-            action: scene.add.image(0, 0, 'flueben.png').setScale(0.2).setTint(COLOR_LIGHT).setVisible(false),
+            action: scene.add.image(0, 0, iconImage).setScale(0.5).setVisible(false),
 
             space: {
                 left: 20,
@@ -136,37 +139,61 @@ export const textBox = {
             }
         }).setOrigin(0).layout().setDepth(20).setVisible(false);
 
-        textBox.setInteractive({ useHandCursor: true })
-            .on('pointerdown', function () {
-                var icon = this.getElement('action').setVisible(false);
-                this.resetChildVisibleState(icon);
-                if (this.isLastPage && !this.isTyping) {
-                    this.setVisible(false);
-                    player.setDisabled(false);
-                    this.emit('complete');
-                };
-                if (this.isTyping) {
-                    this.stop(true);
-                } else {
-                    this.typeNextPage();
-                }
-            }, textBox)
-            .on('pageend', function () {
-                if (this.isLastPage) {
-                    return;
-                }
-                var icon = this.getElement('action').setVisible(true);
-                this.resetChildVisibleState(icon);
-                icon.y -= 30;
-                var tween = scene.tweens.add({
-                    targets: icon,
-                    y: '+=30', // '+=100'
-                    ease: 'Bounce', // 'Cubic', 'Elastic', 'Bounce', 'Back'
-                    duration: 500,
-                    repeat: 0, // -1: infinity
-                    yoyo: false
-                });
-            }, textBox);
+        scene.input.keyboard.addKey('ENTER').on('down', function (event) {
+            var icon = textBox.getElement('action').setVisible(false);
+            textBox.resetChildVisibleState(icon);
+                    if (textBox.isLastPage && !textBox.isTyping) {
+                        textBox.setVisible(false);
+                        player.setDisabled(false);
+                        textBox.emit('complete');
+                    };
+                    if (textBox.isTyping) {
+                        textBox.stop(true);
+                    } else {
+                        textBox.typeNextPage();
+                    }
+            // textBox.setVisible(false);
+            // player.setDisabled(false);
+            
+        });
+        if (hasPointerEvents) {
+            textBox.setInteractive({ useHandCursor: true })
+                .on('pointerdown', function () {
+                    var icon = this.getElement('action').setVisible(false);
+                    this.resetChildVisibleState(icon);
+                    if (this.isLastPage && !this.isTyping) {
+                        this.setVisible(false);
+                        player.setDisabled(false);
+                        this.emit('complete');
+                    };
+                    if (this.isTyping) {
+                        this.stop(true);
+                    } else {
+                        this.typeNextPage();
+                    }
+                }, textBox)
+                .on('pageend', function () {
+                    if (this.isLastPage) {
+                        return;
+                    }
+                    var icon = this.getElement('action').setVisible(true);
+                    this.resetChildVisibleState(icon);
+                    icon.y -= 30;
+                    var tween = scene.tweens.add({
+                        targets: icon,
+                        y: '+=30', // '+=100'
+                        ease: 'Bounce', // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                        duration: 500,
+                        repeat: 0, // -1: infinity
+                        yoyo: false
+                    });
+                }, textBox);
+        } else{
+            textBox.on('pageend', function(){
+                if(textBox.visible)
+                textBox.getElement('action').setVisible(true);
+            })
+        }
 
         // TODO2 FIX POSITION WITH ANCHOR
         const anchorConfig = {
@@ -179,10 +206,67 @@ export const textBox = {
         return textBox;
     },
 
+    createInputField: function (scene, callback = null) {
+        const anchor = scene.plugins.get('rexAnchor');
+
+        let inputText = scene.add.rexInputText(0, 0, 10, 10, {
+            id: 'myNumberInput',
+            type: '0',
+            text: '0',
+            fontSize: '30px',
+            // background: ''
+        })
+            .resize(100, 100)
+            .setOrigin(0.5)
+            .on('textchange', function (inputText) {
+                //printText.text = inputText.text;
+            });
+        inputText.setMaxLength(2);
+        inputText.node.addEventListener("keypress", function (evt) {
+            if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
+                evt.preventDefault();
+            }
+        });
+        inputText.setFocus();
+
+        //printText.text = inputText.text;
+        inputText.setDepth(5);
+        scene.input.keyboard.addKey('ENTER').on('down', function (event) {
+
+            // TODO first get get number
+            console.log(inputText.text);
+            callback(inputText.text);
+            //inputText.setText('');
+            let node = document.getElementById('myNumberInput');
+            if (node) node.parentNode.removeChild(node);
+        });
+
+        var style = document.createElement('style');
+        style.innerHTML = `
+        #myNumberInput::-webkit-inner-spin-button, 
+        #myNumberInput::-webkit-outer-spin-button { 
+          -webkit-appearance: none; 
+          margin: 0; 
+        }`;
+        document.head.appendChild(style);
+
+        anchor.add(inputText, {
+            centerX: 'center+50',
+            bottom: 'bottom+5'
+        });
+        inputText.setScrollFactor(0);
+
+        let canvas = document.querySelector('canvas');
+
+        canvas.style.removeProperty('position');
+    },
+
+
 
     // other related UI stuff
     // eksempel fra chemist lvl
     /* dialogueConfig = {
+            numberOfChoices: 2,
             button0: {
                 text: 'Godkend',
                 action: acceptMedicin
@@ -195,6 +279,7 @@ export const textBox = {
     createDialog: function (scene, dialogueConfig) {
         const anchor = scene.plugins.get('rexAnchor');
         const player = scene.player;
+
 
         let dialog = scene.rexUI.add.dialog({
             x: 400,
@@ -221,10 +306,7 @@ export const textBox = {
                 fontSize: '16px'
             }),
 
-            actions: [
-                createLabel(scene, dialogueConfig.button0.text),
-                createLabel(scene, dialogueConfig.button1.text)
-            ],
+            actions: [],
 
             space: {
                 title: 5,
@@ -249,20 +331,29 @@ export const textBox = {
                 actions: false,
             }
         })
-            .layout()
-            .popUp(1000)
-            .setDepth(uiLayer)
-            .setOrigin(0)
-            .setScrollFactor(0);
+
         //.drawBounds(scene.add.graphics(), 0xff0000)
         anchor.add(dialog, {
             centerX: 'center',
             centerY: 'center+230'
         });
 
+        const buttonsToAdd = dialogueConfig.numberOfChoices;
+        for (let index = 0; index < buttonsToAdd; index++) {
+            const text = dialogueConfig['button' + index].text;
+            dialog.addAction(createLabel(scene, text));
+        }
+
+        dialog.layout()
+            .popUp(1000)
+            .setDepth(uiLayer)
+            .setOrigin(0)
+            .setScrollFactor(0);
+
         dialog
             .on('button.click', function (button, groupName, index) {
-                dialogueConfig.button0.action(index);
+                const action = dialogueConfig['button' + index].action;
+                if (action) action(index);
                 dialog.setVisible(false);
                 player.setDisabled(false);
 

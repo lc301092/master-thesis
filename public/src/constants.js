@@ -32,6 +32,7 @@ export const constants = {
 		SCREEN: 'TimeScreen.png',
         EVENTPIC: 'eventSprite.png',
         TICK: 'flueben.png',
+        MORETEXT: 'flueben_v2.png',
         X: 'xikon.png',
         CURRENTYEAR: 'du_er_her.png',
         DATASÆT: 'datasæt_placeholder.png',
@@ -68,8 +69,19 @@ export const constants = {
         FARM_DECO4: 'treesAndPlants',
         UI_LOG:'Log_icon.png',
         UI_LOG_OPEN: 'Log_icon_open.png',
-        UI_LOG_NEW: 'Log_icon_new.png'
-
+        UI_LOG_NEW: 'Log_icon_new.png',
+        KAMILLE: 'kamille.png',
+        ÆRENPRIS: 'ærenpris.png',
+        NELLIKER: 'nelliker.png',
+        WOODSIGN: 'woodsign.png',
+        MULDJORD_DATA: 'muldjord.png',
+        LERJORD_DATA: 'lerjord.png',
+        SANDJORD_DATA: 'sandjord.png',
+        ÆRENPRIS_DATA: 'ærenpris_data.png',
+        NELLIKER_DATA: 'nelliker_data.png',
+        KAMILLE_DATA: 'kamille_data.png',
+        ENTER_IMAGE: 'enter_keyboard.png',
+        PLANT: 'plant.png'
     },
     SPRITES: {
         PC: 'playable_charaters.png',
@@ -101,7 +113,7 @@ export const constants = {
             FARM_GROUND: 'ground3',
             FARM_DECO2: 'interior',
             FARM_DECO3: 'trees',
-            FARM_DECO4: 'treesAndPlants',
+            FARM_DECO4: 'treesAndPlants'
         },
     },
     TILEMAPS: {

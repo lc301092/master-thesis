@@ -18,11 +18,12 @@ export default class Player {
     constructor(keys, collider, object) {
         this.input = new InputManager(keys);
         this.collider = collider;
-        collider.setFillStyle(0xff0000,0.5).setDepth(50); // for debugging
+        collider.setFillStyle(0xff0000, 0.5).setDepth(50); // for debugging
         this.object = object;
         this.animation = object.anims;
         this.disabled = false;
         this.speed = WALK_SPEED;
+        this.isMoving;
     }
     update() {
         if (this.isDisabled()) return;
@@ -55,7 +56,10 @@ export default class Player {
         if (this.input.sprint()) this.speed = RUN_SPEED;
         else this.speed = WALK_SPEED;
     }
-
+    isPlayerMoving() {
+        return this.isMoving;
+    }
+    
     move() {
         const collider = this.collider;
         const object = this.object;
@@ -99,12 +103,25 @@ export default class Player {
     animate() {
         const velocity = this.object.body.velocity;
         const animation = this.animation;
-        if (velocity.x > 0) animation.play('right', true);
-        else if (velocity.x < 0) animation.playReverse('left', true);
-        else if (velocity.y > 0) animation.play('down', true);
-        else if (velocity.y < 0) animation.play('up', true);
+        if (velocity.x > 0) {
+            animation.play('right', true);
+            this.isMoving = true;
+        }
+        else if (velocity.x < 0) {
+            animation.playReverse('left', true);
+            this.isMoving = true;
+        }
+        else if (velocity.y > 0) { 
+            animation.play('down', true);
+            this.isMoving = true; 
+        }
+        else if (velocity.y < 0) {
+            animation.play('up', true);
+            this.isMoving = true;
+        }
         else {
             animation.stop();
+            this.isMoving = false;
         }
     }
 }

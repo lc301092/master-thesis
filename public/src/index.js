@@ -4,6 +4,7 @@ import AnchorPlugin from '../node_modules/phaser3-rex-plugins/plugins/anchor-plu
 import RexUIPlugin from '../node_modules/phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import DragRotatePlugin from '../node_modules/phaser3-rex-plugins/plugins/dragrotate-plugin.js';
 import BBCodeTextPlugin from '../node_modules/phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
+import InputTextPlugin from '../node_modules/phaser3-rex-plugins/plugins/inputtext-plugin.js';
 
 
 
@@ -26,9 +27,14 @@ const config = {
         arcade: {
             // debug: true,
         }
-    }, scale: {
+    },
+    scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    parent: 'gameDiv',
+    dom: {
+        createContainer: true,
     },
     plugins: {
         global: [{
@@ -44,6 +50,11 @@ const config = {
         {
             key: 'rexBBCodeTextPlugin',
             plugin: BBCodeTextPlugin,
+            start: true
+        },
+        {
+            key: 'rexInputTextPlugin',
+            plugin: InputTextPlugin,
             start: true
         }],
         scene: [{

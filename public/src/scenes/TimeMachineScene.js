@@ -1,4 +1,7 @@
 import { constants } from "../constants.js"
+import {timeMachine} from '../game/timeMachine'
+
+
 let storyProgression;
 let playerData;
 let btnX, btnXValue;
@@ -19,7 +22,6 @@ let intervalCounter;
 const ColorGray = 0x8e8e8e;
 const ColorDarkBlue = 0x0000A0;
 const ColorRed = 0x5eb8ff;
-
 
 export class TimeMachineScene extends Phaser.Scene {
     constructor() {
@@ -43,7 +45,7 @@ export class TimeMachineScene extends Phaser.Scene {
         createButton(this, btnX.x, btnX.y, 70, btnX).setInteractive({ useHandCursor: true });
 
         this.add.image(100, 200, 'clear_screen.png').setOrigin(0).setScale(0.4, 0.2);
-        
+
         titleText = this.add.text(255, 85, 'Tidsindstilling', { fontSize: 30, color: 'black' });
 
         redButtonCircle = this.add.circle(458, 180, 117).setOrigin(0).setInteractive({ useHandCursor: true });
@@ -75,43 +77,29 @@ export class TimeMachineScene extends Phaser.Scene {
     }
 }
 function checkTimeSettings() {
-    switch (storyProgression) {
-        case 0:
-           
-            if (calculateYValue(intervalCounter) == 1930) {
-                this.scene.start(constants.SCENES.CHEMIST, playerData);
-            }
-            return;
-        case 1:
 
-            // TODO hvis der er flere options at rejse til skal de være her 
-            if (calculateYValue(intervalCounter) == 1990) {
-                this.scene.start(constants.SCENES.FARM, playerData);
-            }
-            return;
+    const answer = calculateYValue(intervalCounter);
+    const availableScenarios = timeMachine[storyProgression].destinations;
 
-        default:
-            alert('Du har nu spillet demoen færdig. Tusind tak!');
+    console.log(availableScenarios);
+
+    // sometimes there is only one destination
+    for (let i = 0; i < availableScenarios.length; i++) {
+        const destination = availableScenarios[i];
+        const possibleAnswer = destination.year;
+        const sceneID = destination.sceneID;
+
+        // console.log(destination, possibleAnswer, sceneID, answer);
+        if (possibleAnswer != answer) continue;
+        playerData.playerProgression.push(destination);
+        playerData.activeScene = destination.sceneID;
+        localStorage.setItem('foobar', JSON.stringify(playerData));
+        this.scene.start(sceneID, playerData);
     }
-    alert('Der sker ikke noget, der må være noget galt med tidsindstillingen');
+    // TODO make feedback (sound, red flash w/e.. ) for wrong answer here 
 }
-function promptXValue() {
 
-    let promptVal = prompt('\nDrejeknappen står på: ' + btnXValue + '\n\nDu kan dreje på denne knap. Indtast et positivt tal for at dreje den et hak med urets retning eller et negativt tal for at dreje den et hak mod urets retning');
-    if (!promptVal) return;
 
-    if (isNaN(promptVal)) {
-        alert('du kan kun skrive et tal, prøv igen');
-        promptXValue();
-        return;
-    }
-    btnXValue += parseInt(promptVal);
-    if (btnXValue > 9999) btnXValue = 9999;
-
-    rotateBtnX(btnXValue);
-    // update 
-    updateScreen();
-}
 function calculateYValue(xValue) {
     let yValue = (-15 * xValue) + 2200;
     console.log(yValue);
@@ -124,14 +112,17 @@ function rotateBtnX(btnValue) {
     btnX.angle = newRotation;
 }
 function updateScreen(displayUnit) {
+    console.log(storyProgression);
+    const progress = timeMachine[storyProgression];
+    if(!progress) return;
+    const functionComponents = progress.function;
     let charOrNum = (displayUnit == 0) ? 'x' : displayUnit;
     let xValue = '[color=#009900]' + charOrNum + '[/color]';
-    let aValue = -15;
-    let bValue = 2200;
+    let aValue = functionComponents.a;
+    let bValue = functionComponents.b;
     let functionf = '[color=orange]f([/color]' + xValue + '[color=orange])[/color] = ' + aValue + '*' + xValue + ' + ' + bValue;
     displayFunction.setText(functionf);
 }
-
 
 function createButton(scene, x, y, radius, imageToRotate) {
     let config = {

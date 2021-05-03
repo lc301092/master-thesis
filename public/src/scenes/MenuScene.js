@@ -14,7 +14,13 @@ export class MenuScene extends Phaser.Scene {
     preload() {
     }
     create() {
-        this.add.image(0, 0, constants.IMAGES.SKY).setOrigin(0);
+        let canvas = document.querySelector('canvas');
+
+        console.log(canvas);
+
+        canvas.style.position = 'relative';
+
+        let bg = this.add.image(0, 0, constants.IMAGES.SKY).setOrigin(0).setInteractive();
 
         let width = this.cameras.main.width;
         let height = this.cameras.main.height;
@@ -31,7 +37,7 @@ export class MenuScene extends Phaser.Scene {
 
         this.input.on('pointerdown', (pointer) => {
             console.log('clicked');
-            this.scene.start(constants.SCENES.PLAY, playerData);
+            this.scene.start(constants.SCENES.INTRO, playerData);
         });
     }
         

@@ -1,8 +1,13 @@
 import { constants } from "../constants.js"
+import { timeMachine } from '../game/timeMachine'
+
+const YEAR_MAX = 2200;
+const YEAR_MIN = 1800;
+const AVAILABLE_YEARS = YEAR_MAX - YEAR_MIN;
+const yearToScreenScale = 1.5;
 
 let storyProgression;
 let playerData;
-let eventPic;
 let currentYearPic;
 let secondEventPic;
 let eventText;
@@ -10,12 +15,14 @@ let welcome = true;
 let isWriting;
 let textPlugin;
 
+
+
 export class Timeline extends Phaser.Scene {
-	constructor() {
-		super({
-			key: constants.SCENES.TIMELINE
-		})
-	}
+    constructor() {
+        super({
+            key: constants.SCENES.TIMELINE
+        })
+    }
 
     init(data) {
         playerData = data;
@@ -29,13 +36,13 @@ export class Timeline extends Phaser.Scene {
 
     }
 
-	create() {
-		let scene = this;
-		const header = scene.add.text(330, 50, 'Tidslinje', {
-			fill: '#31FDF0',
-			fontSize: '25px'
-		});
-		//const year = scene.add.text(150, 100, 'År: 1930', { fill: '#31FDF0'});
+    create() {
+        let scene = this;
+        const header = scene.add.text(330, 50, 'Tidslinje', {
+            fill: '#31FDF0',
+            fontSize: '25px'
+        });
+        //const year = scene.add.text(150, 100, 'År: 1930', { fill: '#31FDF0'});
 
         // set text label
         scene.label = this.add.rexBBCodeText(100, 270, '', { wrap: { mode: 1, width: 600 } });
@@ -56,8 +63,6 @@ export class Timeline extends Phaser.Scene {
         });
 
 
-
-
         // Ikon der viser dit nuværende år
         currentYearPic = this.add.image(700, 230, constants.IMAGES.CURRENTYEAR).setScale(0.35);
         currentYearPic.setInteractive({ useHandCursor: true });
@@ -73,70 +78,70 @@ export class Timeline extends Phaser.Scene {
 
         });
 
-        eventPic = this.add.image(150, 120, constants.IMAGES.EVENTPIC).setOrigin(0);
-
         // event billede til andet scenarie
-        switch (storyProgression) {
+        const availableScenarios = timeMachine[storyProgression];
+        if (!availableScenarios){
+            const endMessage = 'TIDSLINJEN ER BLEVET GENOPRETTET, KØRER STATUS...             ...                                10%...                                           60%...                                       99%...                      ...'
+            this.typeWriter(endMessage);
+            alert('Demoen er nu slut. Mange tak fordi du ville spille med! Du kan lukke vinduet nu eller blive hængende og kigge rundt');
+            return;
+        }
+        const destinations = availableScenarios.destinations;
+        // sometimes there is only one destination
+        for (let i = 0; i < destinations.length; i++) {
+            let eventPic;
+            const destination = destinations[i];
+            const year = destination.year;
+            //const sceneID = destination.sceneID;
+            const scenarioText = destination.text;
 
-            case 0:
-                // event billede til første scenarie
-                eventPic.setInteractive({ useHandCursor: true });
-                eventPic.on('pointerover', () => {
-                    eventPic.setScale(1.01);
-                });
-                eventPic.on('pointerout', () => {
-                    eventPic.setScale(1);
-                });
-                eventPic.on('pointerdown', () => {
-                    // Dynamisk tekst
-                    this.typewriteText('ADVARSEL: \nDER ER GÅET ROD I MEDICINFREMSTILLINGEN! \nHJÆLP LABORANTEN MED AT VÆLGE DEN RETTE MEDICIN! \n\nÅRSTAL:[size=24][color=orange][b] 1930 [/b][/color][/size] \nMATEMATIK: STATISTIK');
+            // TODO based on year 
+            // set new x value
+            const x = (year - YEAR_MIN) * yearToScreenScale;
+            eventPic = this.add.image(x, 120, constants.IMAGES.EVENTPIC).setOrigin(0);
 
-                });
-                if (!welcome) return;
-                welcome = false;
+            eventPic.setInteractive({ useHandCursor: true });
+            eventPic.on('pointerover', () => {
+                eventPic.setScale(1.01);
+            });
+            eventPic.on('pointerout', () => {
+                eventPic.setScale(1);
+            });
+            eventPic.on('pointerdown', () => {
+                // Dynamisk tekst
+                this.typewriteText(scenarioText);
+            });
 
-                this.typewriteText('VELKOMMEN HJEM REKRUT! \n\nHER KAN DU SE DIN TIDSLINJE! \nTRYK PÅ IKONERNE, FOR AT FINDE UD AF HVAD DER SKABER PROBLEMER I TIDSLINJEN OG RET OP PÅ DEM, VED AT REJSE TILBAGE I TIDEN! \n\nHELD OG LYKKE!');
-                break;
-            case 1:
-                let sceneRef = this;
-                
-                let isCorrect = playerData.answers[storyProgression-1].isCorrect;
-                let questGraphic = '/\\/\\/\\/\\';
-                let questText;
-                console.log('ANSWER IS: ' + isCorrect);
-                let questLabel = this.add.rexBBCodeText(eventPic.x, 225, '')
-                    .setInteractive({ useHandCursor: true })
-                    .on('areadown', function (key) {
-                        sceneRef.typewriteText(questText);
-                    });
-                // resolveLastMission()
-                if (isCorrect) {
-                    questLabel.setText(`[b][area=correct][color=lightgreen]${questGraphic}[/color][/stroke][/area][/b]`);
-                    questText = 'Der er ikke forstyrrelser med tidslinjen i denne periode';
-                }
-                else {
-                    questLabel.setText(`[b][stroke=black][area=incorrect][color=red]${questGraphic}[/color][/stroke][/area][/b]`);
-                    questText = 'Der er stadig problemer i denne periode';
-                }
+            // TODO add feedback if storyprogession is more than 0
+        }
+        if (storyProgression > 0) {
+            const progressIndex = storyProgression - 1;
+            const questGraphic = '/\\/\\/\\/\\';
+            const isCorrect = playerData.answers[progressIndex].isCorrect;
+            const lastDestYear = playerData.playerProgression[progressIndex].year;
+            const lastDestx = (lastDestYear - YEAR_MIN) * yearToScreenScale;
+            console.log('ANSWER IS: ' + isCorrect);
+            let questText;
 
-                eventPic.visible = false;
-
-                secondEventPic = this.add.image(400, 120, constants.IMAGES.EVENTPIC).setOrigin(0);
-                secondEventPic.setInteractive({ useHandCursor: true });
-                secondEventPic.on('pointerover', () => {
-                    secondEventPic.setScale(1.01);
+            let questLabel = this.add.rexBBCodeText(lastDestx, 225, '')
+                .setInteractive({ useHandCursor: true })
+                .on('areadown', function (key) {
+                    scene.typewriteText(questText);
                 });
-                secondEventPic.on('pointerout', () => {
-                    secondEventPic.setScale(1);
-                });
-                secondEventPic.on('pointerdown', () => {
-                    // Dynamisk tekst   
-                    this.typewriteText('ADVARSEL: \nDER ER SKET ET SPILD AF MEDICIN, SOM HAR FØRT TIL FORURENING AF GRUNDVANDET. \nHJÆLP BIOLOGERNE MED AT RENSE GRUNDVANDET. \n\nÅRSTAL: 2000 \nMATEMATIK: STATISTIK');
-
-                });
-                break;
+            if (isCorrect) {
+                questLabel.setText(`[b][area=correct][color=lightgreen]${questGraphic}[/color][/stroke][/area][/b]`);
+                questText = 'Der er ikke forstyrrelser med tidslinjen i denne periode';
+            }
+            else {
+                questLabel.setText(`[b][stroke=black][area=incorrect][color=red]${questGraphic}[/color][/stroke][/area][/b]`);
+                questText = 'Der er stadig problemer i denne periode';
+            }
         }
 
+        if (!welcome) return;
+        welcome = false;
+        const welcomeMessage = 'VELKOMMEN HJEM REKRUT! \n\nHER KAN DU SE DIN TIDSLINJE! \nTRYK PÅ IKONERNE, FOR AT FINDE UD AF HVAD DER SKABER PROBLEMER I TIDSLINJEN OG RET OP PÅ DEM, VED AT REJSE TILBAGE I TIDEN! \n\nHELD OG LYKKE!';
+        this.typewriteText(welcomeMessage);
     }
 
     typewriteText(text) {
@@ -144,7 +149,7 @@ export class Timeline extends Phaser.Scene {
         isWriting = true;
         this.typeWriter(text);
     }
-    typeWriter(text) {
+    typeWriter(text = 'Ingen beskrivelse') {
         // reset tekst
         this.label.text = '';
         //this.disableInteractiveEvents();
@@ -163,14 +168,12 @@ export class Timeline extends Phaser.Scene {
         });
     }
 
-	typewriteTextWrapped(text) {
-		const lines = this.label.getWrappedText(text)
-		const wrappedText = lines.join('\n')
+    typewriteTextWrapped(text) {
+        const lines = this.label.getWrappedText(text)
+        const wrappedText = lines.join('\n')
 
         this.typewriteText(wrappedText)
     }
-    resolveLastMission() {
 
-    }
 
 }
