@@ -101,7 +101,8 @@ function checkTimeSettings() {
 
 
 function calculateYValue(xValue) {
-    let yValue = (-15 * xValue) + 2200;
+    const functionf = timeMachine[storyProgression].function;
+    let yValue = (functionf.a * xValue) + functionf.b;
     console.log(yValue);
     return yValue;
 };
@@ -112,7 +113,6 @@ function rotateBtnX(btnValue) {
     btnX.angle = newRotation;
 }
 function updateScreen(displayUnit) {
-    console.log(storyProgression);
     const progress = timeMachine[storyProgression];
     if(!progress) return;
     const functionComponents = progress.function;

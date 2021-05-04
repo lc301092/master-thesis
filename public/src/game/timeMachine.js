@@ -27,8 +27,8 @@ export const timeMachine =
         destinations: [
             {
                 sceneID: constants.SCENES.FARM,
-                year: 1990,
-                text: 'ADVARSEL: \n OPSKALERINGEN AF MEDICINUDVIKLING HAR FØRT TIL, AT DER SKAL DYRKES FLERE PLANTER TIL MEDICINBRUG. DU SKAL UD TIL LANDMÆND OG RÅDGIVE DEM I DYRKNING AF PLANTER. \n\nÅRSRTAL: [size=24][color=orange][b] 1990 [/b][/color][/size]\nMATEMATIK: STATISTIK OG LINEÆR REGRESSION '
+                year: 1966,
+                text: 'ADVARSEL: \n OPSKALERINGEN AF MEDICINUDVIKLING HAR FØRT TIL, AT DER SKAL DYRKES FLERE PLANTER TIL MEDICINBRUG. DU SKAL UD TIL LANDMÆND OG RÅDGIVE DEM I DYRKNING AF PLANTER. \n\nÅRSRTAL: [size=24][color=orange][b] 1966 [/b][/color][/size]\nMATEMATIK: STATISTIK OG LINEÆR REGRESSION '
             },
             // {
             //     sceneID: 'Placeholder scene',
