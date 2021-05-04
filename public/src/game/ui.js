@@ -89,9 +89,10 @@ export default class PlayerLog {
 export const textBox = {
     startOnComplete: function (scene, uiElement, text, speed, callback) {
         scene.player.setDisabled(true);
-        uiElement.setVisible(true);
         uiElement.once('complete', () => { return callback() }).start(text, speed);
-
+        setTimeout(() => {
+            uiElement.setVisible(true);
+        }, 5);
     },
     writeUiText: function (scene, uiElement, text, speed) {
         scene.player.setDisabled(true);
@@ -206,13 +207,13 @@ export const textBox = {
         return textBox;
     },
 
-    createInputField: function (scene, callback = null) {
+    createInputField: function (scene, callback = null, anchorConfig = null) {
         const anchor = scene.plugins.get('rexAnchor');
 
         let inputText = scene.add.rexInputText(0, 0, 10, 10, {
             id: 'myNumberInput',
             type: '0',
-            text: '0',
+            text: '',
             fontSize: '30px',
             // background: ''
         })
@@ -250,10 +251,14 @@ export const textBox = {
         }`;
         document.head.appendChild(style);
 
-        anchor.add(inputText, {
-            centerX: 'center+50',
+
+        let  config = {
+            centerX: 'center+85',
             bottom: 'bottom+5'
-        });
+        };
+        if (anchorConfig) config = anchorConfig;
+        anchor.add(inputText, config);
+
         inputText.setScrollFactor(0);
 
         let canvas = document.querySelector('canvas');

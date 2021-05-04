@@ -18,7 +18,7 @@ export default class Player {
     constructor(keys, collider, object) {
         this.input = new InputManager(keys);
         this.collider = collider;
-        collider.setFillStyle(0xff0000, 0.5).setDepth(50); // for debugging
+        //collider.setFillStyle(0xff0000, 0.5).setDepth(50); // for debugging
         this.object = object;
         this.animation = object.anims;
         this.disabled = false;

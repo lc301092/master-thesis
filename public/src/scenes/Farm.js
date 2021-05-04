@@ -9,8 +9,13 @@ let playerInteractionCollider;
 
 const tip3 = "Bog#3: \n\n..Observationer: Hyppigheden for hver observation er det antal gange observationen forekommer.";
 const tip4 = "Bog#4: \n\n..Middelværdi: Når man finder middelværdien af et datasæt, svarer det til at finde gennemsnittet at tallene.";
-const tip5 = "Bog#5:\n\n..Lineær funktion: Mangler";
-
+const tip5 = "Bog#5:\n\n..Lineær funktion: Hvis man kun har en enkel x- og y-værdi, kan man til tider bruge x1 = 0 og y1 = 0, som koordinatsæt (0,0) til at udregne en lineær regression";
+let bookindex = 3;
+const book = {
+    tip3: tip3,
+    tip4: tip4,
+    tip5: tip5
+}
 
 let scene;
 const sceneIndex = 1;
@@ -98,6 +103,9 @@ let collideables;
 let uiTextBox;
 let uiTextBoxInput;
 let uiPlayerLog;
+let logUpdated1 = false;
+let logUpdated2 = false;
+let logUpdated3 = false;
 
 const signStyle = { fontSize: 15, color: 'black' }
 let signNumber0;
@@ -166,10 +174,14 @@ export class Farm extends Phaser.Scene {
         const gameObjects = {
             bookShelf: {
                 collider: scene.add.rectangle(40, 330, 50, 50,
-                    0xff0000, 0.5).setDepth(5),
+                    //0xff0000, 0.5
+                ).setDepth(5),
                 action: () => {
-                    const text = 'erstat med tip3, tip4, tip5';
+
+                    const text = book['tip' + bookindex];
                     textBox.writeUiText(scene, uiTextBox, text, 50);
+                    bookindex++
+                    if (bookindex > 5) bookindex = 3;
                 }
             },
             field0:
@@ -218,12 +230,16 @@ export class Farm extends Phaser.Scene {
             },
             emptyBox0: {
                 collider: scene.add.rectangle(262, 638, 40, 20,
-                    0xff0000, 0.5).setDepth(5),
+                    //0xff0000, 0.5
+                ).setDepth(5),
                 action: () => {
-                    // const text = 'Her skal der være information om nelliker';
+                    if (!logUpdated2) {
+                        uiPlayerLog.setText('Udregn hvilken jord, der passer til plantens vandbehov');
+                        logUpdated2 = true;
+                        logUpdated1 = true;
+                    }
                     objective.seeds[0].dataSheet.setVisible(true);
                     objective.hasSeeds = true;
-                    //textBox.writeUiText(scene, uiTextBox, text, 50);
                 },
                 images: [scene.add.image(262, 638, 'nelliker.png').setScale(0.15).setDepth(5),
                 scene.add.image(270, 640, 'nelliker.png').setScale(0.15).setDepth(5),
@@ -236,12 +252,15 @@ export class Farm extends Phaser.Scene {
             },
             emptyBox1: {
                 collider: scene.add.rectangle(314, 638, 40, 20,
-                    0xff0000, 0.5).setDepth(5),
+                    //  0xff0000, 0.5
+                ).setDepth(5),
                 action: () => {
-                    // const text = 'Her skal der være information om lægeærenpris';
-                    objective.hasSeeds = true;
+                    if (!logUpdated2) {
+                        uiPlayerLog.setText('Udregn hvilken jord, der passer til plantens vandbehov');
+                        logUpdated2 = true;
+                        logUpdated1 = true;
+                    } objective.hasSeeds = true;
                     objective.seeds[1].dataSheet.setVisible(true);
-                    // textBox.writeUiText(scene, uiTextBox, text, 50);
                 }, images: [scene.add.image(262, 638, 'ærenpris.png').setScale(0.15).setDepth(5),
                 scene.add.image(325, 640, 'ærenpris.png').setScale(0.18).setDepth(5),
                 scene.add.image(310, 638, 'ærenpris.png').setScale(0.18).setDepth(5),
@@ -252,12 +271,15 @@ export class Farm extends Phaser.Scene {
             ,
             emptyBox2: {
                 collider: scene.add.rectangle(360, 638, 40, 20,
-                    0xff0000, 0.5).setDepth(5),
+                    //0xff0000, 0.5
+                ).setDepth(5),
                 action: () => {
-                    // const text = 'Her skal der være information om snerleklokke';
-                    objective.hasSeeds = true;
+                    if (!logUpdated2) {
+                        uiPlayerLog.setText('Udregn hvilken jord, der passer til plantens vandbehov');
+                        logUpdated2 = true;
+                        logUpdated1 = true;
+                    } objective.hasSeeds = true;
                     objective.seeds[2].dataSheet.setVisible(true);
-                    // textBox.writeUiText(scene, uiTextBox, text, 50);
                 }, images: [scene.add.image(262, 638, 'kamille.png').setScale(0.15).setDepth(5),
                 scene.add.image(375, 640, 'kamille.png').setScale(0.25).setDepth(5),
                 scene.add.image(360, 638, 'kamille.png').setScale(0.25).setDepth(5),
@@ -267,7 +289,8 @@ export class Farm extends Phaser.Scene {
             },
             fullBox: {
                 collider: scene.add.rectangle(120, 638, 160, 20,
-                    0xff0000, 0.5).setDepth(5),
+                    //0xff0000, 0.5
+                ).setDepth(5),
                 action: () => {
                     const text = 'Det er da altid noget, at hun har haft succes med at plante afgrøder.. heh';
                     objective.hasSeeds = true;
@@ -276,7 +299,8 @@ export class Farm extends Phaser.Scene {
             },
             axe: {
                 collider: scene.add.rectangle(32, 455, 20, 20,
-                    0xff0000, 0.5).setDepth(5),
+                    // 0xff0000, 0.5
+                ).setDepth(5),
                 action: () => {
                     const text = 'Jeg var ikke klar over at man havde brug for en økse, for at plante afgrøder... hmm..';
                     textBox.writeUiText(scene, uiTextBox, text, 50);
@@ -284,12 +308,12 @@ export class Farm extends Phaser.Scene {
             },
             npc: {
                 collider: scene.add.rectangle(225, 495, 25, 40,
-                    0xff0000, 0.5
+                    // 0xff0000, 0.5
                 ), action: npcInteraction
             },
             portal: {
                 collider: scene.add.rectangle(140, 330, 50, 70,
-                    0xff0000, 0.5 // debugging purposes
+                    //0xff0000, 0.5 // debugging purposes
                 ),
                 action: portalInteraction
             },
@@ -304,7 +328,7 @@ export class Farm extends Phaser.Scene {
             },
             woodsign0: {
                 collider: scene.add.rectangle(290, 530, 20, 20,
-                    0xff0000, 0.5 // debugging purposes
+                    // 0xff0000, 0.5 // debugging purposes
                 ),
                 action: () => {
                     const index = 0;
@@ -315,7 +339,7 @@ export class Farm extends Phaser.Scene {
             },
             woodsign1: {
                 collider: scene.add.rectangle(530, 530, 20, 20,
-                    0xff0000, 0.5 // debugging purposes
+                    // 0xff0000, 0.5 // debugging purposes
                 ),
                 action: () => {
                     const index = 1;
@@ -325,7 +349,7 @@ export class Farm extends Phaser.Scene {
             },
             woodsign2: {
                 collider: scene.add.rectangle(690, 530, 20, 20,
-                    0xff0000, 0.5 // debugging purposes
+                    // 0xff0000, 0.5 // debugging purposes
                 ),
                 action: () => {
                     const index = 2;
@@ -444,13 +468,13 @@ const portalInteraction = () => {
                 // TODO check wether objective is correct or not.
                 const objectives = objective.fields;
                 let isCorrect1 = objectives[0].type == 'nelliker' && objectives[1].type == 'kamille' && objectives[2].type == 'lægeærenpris';
-                let isCorrect2 = objectives[0].daysToHarvest > 44 < 47 && objectives[1].daysToHarvest == 70 && objectives[2].daysToHarvest > 11 < 14 ;
+                let isCorrect2 = objectives[0].daysToHarvest > 44 < 47 && objectives[1].daysToHarvest > 26 < 29 && objectives[2].daysToHarvest > 11 < 14;
                 objective.isCorrect = isCorrect1 && isCorrect2;
 
                 console.log(isCorrect1);
                 console.log(isCorrect2);
                 console.log(objective.isCorrect);
-                
+
 
                 // Save answers!
                 playerData.answers[sceneIndex] = objective;
@@ -478,31 +502,41 @@ const npcInteraction = () => {
         ['Planter skal bruges til at producere medicin, som skal bruges hurtigst muligt, da det kan redde en masse menneskeliv'],
         ['Der står noget om planterne nede ved de grå kasser, har du tjekket det?'],
         ['Hey det der ser ikke helt dumt ud. Kan du ikke lige gøre mig en sidste tjeneste og angive på skiltene, hvornår planterne skal høstes. Det bliver nemlig nogle andre end mig, som holder opsyn og høster'],
-        ['Placeholder tekst 5']
+        ['Jeg har lige taget nogle noter og udregnet jordens porøsitet. Så sender jeg det videre til de næste. Tusind tak for hjælpen, jeg tror ikke der er så meget andet end at vente og håbe på det bedste'],
+        ['...']
     ]
-    textBox.writeUiText(scene, uiTextBox, texts[npcState], 50);
+    textBox.startOnComplete(scene, uiTextBox, texts[npcState], 50, function () {
 
-    switch (npcState) {
-        // npc is only ever 0 the first time the player speaks to them.
-        case 0:
-            npcState++;
-            break;
-        case 1:
-            npcState++;
-            break;
-        case 2:
-            //npcState++;
-            break;
-        case 3:
-            q1hasRunOnce = true;
-            //npcState++;
-            break;
-        case 4:
-            q2hasRunOnce = true;
-            break;
-    }
+        switch (npcState) {
+            // npc is only ever 0 the first time the player speaks to them.
+            case 0:
+                npcState++;
+                uiPlayerLog.setText('Du skal plante: nelliker, ærenpris og kamille');
+                logUpdated1 = true;
+                break;
+            case 1:
+                npcState++;
+                break;
+            case 2:
+                //npcState++;
+                break;
+            case 3:
+                q1hasRunOnce = true;
+                if (!logUpdated3) {
+                    logUpdated3 = true;
+                    uiPlayerLog.setText('Udregn funktionerne for planternes vækst og notér en passende højde for deres høst');
+                }
+                break;
+            case 4:
+                q2hasRunOnce = true;
+                npcState++;
+                break;
+            case 5:
+                break;
+        }
 
-    if (texts[npcState] == -1) npcState = 1;
+        if (texts[npcState] == -1) npcState = 1;
+    });
 
 }
 
@@ -590,9 +624,9 @@ function plantSeed(plantIndex) {
 function checkIfDone(questIndex) {
     let quest = objective.fields;
     let key;
-    if(questIndex == 1) key = 'type';
-    
-    else if(questIndex == 2) key = 'daysToHarvest';
+    if (questIndex == 1) key = 'type';
+
+    else if (questIndex == 2) key = 'daysToHarvest';
 
     let counter = 0;
 
@@ -600,9 +634,9 @@ function checkIfDone(questIndex) {
         const questObj = element[key];
         if (questObj) counter++;
     });
-        
 
-    
+
+
     if (counter == 3 && !q2hasRunOnce && questIndex == 2) {
         console.log('quest 2 complete');
         npcState = 4;
@@ -630,7 +664,7 @@ function writeOnSign(signIndex) {
         const text = 'Plant nogle frø først';
         textBox.writeUiText(scene, uiTextBox, text, 50);
     } else {
-        const text = ['', 'Skriv dage til høst: '];
+        const text = ['', 'Kan høstes, når den er:     cm høj'];
         textBox.createInputField(scene, function (signNumber) {
             const field = signsObjective[signIndex];
             const canvas = document.querySelector('canvas');
@@ -639,7 +673,7 @@ function writeOnSign(signIndex) {
             field.daysToHarvest = signNumber;
 
             canvas.style.position = 'relative';
-            checkIfDone(2); 
+            checkIfDone(2);
         });
         textBox.writeUiText(scene, uiTextBoxInput, text, 0);
     }
