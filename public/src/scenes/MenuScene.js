@@ -2,6 +2,7 @@ import { constants } from "../constants.js"
 
 let playerData;
 
+
 export class MenuScene extends Phaser.Scene {
     constructor() {
         super({
@@ -14,6 +15,7 @@ export class MenuScene extends Phaser.Scene {
     preload() {
     }
     create() {
+        const music = this.sound.add('menu').play({volume: 0.1});
         let canvas = document.querySelector('canvas');
 
         console.log(canvas);
@@ -26,7 +28,7 @@ export class MenuScene extends Phaser.Scene {
         let height = this.cameras.main.height;
         let loadingText = this.make.text({
             x: width / 2,
-            y: height / 2 - 50,
+            y: height / 2 + 100,
             text: 'Tryk på skærmen for at komme videre',
             style: {
                 font: '20px monospace',

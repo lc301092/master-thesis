@@ -75,6 +75,7 @@ export class IntroScene extends Phaser.Scene {
                     state = 4;
                 }
                 else if (state === 4) {
+                    this.sound.removeByKey('menu');
                     this.scene.start(constants.SCENES.PLAY, playerData);
                 }
 

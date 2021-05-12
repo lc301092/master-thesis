@@ -4,6 +4,8 @@ const COLOR_WHITE = 0xffffff;
 const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
+const COLOR_BLUE = 0x0096FF;
+const COLOR_LIGHTBLUE = 0xF0FFFF;
 const GetValue = Phaser.Utils.Objects.GetValue;
 const uiLayer = 20;
 const uiLayerOnTop = 21;
@@ -16,8 +18,9 @@ export default class PlayerLog {
 
     // container config should contain x,y,width,height 
     constructor(scene) {
-        this.scene = scene
-        this.background = scene.add.rectangle(0, 0, 200, 350, COLOR_WHITE).setOrigin(0);
+        this.scene = scene;
+        this.sound = scene.sound.add('toggle_log',{volume: 0.2});
+        this.background = scene.add.rectangle(0, 0, 200, 350, COLOR_WHITE).setOrigin(0).setStrokeStyle(5, COLOR_BLUE).setFillStyle(COLOR_LIGHTBLUE);
         this.visible;
         this.baseYValue = this.background.y + 20;
         this.nextTextPostition = 20;
@@ -28,16 +31,19 @@ export default class PlayerLog {
             top: 'top+10',
             right: 'right-210'
         })
-        this.uiButton = scene.add.image(0, 0, 'Log_icon.png').setScale(0.15).setOrigin(0).setInteractive({ useHandCursor: true }).setScrollFactor(0).setDepth(uiLayerOnTop);
+        this.uiButton = scene.add.image(0, -18, 'Log_icon.png').setScale(0.15).setInteractive({ useHandCursor: true }).setScrollFactor(0).setDepth(uiLayerOnTop);
         this.uiButton.on('pointerdown', () => {
             this.toggle.bind(this);
             this.toggle();
         });
-        this.anchor.add(this.uiButton, {
-            bottom: 'bottom-20',
-            left: 'left+10'
+        this.buttonBg = scene.add.rectangle(0, 0, 80, 80, COLOR_WHITE).setStrokeStyle(5, COLOR_BLUE,0.5).setFillStyle(COLOR_LIGHTBLUE,0.5);
+        this.buttonContainer = scene.add.container(0, 0, [this.buttonBg, this.uiButton]).setDepth(uiLayer).setScrollFactor(0).setVisible(true);
+        this.anchor.add(this.buttonContainer, {
+            bottom: 'bottom-50',
+            left: 'left+50'
         });
-    }
+        
+}
 
 
     toggle() {
@@ -52,11 +58,15 @@ export default class PlayerLog {
         if (container.visible) {
             container.setVisible(false);
             uiButton.setTexture('Log_icon.png');
+            uiButton.y = -18;
         }
         else {
             container.setVisible(true)
             uiButton.setTexture('Log_icon_open.png');
+            uiButton.y = 0;
         }
+
+        this.sound.play();
     }
 
     setText(text, indent = 10, style = null) {
@@ -80,6 +90,7 @@ export default class PlayerLog {
 
         this.container.add(textObj);
         this.uiButton.setTexture('Log_icon_new.png');
+        this.uiButton.y = -18;
         //return textObj;
     }
 
@@ -113,7 +124,7 @@ export const textBox = {
             fixedHeight: 65,
         };
 
-        const iconImage = (hasPointerEvents) ? 'flueben_v2.png': 'enter_keyboard.png';
+        const iconImage = (hasPointerEvents) ? 'flueben_v2.png' : 'enter_keyboard.png';
 
         var wrapWidth = GetValue(config, 'wrapWidth', 0);
         var fixedWidth = GetValue(config, 'fixedWidth', 0);
@@ -143,19 +154,19 @@ export const textBox = {
         scene.input.keyboard.addKey('ENTER').on('down', function (event) {
             var icon = textBox.getElement('action').setVisible(false);
             textBox.resetChildVisibleState(icon);
-                    if (textBox.isLastPage && !textBox.isTyping) {
-                        textBox.setVisible(false);
-                        player.setDisabled(false);
-                        textBox.emit('complete');
-                    };
-                    if (textBox.isTyping) {
-                        textBox.stop(true);
-                    } else {
-                        textBox.typeNextPage();
-                    }
+            if (textBox.isLastPage && !textBox.isTyping) {
+                textBox.setVisible(false);
+                player.setDisabled(false);
+                textBox.emit('complete');
+            };
+            if (textBox.isTyping) {
+                textBox.stop(true);
+            } else {
+                textBox.typeNextPage();
+            }
             // textBox.setVisible(false);
             // player.setDisabled(false);
-            
+
         });
         if (hasPointerEvents) {
             textBox.setInteractive({ useHandCursor: true })
@@ -189,10 +200,10 @@ export const textBox = {
                         yoyo: false
                     });
                 }, textBox);
-        } else{
-            textBox.on('pageend', function(){
-                if(textBox.visible)
-                textBox.getElement('action').setVisible(true);
+        } else {
+            textBox.on('pageend', function () {
+                if (textBox.visible)
+                    textBox.getElement('action').setVisible(true);
             })
         }
 
@@ -252,7 +263,7 @@ export const textBox = {
         document.head.appendChild(style);
 
 
-        let  config = {
+        let config = {
             centerX: 'center+85',
             bottom: 'bottom+5'
         };

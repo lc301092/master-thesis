@@ -73,6 +73,8 @@ export class ChemistLevel extends Phaser.Scene {
     }
     create() {
         scene = this;
+        scene.sound.removeByKey('base');        
+        const backgroundMusic = scene.sound.play('kemi', {volume: 0.2});
         // tilemap configurations
 
         let chemist_lvl = this.add.tilemap('scenarie1');
@@ -289,9 +291,9 @@ function npcInteraction() {
             scenarioLog.rules.push(rule1, rule2);
 
             textBox.startOnComplete(this, uiTextBox, ruleText, 50, function () {
+                uiPlayerLog.toggle();
                 uiPlayerLog.setText(rule1);
                 uiPlayerLog.setText(rule2);
-                uiPlayerLog.toggle();
                 console.log('done');
             });
         }

@@ -24,7 +24,18 @@ export const constants = {
         alt_interact: 'SPACE',
         sprint: 'shift'
     },
-    AUDIO: {},
+    AUDIO: {
+        BUTTON_TURN: 'button_turn.wav',
+        COMPUTER_WRITE: 'computer_write2.wav',
+        COMPUTER_ON: 'computer_on.wav',
+        TIME_TRAVEL: 'time_travel.mp3',
+        MENU: 'menu.m4a',
+        BASE: 'base.m4a',
+        CHEMIST: 'kemi.m4a',
+        FARM: 'farm.m4a',
+        TOGGLE: 'toggle_log.wav',
+        WRONG: 'wrong.m4a'
+    },
     IMAGES: {
         BASE_MAP: 'map.png',
         BASE_MAP2: 'map2.png',
@@ -81,7 +92,11 @@ export const constants = {
         NELLIKER_DATA: 'nelliker_data.png',
         KAMILLE_DATA: 'kamille_data.png',
         ENTER_IMAGE: 'enter_keyboard.png',
-        PLANT: 'plant.png'
+        PLANT: 'plant.png',
+        TUTORIAL_ARROWS: 'tutorial-ARROWS.png',
+        TUTORIAL_WASD: 'tutorial-WASD.png',
+        TUTORIAL_E: 'tutorial-E.png',
+        TUTORIAL_SPACE: 'tutorial-SPACE.png'
     },
     SPRITES: {
         PC: 'playable_charaters.png',

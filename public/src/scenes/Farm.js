@@ -75,19 +75,19 @@ const objective = {
     activeField: '',
     fields: [
         {
-            type: null,
+            type: '',
             imageArray: [],
             daysToHarvest: null,
             earth: null,
             sign: null
         },
         {
-            type: null,
+            type: '',
             imageArray: [],
             daysToHarvest: null,
             sign: null
         }, {
-            type: null,
+            type: '',
             imageArray: [],
             daysToHarvest: null,
             sign: null
@@ -138,15 +138,16 @@ export class Farm extends Phaser.Scene {
     }
     create() {
         scene = this;
-
+        scene.sound.removeByKey('base');        
+        const backgroundMusic = scene.sound.play('farm', {volume: 0.2});
         // add tileset image
         let tileImages = constants.TILEIMAGES.FARM_LVL;
         let images = constants.IMAGES;
         let tileObj = {};
-
-        objective.fields[0].sign = scene.add.text(280, 527, '', signStyle).setDepth(6);
-        objective.fields[1].sign = scene.add.text(520, 527, '', signStyle).setDepth(6);
-        objective.fields[2].sign = scene.add.text(680, 527, '', signStyle).setDepth(6);
+// 
+        objective.fields[0].sign = scene.add.text(272, 527, '', signStyle).setDepth(6);
+        objective.fields[1].sign = scene.add.text(512, 527, '', signStyle).setDepth(6);
+        objective.fields[2].sign = scene.add.text(672, 527, '', signStyle).setDepth(6);
 
 
         const anchorConfig = {
@@ -234,6 +235,7 @@ export class Farm extends Phaser.Scene {
                 ).setDepth(5),
                 action: () => {
                     if (!logUpdated2) {
+                        uiPlayerLog.toggle();
                         uiPlayerLog.setText('Udregn hvilken jord, der passer til plantens vandbehov');
                         logUpdated2 = true;
                         logUpdated1 = true;
@@ -256,6 +258,7 @@ export class Farm extends Phaser.Scene {
                 ).setDepth(5),
                 action: () => {
                     if (!logUpdated2) {
+                        uiPlayerLog.toggle();
                         uiPlayerLog.setText('Udregn hvilken jord, der passer til plantens vandbehov');
                         logUpdated2 = true;
                         logUpdated1 = true;
@@ -275,6 +278,7 @@ export class Farm extends Phaser.Scene {
                 ).setDepth(5),
                 action: () => {
                     if (!logUpdated2) {
+                        uiPlayerLog.toggle();
                         uiPlayerLog.setText('Udregn hvilken jord, der passer til plantens vandbehov');
                         logUpdated2 = true;
                         logUpdated1 = true;
@@ -292,7 +296,7 @@ export class Farm extends Phaser.Scene {
                     //0xff0000, 0.5
                 ).setDepth(5),
                 action: () => {
-                    const text = 'Det er da altid noget, at hun har haft succes med at plante afgrøder.. heh';
+                    const text = 'Det er da altid noget, at hun har haft succes med at så andre afgrøder.. heh';
                     objective.hasSeeds = true;
                     textBox.writeUiText(scene, uiTextBox, text, 50);
                 }
@@ -302,7 +306,7 @@ export class Farm extends Phaser.Scene {
                     // 0xff0000, 0.5
                 ).setDepth(5),
                 action: () => {
-                    const text = 'Jeg var ikke klar over at man havde brug for en økse, for at plante afgrøder... hmm..';
+                    const text = 'Jeg var ikke klar over at man havde brug for en økse, for at arbejde med planter... Hun har nok brug for lidt hjælp..';
                     textBox.writeUiText(scene, uiTextBox, text, 50);
                 }
             },
@@ -498,11 +502,11 @@ const npcInteraction = () => {
     // determine what npc will say
 
     const texts = [
-        ['Jeg forstår det bare ikke!', 'Uanset hvad vi gør, kan vi ikke få planterne til at gro ordenligt.', 'Der kan sagtens gro kartofler i den mørke muldjord her, men de her planter er umulige! U-m-u-l-i-g-e siger jeg dig', 'Hvis du kan fikse problemerne er du mere end velkommen til at tage for dig i de grå kasser dernede', 'Frøene du skal plante er nelliker, lægeærenpris og kamille'],
-        ['Planter skal bruges til at producere medicin, som skal bruges hurtigst muligt, da det kan redde en masse menneskeliv'],
-        ['Der står noget om planterne nede ved de grå kasser, har du tjekket det?'],
-        ['Hey det der ser ikke helt dumt ud. Kan du ikke lige gøre mig en sidste tjeneste og angive på skiltene, hvornår planterne skal høstes. Det bliver nemlig nogle andre end mig, som holder opsyn og høster'],
-        ['Jeg har lige taget nogle noter og udregnet jordens porøsitet. Så sender jeg det videre til de næste. Tusind tak for hjælpen, jeg tror ikke der er så meget andet end at vente og håbe på det bedste'],
+        ['Jeg forstår det bare ikke!', 'Uanset hvad vi gør, kan vi ikke få planterne til at gro ordenligt.', 'Der kan sagtens gro kartofler i den mørke muldjord her, men de her planter er umulige! U-m-u-l-i-g-e siger jeg dig', 'Hvis du kan fikse problemerne er du mere end velkommen til at tage for dig i de grå kasser dernede', 'Frøene du skal så er nelliker, lægeærenpris og kamille'],
+        ['Jeg har tre typer jord, men det er ikke alle frø, der kan gro i de forskellige typer jord... Men! Du kan finde informationer på frøene ved de grå kasser dernede, og jeg har udført nogle jordmålinger, der ligger henne ved hver plantage'],
+        ['Planter skal bruges til at producere medicin, som skal bruges hurtigst muligt, så det kan redde en masse menneskeliv'],
+        ['Hey det der ser ikke helt dumt ud. ','' ,'','Kan du gøre mig en sidste tjeneste? Ser du, ved frøene står der hvornår de normalt høstes, men vi har altså lidt travlt her, så de skal altså bare høstes, når de får en tilpas nok højde. Når du har udregnet en plantes højde, så skriv det på skiltene foran jorden, hvor du har sået den'],
+        ['Så er der ikke andet end at vente og måle hver dag. Tusind tak for hjælpen! Imens du fiksede planternes optimale høsthøjde fik jeg lige færdigskrevet noget om de forskellige jordtypers porøsitet.'],
         ['...']
     ]
     textBox.startOnComplete(scene, uiTextBox, texts[npcState], 50, function () {
@@ -511,7 +515,9 @@ const npcInteraction = () => {
             // npc is only ever 0 the first time the player speaks to them.
             case 0:
                 npcState++;
-                uiPlayerLog.setText('Du skal plante: nelliker, ærenpris og kamille');
+                if(logUpdated1) return;
+                uiPlayerLog.toggle();
+                uiPlayerLog.setText('Du skal så: nelliker, ærenpris og kamille');
                 logUpdated1 = true;
                 break;
             case 1:
@@ -523,8 +529,9 @@ const npcInteraction = () => {
             case 3:
                 q1hasRunOnce = true;
                 if (!logUpdated3) {
+                    uiPlayerLog.toggle();
                     logUpdated3 = true;
-                    uiPlayerLog.setText('Udregn funktionerne for planternes vækst og notér en passende højde for deres høst');
+                    uiPlayerLog.setText('Udregn funktionerne for planternes vækst og notér en passende højde til høst');
                 }
                 break;
             case 4:
@@ -563,7 +570,7 @@ function inspectField(fieldIndex) {
             text: 'Vent lidt',
             action: closeEarthData
         },
-        title: 'Hvad vil du gerne plante her?'
+        title: `Her er der plantet: ${field.type} \n Hvad vil du gerne så i denne jord?`
     };
     textBox.createDialog(scene, dialogueConfig);
 }
@@ -661,15 +668,16 @@ function closeEarthData() {
 function writeOnSign(signIndex) {
     const signsObjective = objective.fields;
     if (!signsObjective[signIndex].type) {
-        const text = 'Plant nogle frø først';
+        const text = 'Så nogle frø først';
         textBox.writeUiText(scene, uiTextBox, text, 50);
     } else {
         const text = ['', 'Kan høstes, når den er:     cm høj'];
         textBox.createInputField(scene, function (signNumber) {
+            if(signNumber.trim() == '') return;
             const field = signsObjective[signIndex];
             const canvas = document.querySelector('canvas');
 
-            field.sign.setText(signNumber);
+            field.sign.setText(signNumber + 'cm');
             field.daysToHarvest = signNumber;
 
             canvas.style.position = 'relative';

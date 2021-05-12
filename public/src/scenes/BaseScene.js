@@ -2,11 +2,9 @@ import { constants } from "../constants.js"
 import Player from "../game/player.js"
 import { textBox } from "../game/ui.js";
 
-// 
+
 let playerSprite, playerData, scene;
 let playerInteractionCollider;
-const ADJUST_RANGE_Y = 30;
-const ADJUST_RANGE_X = 15;
 
 let uiTextBox;
 const correctItems = [{
@@ -35,6 +33,13 @@ const correctItems = [{
     //,{}
 ];
 
+let isTutorialComplete
+let tutorialKey;
+let tutorialAltKey;
+let tutorialText2;
+let tutorialContainer;
+
+let audio;
 
 export class Base extends Phaser.Scene {
     constructor() {
@@ -51,6 +56,7 @@ export class Base extends Phaser.Scene {
         playerData = data;
         playerSprite.x = data.playerPosition.x;
         playerSprite.y = data.playerPosition.y;
+        isTutorialComplete = playerData.isTutorialComplete;
 
         let keys = this.input.keyboard.addKeys(constants.USERINPUT);
         playerInteractionCollider = this.add.rectangle(playerSprite.x, playerSprite.y, playerSprite.width / 2, playerSprite.height / 2,
@@ -61,11 +67,15 @@ export class Base extends Phaser.Scene {
 
     }
     preload() {
+        //audio = this.load.audio('wrong', ['/assets/audio/wrong.mp3']);
 
     }
 
     create() {
         scene = this;
+        scene.sound.removeByKey('kemi');
+        scene.sound.removeByKey('farm');
+        const backgroundMusic = scene.sound.add('base',{volume: 0.2}).play();
         // tilemap configurations
 
         let tilemap = this.add.tilemap('baseSceneTest');
@@ -103,7 +113,7 @@ export class Base extends Phaser.Scene {
                 const action = correctItems[i].message;
                 let correctItem = scene.add.image(x, y, name).setScale(scale);
                 let itemCollider = this.add.rectangle(x, y, correctItem.displayWidth / 2, correctItem.displayHeight,
-                 //   0xff0000, 0.5 // debugging purposes
+                    //   0xff0000, 0.5 // debugging purposes
                 );
                 correctItems[i].collider = itemCollider;
                 collideables.add(itemCollider);
@@ -116,10 +126,22 @@ export class Base extends Phaser.Scene {
         uiTextBox = textBox.createTextBox(this);
 
         //        scene.physics.add.overlap(playerInteractionCollider, itemCollider, , null, this);
+        if (!isTutorialComplete) startTutorial();
 
     }
     update() {
         this.player.update();
+
+        if (this.player.isMoving && !isTutorialComplete) {
+            tutorialKey.setTexture(constants.IMAGES.TUTORIAL_E);
+            tutorialAltKey.setTexture(constants.IMAGES.TUTORIAL_SPACE).setScale(0.2);
+            tutorialText2.setText('For at interagere \n med objekter');
+            tutorialText2.y = 45;
+        }
+
+        if(this.player.isInteracting()){
+           // this.sound.play('button_turn');
+        }
     }
 
 }
@@ -220,6 +242,8 @@ function setupTilemap(scene, baseSceneTest) {
             console.log('Observér tidslinjen');
             playerData.playerPosition.x = playerSprite.x;
             playerData.playerPosition.y = playerSprite.y;
+            playerData.isTutorialComplete = true;
+            scene.sound.play('computer_on',{volume: 0.1});
             scene.scene.start(constants.SCENES.TIMELINE, playerData);
             // --- indstil tidsmaskine "scene" kode her ---
         };
@@ -231,8 +255,31 @@ function setupTilemap(scene, baseSceneTest) {
             console.log('Tidsmaskine aktiveret');
             playerData.playerPosition.x = playerSprite.x;
             playerData.playerPosition.y = playerSprite.y;
+            playerData.isTutorialComplete = true;
             scene.scene.start(constants.SCENES.TIME_MACHINE, playerData);
             // --- skift scene til laboratorie kode her ---
         };
     });
+}
+function startTutorial() {
+    const tutorialX = playerSprite.x;
+    const tutorialY = playerSprite.y;
+    console.log(tutorialX);
+    console.log(tutorialY);
+
+    let tutorialBG = scene.add.rectangle(0, 0, 150, 160, 0x000000).setStrokeStyle(5, 0xff00a2, 0.5).setFillStyle(0xff00ff, 0.5);
+
+    tutorialKey = scene.add.image(0, -40, constants.IMAGES.TUTORIAL_ARROWS).setScale(0.3);
+    tutorialAltKey = scene.add.image(0, 30, constants.IMAGES.TUTORIAL_WASD).setScale(0.3);
+    let tutorialText = scene.add.text(-15, -12, 'ELLER', {
+        fontSize: 10
+    });
+    tutorialText2 = scene.add.text(-60, 60, 'For at bevæge dig', {
+        fontSize: 12
+    });
+
+    tutorialContainer = scene.add.container(tutorialX, tutorialY, [tutorialBG, tutorialKey, tutorialText, tutorialAltKey, tutorialText2]).setDepth(20).setScrollFactor(0).setVisible(false);
+    setTimeout(() => {
+        tutorialContainer.setVisible(true);
+    }, 6000);
 }

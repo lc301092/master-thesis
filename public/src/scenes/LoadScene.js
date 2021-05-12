@@ -62,7 +62,8 @@ export class LoadScene extends Phaser.Scene {
                 break;
             case 'audio':
                 for (const key in constants.AUDIO) {
-                    this.load.image(constants.AUDIO[key], constants.AUDIO[key])
+                    const audioKey = constants.AUDIO[key].split('.')[0]; 
+                    this.load.audio(audioKey, constants.AUDIO[key])
                 }
                 break;
             case 'sprite':
@@ -103,6 +104,7 @@ export class LoadScene extends Phaser.Scene {
         });
 
         this.loadResources('image');
+        this.loadResources('audio');
         this.loadResources('tilemap');
 
         let width = this.cameras.main.width;

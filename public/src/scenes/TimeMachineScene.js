@@ -1,6 +1,7 @@
 import { constants } from "../constants.js"
 import {timeMachine} from '../game/timeMachine'
 
+let scene;
 
 let storyProgression;
 let playerData;
@@ -13,6 +14,7 @@ let compupterStyle = { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, ser
 let textPlugin;
 
 let DragRotate;
+let audio;
 // const rotationIntervals = [0,45,90,135,180,225,270,315,360];
 const rotationInterval = 45;
 const rotationIntervals = [0, 45, 90, 135, 180, -45, -90, -135, -180];
@@ -39,10 +41,12 @@ export class TimeMachineScene extends Phaser.Scene {
         DragRotate = this.plugins.get('rexDragRotate');
     }
     create() {
+        scene = this;
+        audio = this.sound;
         this.add.image(50, 50, 'bg_time_device.png').setOrigin(0);
         btnX = this.add.image(259, 416, constants.IMAGES.BTN_TIME_MACHINE);
 
-        createButton(this, btnX.x, btnX.y, 70, btnX).setInteractive({ useHandCursor: true });
+        createButton(btnX.x, btnX.y, 70, btnX).setInteractive({ useHandCursor: true });
 
         this.add.image(100, 200, 'clear_screen.png').setOrigin(0).setScale(0.4, 0.2);
 
@@ -94,9 +98,12 @@ function checkTimeSettings() {
         playerData.playerProgression.push(destination);
         playerData.activeScene = destination.sceneID;
         localStorage.setItem('foobar', JSON.stringify(playerData));
-        this.scene.start(sceneID, playerData);
+        travelTo(sceneID,playerData);
+        return;
     }
     // TODO make feedback (sound, red flash w/e.. ) for wrong answer here 
+    scene.cameras.main.flash();
+    scene.sound.play('wrong');
 }
 
 
@@ -124,7 +131,7 @@ function updateScreen(displayUnit) {
     displayFunction.setText(functionf);
 }
 
-function createButton(scene, x, y, radius, imageToRotate) {
+function createButton(x, y, radius, imageToRotate) {
     let config = {
         x: x,
         y: y,
@@ -164,6 +171,7 @@ function createButton(scene, x, y, radius, imageToRotate) {
             button.setTint(color);
         })
         .on('dragend', function (dragRotate) {
+            audio.play('button_turn');
             button.setTint(ColorGray);
             let angle = imageToRotate.angle;
             // let angle = Math.abs(imageToRotate.angle);
@@ -207,7 +215,20 @@ const getBtnxValue = (currentPos, isMovingWithClock) => {
 
     previousPos = currentPos;
 
-    console.log('display position: ' + intervalCounter);
+    //console.log('display position: ' + intervalCounter);
     return intervalCounter;
 
 };
+
+function travelTo(level, data){
+    const activateSound = scene.sound.add('time_travel'); 
+    const duration = (activateSound.totalDuration*2/3)*1000; 
+    const camera = scene.cameras.main;
+    camera.shake(duration,0.02);
+    camera.fadeOut(duration, 0,0,70);
+    console.log('playing sound');
+    activateSound.play();
+    activateSound.once('complete',() => {
+        scene.scene.start(level,data);
+    })
+}

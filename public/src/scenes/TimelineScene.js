@@ -15,6 +15,9 @@ let welcome = true;
 let isWriting;
 let textPlugin;
 
+let computerWriteSound;
+
+
 
 
 export class Timeline extends Phaser.Scene {
@@ -38,6 +41,7 @@ export class Timeline extends Phaser.Scene {
 
     create() {
         let scene = this;
+        computerWriteSound = scene.sound.add('computer_write2', { volume: 0.1 });
         const header = scene.add.text(330, 50, 'Tidslinje', {
             fill: '#31FDF0',
             fontSize: '25px'
@@ -80,7 +84,7 @@ export class Timeline extends Phaser.Scene {
 
         // event billede til andet scenarie
         const availableScenarios = timeMachine[storyProgression];
-        if (!availableScenarios){
+        if (!availableScenarios) {
             const endMessage = 'TIDSLINJEN ER BLEVET GENOPRETTET, KØRER STATUS...             ...                                10%...                                           60%...                                       99%...                      ...'
             this.typeWriter(endMessage);
             alert('Demoen er nu slut. Mange tak fordi du ville spille med! Du kan lukke vinduet nu eller blive hængende og kigge rundt');
@@ -142,6 +146,11 @@ export class Timeline extends Phaser.Scene {
         welcome = false;
         const welcomeMessage = 'VELKOMMEN HJEM REKRUT! \n\nHER KAN DU SE DIN TIDSLINJE! \nTRYK PÅ IKONERNE, FOR AT FINDE UD AF HVAD DER SKABER PROBLEMER I TIDSLINJEN OG RET OP PÅ DEM, VED AT REJSE TILBAGE I TIDEN! \n\nHELD OG LYKKE!';
         this.typewriteText(welcomeMessage);
+    }
+    update() {
+        if (!isWriting) return;
+        const shouldPlay = (1 == (Math.floor(Math.random() * 5 )));
+        if (shouldPlay && isWriting && !computerWriteSound.isPlaying) computerWriteSound.play();
     }
 
     typewriteText(text) {
