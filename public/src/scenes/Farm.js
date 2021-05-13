@@ -449,10 +449,10 @@ function setupTilemap(scene, tilemap) {
     let borders = tilemap.createLayer('InvisibleBorders', [FARM_DECO2], 0, 0).setDepth(-3);
     let ground = tilemap.createLayer('Ground', [FARM_GROUND, FARM_DECO3], 0, 0).setDepth(-2);
     let wallTop = tilemap.createLayer('BorderTop', [FARM_DECO2], 0, 0).setDepth(-1);
-    let wallBot = tilemap.createLayer('BorderBot', [FARM_DECO2], 0, 0).setDepth(1);
+    let wallBot = tilemap.createLayer('BorderBot', [FARM_DECO2], 0, 0).setDepth(5);
     let exterior = tilemap.createLayer('Exterior', [FARM_BUILDING, FARM_DECO4, FARM_DECO2, FARM_DECO3], 0, 0);
     let exterior2 = tilemap.createLayer('Exterior2', [FARM_DECO], 0, 0);
-    let flavor = tilemap.createLayer('GroundFlavor', [FARM_DECO3], 0, 0).setDepth(1);
+    let flavor = tilemap.createLayer('GroundFlavor', [FARM_DECO3, FARM_DECO], 0, 0).setDepth(6);
     let interact = tilemap.createLayer('interactables', [FARM_BOOK, FARM_DECO2], 0, 0);
 
     // border collision 
