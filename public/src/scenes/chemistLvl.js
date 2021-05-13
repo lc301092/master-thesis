@@ -74,7 +74,7 @@ export class ChemistLevel extends Phaser.Scene {
     create() {
         scene = this;
         scene.sound.removeByKey('base');        
-        const backgroundMusic = scene.sound.play('kemi', {volume: 0.2});
+        const backgroundMusic = scene.sound.play('kemi', {volume: 0.2, loop: true});
         // tilemap configurations
 
         let chemist_lvl = this.add.tilemap('scenarie1');
