@@ -5,6 +5,7 @@ import { textBox } from "../game/ui.js";
 
 let playerSprite, playerData, scene;
 let playerInteractionCollider;
+let powerDiagram;
 
 let uiTextBox;
 const correctItems = [{
@@ -39,7 +40,7 @@ let tutorialAltKey;
 let tutorialText2;
 let tutorialContainer;
 
-let audio;
+let anchor;
 
 export class Base extends Phaser.Scene {
     constructor() {
@@ -67,24 +68,23 @@ export class Base extends Phaser.Scene {
 
     }
     preload() {
-        //audio = this.load.audio('wrong', ['/assets/audio/wrong.mp3']);
-
+        anchor = this.plugins.get('rexAnchor');
     }
 
     create() {
         scene = this;
         scene.sound.removeByKey('kemi');
         scene.sound.removeByKey('farm');
-        const backgroundMusic = scene.sound.add('base',{volume: 0.1, loop: true}).play();
-        
+        const backgroundMusic = scene.sound.add('base', { volume: 0.1, loop: true }).play();
+
         let dynmaicCollider = this.physics.add.group();
         let collideables = this.physics.add.staticGroup();
         dynmaicCollider.add(this.player.collider);
 
         let playerAnswers = playerData.answers;
         let currentProgression = playerData.playerProgression.length - 1;
-        
-        let tilemap; 
+
+        let tilemap;
 
 
         tilemap = this.add.tilemap('baseSceneTest');
@@ -124,14 +124,29 @@ export class Base extends Phaser.Scene {
         let mainCamera = scene.cameras.main;
         mainCamera.startFollow(playerSprite, true, 0.05, 0.05);
 
-        let bookSheldImg = scene.add.image(400,90,'bookshelf.png');
-        let bookShelf = scene.add.rectangle(bookSheldImg.x,bookSheldImg.y-15,bookSheldImg.width*2/3,bookSheldImg.height/3,
-           // 0xff0000,0.5
-            );
+        let bookSheldImg = scene.add.image(400, 90, 'bookshelf.png').setScale(0.8);
+        let bookShelfCollider = scene.add.rectangle(bookSheldImg.x, bookSheldImg.y - 15, bookSheldImg.width * 1.5 / 3, bookSheldImg.height / 3,
+            // 0xff0000,0.5
+        )
 
-        collideables.add(bookShelf);
+        if (playerAnswers.length == 0) powerDiagram = scene.add.image(0, 0, constants.IMAGES.POWERDISSIPATION_1);
+        else powerDiagram = scene.add.image(0, 0, constants.IMAGES.POWERDISSIPATION_2);
+        powerDiagram.setScale(0.5).setOrigin(0).setDepth(10).setScrollFactor(0).setVisible(false);
+
+        const anchorConfig = {
+            centerX: 'center',
+            centerY: 'center'
+        }
+        anchor.add(powerDiagram, anchorConfig);
+        let computerCollider = scene.add.rectangle(368, 265, 25, 12,
+            0xff0000, 0.5
+        ).setDepth(5);
+
+        collideables.add(bookShelfCollider);
+        collideables.add(computerCollider);
         scene.physics.add.collider(playerSprite, collideables);
-        scene.physics.add.overlap(playerInteractionCollider, bookShelf, bookShelfInteraction, null, this);
+        scene.physics.add.overlap(playerInteractionCollider, bookShelfCollider, bookShelfInteraction, null, this);
+        scene.physics.add.overlap(playerInteractionCollider, computerCollider, computerInteraction, null, this);
 
         uiTextBox = textBox.createTextBox(this);
 
@@ -148,10 +163,10 @@ export class Base extends Phaser.Scene {
             tutorialText2.setText('For at interagere \n med objekter');
             tutorialText2.y = 45;
         }
-
-        if(this.player.isInteracting()){
-           // this.sound.play('button_turn');
+        if (this.player.isPlayerMoving() && powerDiagram.visible) {
+            powerDiagram.setVisible(false);
         }
+
     }
 
 }
@@ -253,7 +268,7 @@ function setupTilemap(scene, baseSceneTest) {
             playerData.playerPosition.x = playerSprite.x;
             playerData.playerPosition.y = playerSprite.y;
             playerData.isTutorialComplete = true;
-            scene.sound.play('computer_on',{volume: 0.1});
+            scene.sound.play('computer_on', { volume: 0.1 });
             scene.scene.start(constants.SCENES.TIMELINE, playerData);
             // --- indstil tidsmaskine "scene" kode her ---
         };
@@ -294,7 +309,11 @@ function startTutorial() {
     }, 6000);
 }
 
-function bookShelfInteraction(){
-    if(scene.player.isInteracting())
-    textBox.writeUiText(scene,uiTextBox,'Bog#0 "Tidsrejser". \nDer står måske noget nyttigt her \n\n"Nedskrevet viden (runer, dokumenter, bøger, computere etc.) er den bedste måde at finde viden, om den tid man er i"', 50);
+function bookShelfInteraction() {
+    if (scene.player.isInteracting())
+        textBox.writeUiText(scene, uiTextBox, 'Bog#0 "Tidsrejser". \nDer står måske noget nyttigt her \n\n"Nedskrevet viden (runer, dokumenter, bøger, computere etc.) er den bedste måde at finde viden, om den tid man er i"', 50);
+}
+
+function computerInteraction() {
+    if (scene.player.isInteracting()) powerDiagram.setVisible(true);
 }

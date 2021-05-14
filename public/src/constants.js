@@ -37,8 +37,6 @@ export const constants = {
         WRONG: 'wrong.m4a'
     },
     IMAGES: {
-        BASE_MAP: 'map.png',
-        BASE_MAP2: 'map2.png',
         SKY: 'sky.png',
 		SCREEN: 'TimeScreen.png',
         EVENTPIC: 'eventSprite.png',
@@ -97,7 +95,10 @@ export const constants = {
         TUTORIAL_WASD: 'tutorial-WASD.png',
         TUTORIAL_E: 'tutorial-E.png',
         TUTORIAL_SPACE: 'tutorial-SPACE.png',
-        BOOKSHELF: 'bookshelf.png'
+        BOOKSHELF: 'bookshelf.png',
+        POWERDISSIPATION_1:'a-værdi-15.png',
+        POWERDISSIPATION_2:'a-værdi-9.png',
+        MENU_TITLE_WHITE: 'menu_title.png',
     },
     SPRITES: {
         PC: 'playable_charaters.png',

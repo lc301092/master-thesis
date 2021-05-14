@@ -125,8 +125,8 @@ function updateScreen(displayUnit) {
     if(!progress) return;
     const functionComponents = progress.function;
     let charOrNum = (displayUnit == 0) ? 'x' : displayUnit;
-    let xValue = '[color=#009900]' + charOrNum + '[/color]';
-    let aValue = functionComponents.a;
+    let xValue = '[color=#3cb03c]' + charOrNum + '[/color]';
+    let aValue = '[color=#8cd1ff]' + functionComponents.a + '[/color]';
     let bValue = functionComponents.b;
     let functionf = '[color=orange]f([/color]' + xValue + '[color=orange])[/color] = ' + aValue + '*' + xValue + ' + ' + bValue;
     displayFunction.setText(functionf);

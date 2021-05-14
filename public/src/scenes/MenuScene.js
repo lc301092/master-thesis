@@ -23,9 +23,10 @@ export class MenuScene extends Phaser.Scene {
         canvas.style.position = 'relative';
 
         let bg = this.add.image(0, 0, constants.IMAGES.SKY).setOrigin(0).setInteractive();
-
+        
         let width = this.cameras.main.width;
         let height = this.cameras.main.height;
+        let title = this.add.image(400,250,'menu_title.png'); //.setScale(0.5).setOrigin(0).setDepth(1);
         let loadingText = this.make.text({
             x: width / 2,
             y: height / 2 + 100,

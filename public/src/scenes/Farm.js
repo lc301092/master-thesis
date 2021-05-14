@@ -7,6 +7,8 @@ let playerData;
 let playerSprite;
 let playerInteractionCollider;
 
+const rule2 = 'Udregn middelværdien for jordtypernes fugtindhold og find ud af hvilke, der passer til planternes vandbehov';
+
 const tip3 = "Bog#3: \n\n..Observationer: Hyppigheden for hver observation er det antal gange observationen forekommer.";
 const tip4 = "Bog#4: \n\n..Middelværdi: Når man finder middelværdien af et datasæt, svarer det til at finde gennemsnittet at tallene.";
 const tip5 = "Bog#5:\n\n..Lineær funktion: Hvis man kun har en enkel x- og y-værdi, kan man til tider bruge x1 = 0 og y1 = 0, som koordinatsæt (0,0) til at udregne en lineær regression";
@@ -235,7 +237,7 @@ export class Farm extends Phaser.Scene {
                 action: () => {
                     if (!logUpdated2) {
                         uiPlayerLog.toggle();
-                        uiPlayerLog.setText('Udregn hvilken jord, der passer til plantens vandbehov');
+                        uiPlayerLog.setText(rule2);
                         logUpdated2 = true;
                         logUpdated1 = true;
                     }
@@ -258,7 +260,7 @@ export class Farm extends Phaser.Scene {
                 action: () => {
                     if (!logUpdated2) {
                         uiPlayerLog.toggle();
-                        uiPlayerLog.setText('Udregn hvilken jord, der passer til plantens vandbehov');
+                        uiPlayerLog.setText(rule2);
                         logUpdated2 = true;
                         logUpdated1 = true;
                     } objective.hasSeeds = true;
@@ -278,7 +280,7 @@ export class Farm extends Phaser.Scene {
                 action: () => {
                     if (!logUpdated2) {
                         uiPlayerLog.toggle();
-                        uiPlayerLog.setText('Udregn hvilken jord, der passer til plantens vandbehov');
+                        uiPlayerLog.setText(rule2);
                         logUpdated2 = true;
                         logUpdated1 = true;
                     } objective.hasSeeds = true;
@@ -530,7 +532,7 @@ const npcInteraction = () => {
                 if (!logUpdated3) {
                     uiPlayerLog.toggle();
                     logUpdated3 = true;
-                    uiPlayerLog.setText('Udregn funktionerne for planternes vækst og notér en passende højde til høst');
+                    uiPlayerLog.setText('Udregn funktionerne for planternes vækst og notér en passende højde til når de tidligst kan høstes');
                 }
                 break;
             case 4:
