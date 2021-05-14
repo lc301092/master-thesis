@@ -15,7 +15,7 @@ export class MenuScene extends Phaser.Scene {
     preload() {
     }
     create() {
-        const music = this.sound.add('menu').play({volume: 0.1});
+        const music = this.sound.add('menu').play({volume: 0.05, loop: true});
         let canvas = document.querySelector('canvas');
 
         console.log(canvas);

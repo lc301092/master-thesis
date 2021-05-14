@@ -35,7 +35,8 @@ export class IntroScene extends Phaser.Scene {
             fill: '#ff0000',
             stroke: '#8B0000',
             strokeThickness: 1,
-            backgroundColor: 'black'
+            backgroundColor: 'black',
+            padding: 10
         });
         state = 0;
 

@@ -130,7 +130,6 @@ export class Farm extends Phaser.Scene {
         );
         this.player = new Player(keys, playerInteractionCollider, playerSprite);
         playerSprite.setSize(25, 50).setOffset(12, 10);
-
     }
     preload() {
 
@@ -139,7 +138,7 @@ export class Farm extends Phaser.Scene {
     create() {
         scene = this;
         scene.sound.removeByKey('base');        
-        const backgroundMusic = scene.sound.play('farm', {volume: 0.2});
+        const backgroundMusic = scene.sound.play('farm', {volume: 0.1, loop: true});
         // add tileset image
         let tileImages = constants.TILEIMAGES.FARM_LVL;
         let images = constants.IMAGES;

@@ -12,6 +12,7 @@ let displayFunction;
 let compupterStyle = { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', color: 'black', fontSize: 24 };
 
 let textPlugin;
+let backBtn;
 
 let DragRotate;
 let audio;
@@ -63,7 +64,7 @@ export class TimeMachineScene extends Phaser.Scene {
         updateScreen(0);
 
 
-        const backBtn = this.add.text(50, 550, 'Tilbage', { fill: '#0f0' });
+        backBtn = this.add.text(50, 550, 'Tilbage', { fill: '#0f0' });
         backBtn.setInteractive({ useHandCursor: true });
         backBtn.on('pointerover', () => {
             backBtn.setStyle({ fontSize: '18px' });
@@ -103,7 +104,7 @@ function checkTimeSettings() {
     }
     // TODO make feedback (sound, red flash w/e.. ) for wrong answer here 
     scene.cameras.main.flash();
-    scene.sound.play('wrong');
+    scene.sound.play('wrong',{volume: 0.2});
 }
 
 
@@ -221,13 +222,14 @@ const getBtnxValue = (currentPos, isMovingWithClock) => {
 };
 
 function travelTo(level, data){
+    backBtn.setVisible(false);
     const activateSound = scene.sound.add('time_travel'); 
     const duration = (activateSound.totalDuration*2/3)*1000; 
     const camera = scene.cameras.main;
     camera.shake(duration,0.02);
     camera.fadeOut(duration, 0,0,70);
     console.log('playing sound');
-    activateSound.play();
+    activateSound.play({volume:0.1});
     activateSound.once('complete',() => {
         scene.scene.start(level,data);
     })

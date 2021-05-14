@@ -25,7 +25,7 @@ export const constants = {
         sprint: 'shift'
     },
     AUDIO: {
-        BUTTON_TURN: 'button_turn.wav',
+        BUTTON_TURN: 'button_turn.mp3',
         COMPUTER_WRITE: 'computer_write2.wav',
         COMPUTER_ON: 'computer_on.wav',
         TIME_TRAVEL: 'time_travel.mp3',
@@ -96,7 +96,8 @@ export const constants = {
         TUTORIAL_ARROWS: 'tutorial-ARROWS.png',
         TUTORIAL_WASD: 'tutorial-WASD.png',
         TUTORIAL_E: 'tutorial-E.png',
-        TUTORIAL_SPACE: 'tutorial-SPACE.png'
+        TUTORIAL_SPACE: 'tutorial-SPACE.png',
+        BOOKSHELF: 'bookshelf.png'
     },
     SPRITES: {
         PC: 'playable_charaters.png',
@@ -133,6 +134,8 @@ export const constants = {
     },
     TILEMAPS: {
         BASE_LVL: 'baseSceneTest',
+        BASE_LVL_DESTROYED: 'baseSceneTest_destroyed',
+        BASE_LVL_FIXED: 'baseSceneTest_fixed',
         CHEMIST_LVL: 'scenarie1',
         FARM_LVL: 'farm',
     },

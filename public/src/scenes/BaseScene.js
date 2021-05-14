@@ -14,7 +14,7 @@ const correctItems = [{
     message: () => {
         const player = scene.player;
         if (!player.isInteracting()) return;
-        textBox.writeUiText(scene, uiTextBox, 'Tiden før medicin må have været hård', 50);
+        textBox.writeUiText(scene, uiTextBox, 'Nu har jeg medicin, hvis nogen skulle blive syge', 50);
     },
     scale: 1
 
@@ -75,13 +75,46 @@ export class Base extends Phaser.Scene {
         scene = this;
         scene.sound.removeByKey('kemi');
         scene.sound.removeByKey('farm');
-        const backgroundMusic = scene.sound.add('base',{volume: 0.2}).play();
-        // tilemap configurations
+        const backgroundMusic = scene.sound.add('base',{volume: 0.1, loop: true}).play();
+        
+        let dynmaicCollider = this.physics.add.group();
+        let collideables = this.physics.add.staticGroup();
+        dynmaicCollider.add(this.player.collider);
 
-        let tilemap = this.add.tilemap('baseSceneTest');
-        //baseSceneTest.set
+        let playerAnswers = playerData.answers;
+        let currentProgression = playerData.playerProgression.length - 1;
+        
+        let tilemap; 
+
+
+        tilemap = this.add.tilemap('baseSceneTest');
+        if (playerAnswers.length > 0) {
+
+            console.log('answer is ' + playerAnswers[currentProgression].isCorrect);
+
+            for (let i = 0; i < playerAnswers.length; i++) {
+                console.log(i);
+                if (!playerAnswers[i].isCorrect) {
+                    tilemap = this.add.tilemap('baseSceneTest_destroyed');
+                    continue;
+                }
+                let x = correctItems[i].x;
+                let y = correctItems[i].y;
+                let name = correctItems[i].name;
+                let scale = correctItems[i].scale;
+                const action = correctItems[i].message;
+                let correctItem = scene.add.image(x, y, name).setScale(scale).setDepth(1);
+                let itemCollider = this.add.rectangle(x, y, correctItem.displayWidth / 2, correctItem.displayHeight,
+                    //   0xff0000, 0.5 // debugging purposes
+                );
+                correctItems[i].collider = itemCollider;
+                collideables.add(itemCollider);
+                scene.physics.add.overlap(playerInteractionCollider, itemCollider, action, null, this);
+                tilemap = this.add.tilemap('baseSceneTest_fixed');
+            }
+
+        }
         setupTilemap(scene, tilemap);
-        // add tileset image
 
         playerSprite.setSize(25, 50).setOffset(12, 10);
 
@@ -91,38 +124,15 @@ export class Base extends Phaser.Scene {
         let mainCamera = scene.cameras.main;
         mainCamera.startFollow(playerSprite, true, 0.05, 0.05);
 
-        // map collisions
+        let bookSheldImg = scene.add.image(400,90,'bookshelf.png');
+        let bookShelf = scene.add.rectangle(bookSheldImg.x,bookSheldImg.y-15,bookSheldImg.width*2/3,bookSheldImg.height/3,
+           // 0xff0000,0.5
+            );
 
-        let dynmaicCollider = this.physics.add.group();
-        let collideables = this.physics.add.staticGroup();
-        dynmaicCollider.add(this.player.collider);
-
-        let playerProgression = playerData.playerProgression.length - 1;
-        let playerAnswers = playerData.answers[playerProgression];
-
-        // add base rewards if correct
-        if (playerProgression >= 0 && playerAnswers) {
-            console.log(playerAnswers.isCorrect);
-            for (let i = 0; i <= playerProgression; i++) {
-                if (!playerAnswers.isCorrect) continue;
-
-                let x = correctItems[i].x;
-                let y = correctItems[i].y;
-                let name = correctItems[i].name;
-                let scale = correctItems[i].scale;
-                const action = correctItems[i].message;
-                let correctItem = scene.add.image(x, y, name).setScale(scale);
-                let itemCollider = this.add.rectangle(x, y, correctItem.displayWidth / 2, correctItem.displayHeight,
-                    //   0xff0000, 0.5 // debugging purposes
-                );
-                correctItems[i].collider = itemCollider;
-                collideables.add(itemCollider);
-                scene.physics.add.overlap(playerInteractionCollider, itemCollider, action, null, this);
-            }
-
-        }
-
+        collideables.add(bookShelf);
         scene.physics.add.collider(playerSprite, collideables);
+        scene.physics.add.overlap(playerInteractionCollider, bookShelf, bookShelfInteraction, null, this);
+
         uiTextBox = textBox.createTextBox(this);
 
         //        scene.physics.add.overlap(playerInteractionCollider, itemCollider, , null, this);
@@ -282,4 +292,9 @@ function startTutorial() {
     setTimeout(() => {
         tutorialContainer.setVisible(true);
     }, 6000);
+}
+
+function bookShelfInteraction(){
+    if(scene.player.isInteracting())
+    textBox.writeUiText(scene,uiTextBox,'Bog#0 "Tidsrejser". \nDer står måske noget nyttigt her \n\n"Nedskrevet viden (runer, dokumenter, bøger, computere etc.) er den bedste måde at finde viden, om den tid man er i"', 50);
 }
