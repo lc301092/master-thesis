@@ -6,7 +6,7 @@ router.post('/save-data', function (req, res) {
 	// 
 	let clientData = req.body;
 	let query = {playerId: clientData.playerId};
-	console.log('updating with' + playerId);
+	console.log('updating with' + query);
 	GameData.findOneAndUpdate(query, clientData, {upsert: true}, function(err, doc) {
 		if (err) {
 			console.log('got an error: ', error);

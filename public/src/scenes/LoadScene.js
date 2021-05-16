@@ -29,8 +29,8 @@ export class LoadScene extends Phaser.Scene {
     init() {
         let previousData = JSON.parse(localStorage.getItem(localStorageKey));
         if (previousData) {
-          // playerData = previousData;
-            localStorage.setItem(localStorageKey, JSON.stringify(playerData));
+          //playerData = previousData;
+          localStorage.setItem(localStorageKey, JSON.stringify(playerData));
         }
         else {
             // newgame
