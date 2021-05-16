@@ -2,6 +2,8 @@ import { constants } from "../constants.js"
 import Player from "../game/player.js"
 import PlayerLog from "../game/ui.js"
 import { textBox } from "../game/ui.js"
+import { postGameData } from '../http/post.js'
+
 
 const sceneID = constants.SCENES.CHEMIST;
 let anchor;
@@ -53,7 +55,7 @@ export class ChemistLevel extends Phaser.Scene {
     }
     init(data) {
         playerData = data;
-       // if (playerData.playerProgression.indexOf(sceneID) == -1) playerData.playerProgression.push(sceneID);
+        // if (playerData.playerProgression.indexOf(sceneID) == -1) playerData.playerProgression.push(sceneID);
         //sceneIndex = playerData.playerProgression.indexOf(sceneID);
         scenarioLog.level = sceneID;
         //TODO
@@ -73,8 +75,8 @@ export class ChemistLevel extends Phaser.Scene {
     }
     create() {
         scene = this;
-        scene.sound.removeByKey('base');        
-        const backgroundMusic = scene.sound.play('kemi', {volume: 0.2, loop: true});
+        scene.sound.removeByKey('base');
+        const backgroundMusic = scene.sound.play('kemi', { volume: 0.2, loop: true });
         // tilemap configurations
 
         let chemist_lvl = this.add.tilemap('scenarie1');
@@ -114,7 +116,7 @@ export class ChemistLevel extends Phaser.Scene {
         let portal = scene.physics.add.sprite(260, 190, 'portal').setScale(0.2);
         portal.anims.play('idle');
         let portalCollider = this.add.rectangle(portal.x, portal.y, 50, 70,
-           // 0xff0000, 0.5 // debugging purposes
+            // 0xff0000, 0.5 // debugging purposes
         );
         npc = scene.physics.add.sprite(550, 350, 'professor-npc', 9);
         newDialogue = scene.add.image(npc.x + 5, npc.y - 40, 'exclamation.png').setScale(0.1);
@@ -170,7 +172,7 @@ export class ChemistLevel extends Phaser.Scene {
         scene.physics.add.overlap(playerInteractionCollider, npcCollider, npcInteraction, null, this);
         scene.physics.add.collider(playerSprite, collideables);
 
-        scene.physics.add.overlap(playerInteractionCollider, portalCollider,portalInteraction , null, this);
+        scene.physics.add.overlap(playerInteractionCollider, portalCollider, portalInteraction, null, this);
         scene.physics.add.overlap(playerInteractionCollider, bookshelf, bookshelfInteraction1, null, this);
         scene.physics.add.overlap(playerInteractionCollider, bookshelf2, bookshelfInteraction2, null, this);
         scene.physics.add.overlap(playerInteractionCollider, sink, sinkInteraction, null, this);
@@ -304,7 +306,7 @@ function npcInteraction() {
         if (hasNewDialogue) newDialogue.setVisible(true);
         hasNewDialogue = false;
         let text = ['Jeg kan se, at du har behandlet hver  medicin. Tusind tak for din hjælp!', '', 'Du har stadigvæk mulighed for at ændre din beslutning, hvis du er kommet i tvivl.'];
-        textBox.writeUiText(scene,uiTextBox,text,50);
+        textBox.writeUiText(scene, uiTextBox, text, 50);
     }
 }
 
@@ -329,13 +331,16 @@ function checkIfDone() {
 function sinkInteraction() {
     const player = this.player;
     if (!player.isInteracting()) return;
-    //uiTextBox.setVisible(true);
+    const interaction = 'sink';
+    constants.addToInteractions(interaction, playerData);
     textBox.writeUiText(scene, uiTextBox, sinkString, 50);//alert(sinkString);
 }
 
 function dropInteraction() {
     const player = this.player;
     if (!player.isInteracting()) return;
+    const interaction = 'drop';
+    constants.addToInteractions(interaction, playerData);
     textBox.writeUiText(scene, uiTextBox, dropString, 50);//alert(sinkString);
 
 }
@@ -343,7 +348,8 @@ function dropInteraction() {
 function bookshelfInteraction1() {
     const player = this.player;
     if (!player.isInteracting()) return;
-
+    const interaction = 'bookshelf1';
+    constants.addToInteractions(interaction, playerData);
     textBox.writeUiText(scene, uiTextBox, tip1, 50);//alert(sinkString);
 
     // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
@@ -359,6 +365,8 @@ function bookshelfInteraction1() {
 function bookshelfInteraction2() {
     const player = this.player;
     if (!player.isInteracting()) return;
+    const interaction = 'bookshelf2';
+    constants.addToInteractions(interaction, playerData);
     // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
     textBox.writeUiText(scene, uiTextBox, tip2, 50);//alert(sinkString);
     /*
@@ -416,10 +424,13 @@ function portalInteraction() {
                 let isGoingBack = index == 0;
                 if (!isGoingBack) return;
                 let isCorrect = objective.medY.isApproved && !objective.medR.isApproved && !objective.medB.isApproved;
+                if (isCorrect == null) isCorrect = false;
                 objective.isCorrect = isCorrect;
 
                 // Save answers!
                 playerData.answers[sceneIndex] = objective;
+                playerData.timeToComplete1 = (Date.now()  - playerData.playerId)/1000/60;
+                postGameData(playerData);
                 localStorage.setItem('foobar', JSON.stringify(playerData));
                 console.log('Rejser tilbage');
                 scene.scene.start(constants.SCENES.PLAY, playerData);

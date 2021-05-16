@@ -1,6 +1,7 @@
 import { constants } from "../constants.js"
 import { timeMachine } from '../game/timeMachine'
 
+
 const YEAR_MAX = 2200;
 const YEAR_MIN = 1800;
 const AVAILABLE_YEARS = YEAR_MAX - YEAR_MIN;
@@ -9,12 +10,10 @@ const yearToScreenScale = 1.5;
 let storyProgression;
 let playerData;
 let currentYearPic;
-let secondEventPic;
-let eventText;
 let welcome = true;
 let isWriting;
 let textPlugin;
-
+let hasGameEnded;
 let computerWriteSound;
 
 
@@ -90,6 +89,7 @@ export class Timeline extends Phaser.Scene {
             alert('Demoen er nu slut. Mange tak fordi du ville spille med! Du kan lukke vinduet nu eller blive hængende og kigge rundt');
             return;
         }
+      
         const destinations = availableScenarios.destinations;
         // sometimes there is only one destination
         for (let i = 0; i < destinations.length; i++) {

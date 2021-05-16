@@ -1,6 +1,7 @@
 import { constants } from "../constants.js"
 const localStorageKey = 'foobar';
 let playerData = {
+    playerId: Date.now(),
     name: '',
     // array elements will keep track of player choices by using scene IDs
     // use the array.length to determine the progression
@@ -15,7 +16,8 @@ let playerData = {
     playerPosition: {
         x: 150,
         y: 150
-    }
+    },
+    interactions: []
 }
 
 export class LoadScene extends Phaser.Scene {
@@ -27,8 +29,7 @@ export class LoadScene extends Phaser.Scene {
     init() {
         let previousData = JSON.parse(localStorage.getItem(localStorageKey));
         if (previousData) {
-            // TODO IMPLEMENT LOAD PREVIOUS GAME
-            //playerData = previousData;
+          // playerData = previousData;
             localStorage.setItem(localStorageKey, JSON.stringify(playerData));
         }
         else {

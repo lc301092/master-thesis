@@ -3,11 +3,22 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const mongoose = require('mongoose');
+
+const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb+srv://admin:admin@cluster0.n4heo.mongodb.net/prototype-v4?retryWrites=true&w=majority";;
 
 var indexRouter = require('./routes/index');
 var gameRouter = require('./routes/game');
 //var bluetoothRouter = require('./routes/bluetooth-control');
-
+mongoose.connect(
+	uri,
+	{
+	  useNewUrlParser: true,
+	  useFindAndModify: false,
+	  useUnifiedTopology: true
+	}
+);
 var app = express();
 
 // view engine setup
@@ -21,10 +32,18 @@ app.use(express.urlencoded({
 }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+// app.use(bodyParser.json());
 
 app.use('/', indexRouter);
 app.use('/game', gameRouter);
 //app.use('/bluetooth', bluetoothRouter);
+
+// await mongoose.connect('mongodb://localhost/my_database', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   useFindAndModify: false,
+//   useCreateIndex: true
+// });
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

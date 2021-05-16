@@ -143,5 +143,11 @@ export const constants = {
     TEXT_STYLE: {
         NPC: {},
         COMPUTER: {}
+    },
+    addToInteractions: (value,playerData) => {
+        const property = playerData['interactions'];
+        const exists = property.indexOf(value) != -1; 
+        if(!exists) property.push(value);
+
     }
 }

@@ -15,6 +15,8 @@ const correctItems = [{
     message: () => {
         const player = scene.player;
         if (!player.isInteracting()) return;
+        const interaction = 'medicinGul';
+        constants.addToInteractions(interaction, playerData);
         textBox.writeUiText(scene, uiTextBox, 'Nu har jeg medicin, hvis nogen skulle blive syge', 50);
     },
     scale: 1
@@ -26,6 +28,8 @@ const correctItems = [{
     message: () => {
         const player = scene.player;
         if (!player.isInteracting()) return;
+        const interaction = 'kamilleurt';
+        constants.addToInteractions(interaction, playerData);
         textBox.writeUiText(scene, uiTextBox, 'Kamilleurten er igang med at spirre', 50);
     },
     scale: 0.12
@@ -124,8 +128,8 @@ export class Base extends Phaser.Scene {
         let mainCamera = scene.cameras.main;
         mainCamera.startFollow(playerSprite, true, 0.05, 0.05);
 
-        let bookSheldImg = scene.add.image(400, 90, 'bookshelf.png').setScale(0.8);
-        let bookShelfCollider = scene.add.rectangle(bookSheldImg.x, bookSheldImg.y - 15, bookSheldImg.width * 1.5 / 3, bookSheldImg.height / 3,
+        let bookShelfImg = scene.add.image(400, 100, 'bookshelf.png').setScale(0.8);
+        let bookShelfCollider = scene.add.rectangle(bookShelfImg.x, bookShelfImg.y - 15, bookShelfImg.width * 1.5 / 3, bookShelfImg.height / 3,
             // 0xff0000,0.5
         )
 
@@ -139,7 +143,7 @@ export class Base extends Phaser.Scene {
         }
         anchor.add(powerDiagram, anchorConfig);
         let computerCollider = scene.add.rectangle(368, 265, 25, 12,
-            0xff0000, 0.5
+            // 0xff0000, 0.5
         ).setDepth(5);
 
         collideables.add(bookShelfCollider);
@@ -310,10 +314,14 @@ function startTutorial() {
 }
 
 function bookShelfInteraction() {
-    if (scene.player.isInteracting())
-        textBox.writeUiText(scene, uiTextBox, 'Bog#0 "Tidsrejser". \nDer står måske noget nyttigt her \n\n"Nedskrevet viden (runer, dokumenter, bøger, computere etc.) er den bedste måde at finde viden, om den tid man er i"', 50);
+    if (!scene.player.isInteracting()) return;
+    textBox.writeUiText(scene, uiTextBox, 'Bog#0 "Tidsrejser". \nDer står måske noget nyttigt her \n\n"Nedskrevet viden (runer, dokumenter, bøger, computere etc.) er den bedste måde at finde viden, om den tid man er i"', 50);
+    const interaction = 'bookshelf0';
+    constants.addToInteractions(interaction, playerData);
 }
 
 function computerInteraction() {
     if (scene.player.isInteracting()) powerDiagram.setVisible(true);
+    const interaction = 'computerDiagram' + playerData.answers.length;
+    constants.addToInteractions(interaction, playerData);
 }

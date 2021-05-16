@@ -2,6 +2,8 @@ import { constants } from "../constants.js"
 import Player from "../game/player.js"
 import PlayerLog from "../game/ui.js"
 import { textBox } from "../game/ui.js"
+import { postGameData } from '../http/post.js'
+
 
 let playerData;
 let playerSprite;
@@ -139,13 +141,13 @@ export class Farm extends Phaser.Scene {
     }
     create() {
         scene = this;
-        scene.sound.removeByKey('base');        
-        const backgroundMusic = scene.sound.play('farm', {volume: 0.1, loop: true});
+        scene.sound.removeByKey('base');
+        const backgroundMusic = scene.sound.play('farm', { volume: 0.1, loop: true });
         // add tileset image
         let tileImages = constants.TILEIMAGES.FARM_LVL;
         let images = constants.IMAGES;
         let tileObj = {};
-// 
+        // 
         objective.fields[0].sign = scene.add.text(272, 527, '', signStyle).setDepth(6);
         objective.fields[1].sign = scene.add.text(512, 527, '', signStyle).setDepth(6);
         objective.fields[2].sign = scene.add.text(672, 527, '', signStyle).setDepth(6);
@@ -181,6 +183,8 @@ export class Farm extends Phaser.Scene {
                 action: () => {
 
                     const text = book['tip' + bookindex];
+                    const interaction = 'bookshelf'+bookindex;
+                    constants.addToInteractions(interaction, playerData);
                     textBox.writeUiText(scene, uiTextBox, text, 50);
                     bookindex++
                     if (bookindex > 5) bookindex = 3;
@@ -298,7 +302,8 @@ export class Farm extends Phaser.Scene {
                 ).setDepth(5),
                 action: () => {
                     const text = 'Det er da altid noget, at hun har haft succes med at så andre afgrøder.. heh';
-                    objective.hasSeeds = true;
+                    const interaction = 'grøntsagskasse';
+                    constants.addToInteractions(interaction, playerData);
                     textBox.writeUiText(scene, uiTextBox, text, 50);
                 }
             },
@@ -308,6 +313,8 @@ export class Farm extends Phaser.Scene {
                 ).setDepth(5),
                 action: () => {
                     const text = 'Jeg var ikke klar over at man havde brug for en økse, for at arbejde med planter... Hun har nok brug for lidt hjælp..';
+                    const interaction = 'økse';
+                    constants.addToInteractions(interaction, playerData);
                     textBox.writeUiText(scene, uiTextBox, text, 50);
                 }
             },
@@ -327,7 +334,7 @@ export class Farm extends Phaser.Scene {
                     // 0xff0000, 0.5 // debugging purposes
                 ),
                 action: () => {
-                    const text = 'Det her er altså bare et lille bitte træ, hvad havde du regnet med?';
+                    const text = 'Det her er altså bare et lille bitte træ, her finder du ikke noget :)';
                     textBox.writeUiText(scene, uiTextBox, text, 50);
                 }
             },
@@ -475,6 +482,8 @@ const portalInteraction = () => {
                 let isCorrect1 = objectives[0].type == 'nelliker' && objectives[1].type == 'kamille' && objectives[2].type == 'lægeærenpris';
                 let isCorrect2 = objectives[0].daysToHarvest > 44 < 47 && objectives[1].daysToHarvest > 26 < 29 && objectives[2].daysToHarvest > 11 < 14;
                 objective.isCorrect = isCorrect1 && isCorrect2;
+                if(objective.isCorrect == null) objective.isCorrect = false;
+                objective.isComplete = true;
 
                 console.log(isCorrect1);
                 console.log(isCorrect2);
@@ -483,6 +492,9 @@ const portalInteraction = () => {
 
                 // Save answers!
                 playerData.answers[sceneIndex] = objective;
+                playerData.shouldLookUp = true;
+                playerData.timeToComplete2 = (Date.now()  - playerData.playerId)/1000/60;
+                postGameData(playerData);
                 localStorage.setItem('foobar', JSON.stringify(playerData));
                 // console.log('Rejser tilbage');
                 scene.scene.start(constants.SCENES.PLAY, playerData);
@@ -506,7 +518,7 @@ const npcInteraction = () => {
         ['Jeg forstår det bare ikke!', 'Uanset hvad vi gør, kan vi ikke få planterne til at gro ordenligt.', 'Der kan sagtens gro kartofler i den mørke muldjord her, men de her planter er umulige! U-m-u-l-i-g-e siger jeg dig', 'Hvis du kan fikse problemerne er du mere end velkommen til at tage for dig i de grå kasser dernede', 'Frøene du skal så er nelliker, lægeærenpris og kamille'],
         ['Jeg har tre typer jord, men det er ikke alle frø, der kan gro i de forskellige typer jord... Men! Du kan finde informationer på frøene ved de grå kasser dernede, og jeg har udført nogle jordmålinger, der ligger henne ved hver plantage'],
         ['Planter skal bruges til at producere medicin, som skal bruges hurtigst muligt, så det kan redde en masse menneskeliv'],
-        ['Hey det der ser ikke helt dumt ud. ','' ,'','Kan du gøre mig en sidste tjeneste? Ser du, ved frøene står der hvornår de normalt høstes, men vi har altså lidt travlt her, så de skal altså bare høstes, når de får en tilpas nok højde. Når du har udregnet en plantes højde, så skriv det på skiltene foran jorden, hvor du har sået den'],
+        ['Hey det der ser ikke helt dumt ud. ', '', '', 'Kan du gøre mig en sidste tjeneste? Ser du, ved frøene står der hvornår de normalt høstes, men vi har altså lidt travlt her, så de skal altså bare høstes, når de får en tilpas nok højde. Når du har udregnet en plantes højde, så skriv det på skiltene foran jorden, hvor du har sået den'],
         ['Så er der ikke andet end at vente og måle hver dag. Tusind tak for hjælpen! Imens du fiksede planternes optimale høsthøjde fik jeg lige færdigskrevet noget om de forskellige jordtypers porøsitet.'],
         ['...']
     ]
@@ -516,7 +528,7 @@ const npcInteraction = () => {
             // npc is only ever 0 the first time the player speaks to them.
             case 0:
                 npcState++;
-                if(logUpdated1) return;
+                if (logUpdated1) return;
                 uiPlayerLog.toggle();
                 uiPlayerLog.setText('Du skal så: nelliker, ærenpris og kamille');
                 logUpdated1 = true;
@@ -674,7 +686,7 @@ function writeOnSign(signIndex) {
     } else {
         const text = ['', 'Kan høstes, når den er:     cm høj'];
         textBox.createInputField(scene, function (signNumber) {
-            if(signNumber.trim() == '') return;
+            if (signNumber.trim() == '') return;
             const field = signsObjective[signIndex];
             const canvas = document.querySelector('canvas');
 
