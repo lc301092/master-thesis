@@ -11,7 +11,7 @@ import InputTextPlugin from '../node_modules/phaser3-rex-plugins/plugins/inputte
 import { LoadScene } from './scenes/LoadScene.js';
 import { MenuScene } from './scenes/MenuScene.js';
 import { Base } from './scenes/BaseScene.js';
-import { ChemistLevel } from './scenes/chemistLvl.js';
+import { ChemistLevel } from './scenes/ChemistLvl.js';
 import { Timeline } from './scenes/TimelineScene.js';
 import { TimeMachineScene } from './scenes/TimeMachineScene.js';
 import { IntroScene } from './scenes/IntroScene.js';

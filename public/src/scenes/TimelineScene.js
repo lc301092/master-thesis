@@ -17,8 +17,6 @@ let hasGameEnded;
 let computerWriteSound;
 
 
-
-
 export class Timeline extends Phaser.Scene {
     constructor() {
         super({
@@ -64,7 +62,6 @@ export class Timeline extends Phaser.Scene {
         btn.on('pointerdown', () => {
             scene.scene.start(constants.SCENES.PLAY, playerData);
         });
-
 
         // Ikon der viser dit nuværende år
         currentYearPic = this.add.image(700, 230, constants.IMAGES.CURRENTYEAR).setScale(0.35);
@@ -134,11 +131,11 @@ export class Timeline extends Phaser.Scene {
                 });
             if (isCorrect) {
                 questLabel.setText(`[b][area=correct][color=lightgreen]${questGraphic}[/color][/stroke][/area][/b]`);
-                questText = 'Der er ikke forstyrrelser med tidslinjen i denne periode';
+                questText = 'Der er ikke længere forstyrrelser med tidslinjen fra år '+lastDestYear;
             }
             else {
                 questLabel.setText(`[b][stroke=black][area=incorrect][color=red]${questGraphic}[/color][/stroke][/area][/b]`);
-                questText = 'Der er stadig problemer i denne periode';
+                questText = 'Der er stadig problemer i ' + lastDestYear;
             }
         }
 

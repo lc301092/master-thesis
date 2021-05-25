@@ -1,15 +1,17 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const GameData = require('../model/GameData');
 
-/* GET users listing. */
-router.post('/save-data', function (req, res) {
-	// 
+router.post('/save-data', function (req, res) { 
 	let clientData = req.body;
+	if(!clientData.playerId) return res.send(400);
 	let query = {playerId: clientData.playerId};
 	GameData.findOneAndUpdate(query, clientData, {upsert: true}, function(err, doc) {
-		if (err) return res.send(500, {error: err});
-		return res.send('Succesfully saved.');
+		if (err) {
+			console.log('got an error: ', error);
+			return res.send(500, {error: err});
+		}
+		return res.send('Successfully saved.');
 	});
 });
 

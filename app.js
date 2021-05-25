@@ -4,8 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mongoose = require('mongoose');
-
-const MongoClient = require('mongodb').MongoClient;
 const uri = "mongodb+srv://admin:admin@cluster0.n4heo.mongodb.net/prototype-v4?retryWrites=true&w=majority";;
 
 var indexRouter = require('./routes/index');

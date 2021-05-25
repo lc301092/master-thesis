@@ -100,6 +100,7 @@ function checkTimeSettings() {
         playerData.activeScene = destination.sceneID;
         localStorage.setItem('foobar', JSON.stringify(playerData));
         travelTo(sceneID,playerData);
+        redButtonCircle.removeInteractive();
         return;
     }
     // TODO make feedback (sound, red flash w/e.. ) for wrong answer here 
