@@ -480,7 +480,7 @@ const portalInteraction = () => {
                 // TODO check wether objective is correct or not.
                 const objectives = objective.fields;
                 let isCorrect1 = objectives[0].type == 'nelliker' && objectives[1].type == 'kamille' && objectives[2].type == 'lægeærenpris';
-                let isCorrect2 = objectives[0].daysToHarvest > 44 < 47 && objectives[1].daysToHarvest > 26 < 29 && objectives[2].daysToHarvest > 11 < 14;
+                let isCorrect2 = objectives[0].daysToHarvest > 44 && objectives[0].daysToHarvest < 47 && objectives[1].daysToHarvest > 26 && objectives[1].daysToHarvest < 29 && objectives[2].daysToHarvest > 11 && objectives[2].daysToHarvest < 14;
                 objective.isCorrect = isCorrect1 && isCorrect2;
                 if(objective.isCorrect == null) objective.isCorrect = false;
                 objective.isComplete = true;
