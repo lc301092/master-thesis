@@ -49,7 +49,6 @@ export class LoadScene extends Phaser.Scene {
             case 'image':
                 for (const key in constants.IMAGES) {
                     let imageString = constants.IMAGES[key];
-                    //console.log(imageString);
                     // check if normal image or tileImage
                     if (imageString.split('.png').length > 1) {
                         // normal image

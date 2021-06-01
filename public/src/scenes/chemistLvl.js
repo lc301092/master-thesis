@@ -55,12 +55,8 @@ export class ChemistLevel extends Phaser.Scene {
     }
     init(data) {
         playerData = data;
-        // if (playerData.playerProgression.indexOf(sceneID) == -1) playerData.playerProgression.push(sceneID);
-        //sceneIndex = playerData.playerProgression.indexOf(sceneID);
+
         scenarioLog.level = sceneID;
-        //TODO
-        // updatePlayerlog()
-        // playerData.playerLog.push({level: ""})
 
         playerSprite = this.physics.add.sprite(265, 250, 'player', 4).setCollideWorldBounds(true).setDepth(1); //.setScale(2);
         let keys = this.input.keyboard.addKeys(constants.USERINPUT);
@@ -369,15 +365,7 @@ function bookshelfInteraction2() {
     constants.addToInteractions(interaction, playerData);
     // const tip = 'Medianen i en sumkurve læses ud fra 50% markøren på Y aksen.';
     textBox.writeUiText(scene, uiTextBox, tip2, 50);//alert(sinkString);
-    /*
-    alert(`Du kigger i en bog. Du lægger mærke til følgende:\n "...${tip2}"`);
-    if (scenarioLog.tips.indexOf(tip2) == -1) {
-        scenarioLog.tips.push(tip2);
-        
-        // remove when scenario log is implemented
-        // uiPlayerLog.setText('Tip: ' + tip2);
-    }
-    */
+ 
 };
 
 function acceptMedicin(index) {
